@@ -1,0 +1,496 @@
+/*Element styles*/
+
+ul
+{
+	overflow:hidden;
+}
+
+td.reset
+{
+	border:1px black solid;
+}
+
+
+body
+{
+	font-family:Verdana,sans-serif;
+	font-size:10pt;
+	background-color:#eeeeff;
+	color:black;
+	height:100%;
+}
+
+dt
+{
+	font-weight:bold;
+}
+
+a
+{
+	font-weight:bold;
+	text-decoration:none;
+}
+
+a img /*no borders around link images*/
+{
+	border-style:none;
+}
+
+a:link{ color: #000080;}
+a:visited{color: #8000FF;}
+a:hover{	color: #0000FF;}
+
+h1
+{
+	text-align:center;
+}
+
+td
+{
+	border:1px black solid;
+	padding:2px;
+}
+
+table
+{
+	border-collapse:collapse;
+}
+
+textarea
+{
+	font-family:Verdana,sans-serif;
+	font-size:10pt;
+}
+
+/*math*/
+
+table.math
+{
+	border-collapse:collapse;
+}
+table.math td
+{
+	text-align:center;
+	vertical-align:middle;
+	border:none;
+	padding:2;
+}
+.large
+{
+	font-size:2em;
+}
+.parleftborder
+{
+	border-left: 1px solid black;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+.parrightborder
+{
+	border-right: 1px solid black;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+			
+
+/*Global classes*/
+/*
+note:
+.borderless
+.centermargined
+*/
+
+.error
+{
+	background-color:#ff8080;
+}
+
+.indented
+{
+	margin-left: 20pt;
+}
+
+.success
+{
+	background-color:#80ff80;
+}
+
+.information
+{
+	background-color:#8080ff;
+}
+
+.spaced
+{
+	margin-top:10pt;
+	margin-bottom:10pt;
+}
+
+.superempire
+{
+	color:blue;
+	font-size:20pt;
+}
+
+.thickframe
+{
+	border: 2px solid;
+}
+
+.rip
+{
+	background-color:black;
+	color:white;
+	font-style:italic;
+}
+
+.enemyvillage
+{
+	border: 1px red solid;
+}
+
+.ownedvillage
+{
+	border: 1px lime solid;
+}
+
+
+.positive
+{
+	color:green;
+}
+
+.negative
+{
+	color:red;
+}
+
+.underlined
+{
+	text-decoration:underline;
+}
+
+.alert
+{
+	color:red;
+	font-weight:bold;
+}
+
+.center
+{
+	text-align:center;
+}
+.right
+{
+	text-align:right;
+}
+.left
+{
+	text-align:left;
+}
+/*A*/
+
+a.filllink
+{
+	display:block;
+	width:100%;
+	height:100%;
+}
+
+/*DFN*/
+
+dfn[title]
+{
+	cursor:help;
+}
+
+/*DIVS*/
+
+div.bbbox
+{
+	margin: 5px 20px 5px 20px;
+	border: 1px solid black;
+	text-align: left;
+}
+
+div.thumbdiv
+{
+	width:auto;
+	height:auto;
+	border:1px solid black;
+	margin:5px 5px 5px 5px;
+	float:left;
+}
+
+div.standardbox
+{
+	border: 1px black solid;
+	margin-left:auto;
+	margin-right:auto;
+	width:640px;
+	height:auto;
+	overflow:auto;
+}
+
+div.helpdiv
+{
+	margin-left:20px;
+	display:none;
+}
+
+div.leftsidebar
+{
+	float: left;
+	width: 100px;
+	height: auto;
+	min-height:600px;
+	border: 1px black dashed;
+}
+
+div.rightsidebar
+{
+	float: right;
+	width: 100px;
+	height: auto;
+	min-height:600px;
+	border: 1px black dashed;
+}
+
+div.gdbasestyle
+{
+/*	background-color:#8A8;
+	border-top:4px solid #CDC;
+	border-left:4px solid #CDC;
+	border-bottom:4px solid #454;
+	border-right:4px solid #454;*/
+	
+	background-color:#8090A0;
+	border-top:4px solid #C0C8D0;
+	border-left:4px solid #C0C8D0;
+	border-bottom:4px solid #404850;
+	border-right:4px solid #404850;
+}
+
+div.gamediv
+{
+	height:auto;
+	width:auto;
+	max-height:50%;
+	max-width:50%;
+	z-index:10;
+	padding:10px 10px 10px 10px; 
+	overflow:auto;
+}
+
+div.topleft
+{
+	position:absolute;
+	left:0;
+	top:0;
+}
+
+div.bottomright
+{
+	position:absolute;
+	right:0;
+	bottom:0;
+}
+
+div.bottomleft
+{
+	position:absolute;
+	left:0;
+	bottom:0;
+}
+
+div.topright
+{
+	position:absolute;
+	right:0;
+	top:0;
+}
+
+div.leftbox
+{
+	border: 1px black dashed;
+	float: left;
+	overflow:auto;
+}
+
+div.centerbox
+{
+	border: 1px black dashed;
+	margin-left:auto;
+	margin-right:auto;
+	overflow:auto;
+}
+
+div.rightbox
+{
+	border: 1px black dashed;
+	float: right;
+	overflow:auto;
+}
+
+div.mapdiv
+{
+	margin-left:auto;
+	margin-right: auto;
+	border: 1px solid blue;
+	width:801px;
+	height:801px;
+	background-color:black;
+	position: relative;
+	left:0px;
+	top:0px;
+}
+
+/*IMG*/
+img.image16
+{
+	width:16px;
+	height:16px;
+}
+
+img.image32
+{
+	width:32px;
+	height:32px;
+}
+
+/*INPUT*/
+
+input.coordinate,input.battlesim
+{
+	width:40px;
+}
+
+input.small
+{
+	width:40px;
+}
+
+input[type='text'],input[type='password']
+{
+	background-color:transparent;
+	background-color:white;
+	background-color:rgba(255,255,255,0.3);
+}
+
+/*Tables */
+
+table.villagestats
+{
+/*	float:left;*/
+	margin:5px 5px 5px 5px;
+}
+
+table.borderlesscells td, .borderless
+{
+	border-style:none;
+}
+
+table.canvascontainer, div.canvascontainer, canvas.canvascontainer
+{
+	width:100%;
+	height:100%;
+	position:absolute;
+	left:0;
+	top:0;
+}
+
+table.canvascontainerrelative
+{
+	width:100%;
+	height:100%;
+}
+
+table.center, .centermargined
+{
+	margin-left:auto;
+	margin-right:auto;
+}
+
+table.maptable
+{
+	border-collapse:collapse;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+table.battlesim,table.attack
+{
+	margin-left:auto;
+	margin-right:auto;
+}
+
+td.mapfield
+{
+	width:40px;
+	height:40px;
+	vertical-align:middle;
+	text-align:center;
+	font-size:12pt;
+	border:none;
+}
+
+td.battlesim
+{
+	width:40px;
+	height:40px;
+}
+
+
+td.villagecount
+{
+	width:40px;
+}
+
+td.corner
+{
+	padding:0;
+	margin:0;
+	width:10px;
+	min-width:10px;
+	max-width:10px;
+	height:10px;
+	min-height:10px;
+	max-height:10px;
+	border:none;
+}
+
+td.topbottom
+{
+	padding:0;
+	margin:0;
+	height:10px;
+	min-height:10px;
+	max-height:10px;
+	border:none;
+}
+
+td.leftright
+{
+	padding:0;
+	margin:0;
+	width:10px;
+	min-width:10px;
+	max-width:10px;
+	border:none;
+}
+
+
+/*TD*/
+
+td.canvascontainer
+{
+	text-align:center;
+	vertical-align:middle;
+	width:100%;
+	height:100%;
+	position: relative;
+	left:0;
+	top:0;
+}
+
+
