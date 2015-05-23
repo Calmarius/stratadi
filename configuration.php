@@ -107,7 +107,7 @@ $config=array
 	'facebookImageLink' => 'http://calmarius.net/stratadi/xhu1/img/town7.png', // Image to be shown on Facebook
 	'forceUpdatePeriod'=>'3600',				// For performance reasons. When a player gets massive amount of attacks we don't update the player every time. The interval here describes the minimal amount of time (in seconds) that must be elapsed before the next update.
 	'forumLink' => 'http://calmarius.net/forum', // Link to a forum, you may put it into the main page.
-	'gameStarted'=>'2013-02-04 22:00:00',
+	'gameStarted'=>'2015-05-24 0:00:00',
 	'goldProducer'=>'goldmine',
 	'guildPermissions'=>array  // permission types in a guild
 	(
@@ -297,7 +297,8 @@ $config=array
 			'langName'=>'outgoingmove'
 		)
 	),
-	'serverSpeed'=>5,					// server speed
+	'serverLanguage'=>'hu',         // Server's language.
+	'serverSpeed'=>1,					// server speed
 	'settlerUnit'=>'_4diplomat',				// unit you can settle width
 	'startGold'=>'500',					// start amount of gold
 	'superiorityExponent'=>'1.5',			// superiority exponent
