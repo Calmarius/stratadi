@@ -5,3 +5,6 @@ inbuiltpie.png
 nowstamp.ts
 *.htm
 statimage.png
+export/*
+lockfile
+php_errors.log
