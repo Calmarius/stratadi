@@ -242,7 +242,7 @@ X
 				<a href="${config['imageRoot']}/night.png"><img src="${config['imageRoot']}/thumb_night.png" alt="Evening came" title="Evening came"></a><br>Evening came
 			</div>
 			<div class="thumbdiv">
-				<a href="languages/hu/newgraphics.png"><img src="${config['imageRoot']}/thumb_newgraphics.png" alt="New graphics" title="New graphics"></a><br>New graphics
+				<a href="${config['imageRoot']}/newgraphics.png"><img src="${config['imageRoot']}/thumb_newgraphics.png" alt="New graphics" title="New graphics"></a><br>New graphics
 			</div>
 			<div style="clear:both"></div>
 		</div>
