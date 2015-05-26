@@ -26,6 +26,8 @@ foreach($config['worldEvents'] as $key=>$value)
 include("classes.js.php");
 
 ?>
+var isTouchDevice = false;
+
 
 if (!UPDATEREGIONSIZE)
 {
@@ -2718,6 +2720,7 @@ function bringElementToFront(elm)
 	befFrontElement=elm;
 }
 
+
 mapElm.onclick=function(e)
 {
 	var ev=e || window.event;
@@ -2725,11 +2728,20 @@ mapElm.onclick=function(e)
 }
 
 
+
 var mDown;	
 
 
+mapElm.onmousedown=function(e)
+{
+    if (isTouchDevice) return;
+	var ev=e || window.event;
+	mouseMode.onmousedown(ev);
+    ev.preventDefault();
+	mDown=true;
+}
 
-mapElm.onmousedown=mapElm.ontouchstart=function(e)
+mapElm.ontouchstart=function(e)
 {
 	var ev=e || window.event;
 	mouseMode.onmousedown(ev);
@@ -2737,13 +2749,22 @@ mapElm.onmousedown=mapElm.ontouchstart=function(e)
 	mDown=true;
 }
 
-mapElm.onmouseup=mapElm.onmouseout=mapElm.ontouchend=mapElm.ontouchleave=function(e)
+mapElm.onmouseup=mapElm.onmouseout=function(e)
 {
+    if (isTouchDevice) return;
 	var ev=e || window.event;
 	mouseMode.onmouseup(ev);
     ev.preventDefault();
 	mDown=false;
-//	alert('released');
+}
+
+mapElm.ontouchend=mapElm.ontouchleave=function(e)
+{
+    isTouchDevice = true;
+	var ev=e || window.event;
+	mouseMode.onmouseup(ev);
+    ev.preventDefault();
+	mDown=false;
 }
 
 var updateOnMouseMove=false;
@@ -2764,6 +2785,7 @@ document.addEventListener('mousemove',function(e)
 
 mapElm.onmousemove=function(e)
 {
+    if (isTouchDevice) return;
 	var ev=e || window.event;
 	ev.preventDefault();
 	var mc=mouseCoords(ev);
@@ -2778,6 +2800,7 @@ mapElm.onmousemove=function(e)
 
 mapElm.ontouchmove=function(e)
 {
+    isTouchDevice = true;
 	var ev=e || window.event;
 	ev.preventDefault();
 	var mc=mouseCoords(ev);
