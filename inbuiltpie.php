@@ -43,6 +43,7 @@ function getInbuiltPie()
 	define('ROW_SIZE',20);
 	define('PIE_DIAMETER',200);
 	define('PIE_CENTER',PIE_DIAMETER*0.5+PADDING);
+	$fontPath = realpath('Verdana.ttf');
 
 	$colors=
 	array
@@ -98,7 +99,7 @@ function getInbuiltPie()
 		$percents[$i]=$percent;
 		$psum+=$percent;
 		$strings[$i]=($datarow['guildName']===null ? $serverLanguage['outsideguild']:$datarow['guildName']).' '.round($percent*100,2).'% ('.$builtLevels.')';
-		$bbox=imagettfbbox(10,0,'Verdana.ttf',$strings[$i]);
+		$bbox=imagettfbbox(10,0,$fontPath,$strings[$i]);
 		$width=$bbox[2]-$bbox[0];
 		if ($maxWidth<$width) $maxWidth=$width;
 	}
@@ -124,11 +125,10 @@ function getInbuiltPie()
 		if ($size>=1)
 			imagefilledarc($img,$imageWidth*0.5,PIE_CENTER,PIE_DIAMETER,PIE_DIAMETER,$angle,$angle+$size,$color,IMG_ARC_PIE);
 		$angle+=$size;
-		imagettftext($img,10,0,PADDING,2*PADDING+PIE_DIAMETER+$i*ROW_SIZE,$color,'Verdana.ttf',$strings[$i]);
+		if (imagettftext($img,10,0,PADDING,2*PADDING+PIE_DIAMETER+$i*ROW_SIZE,$color, $fontPath ,$strings[$i]) === FALSE) die('Failed to draw text.');
 	}
 	imagesavealpha($img,true);
 	return $img;
 }
-
 
 ?>
