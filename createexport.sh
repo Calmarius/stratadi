@@ -6,4 +6,5 @@ git archive master | tar -x -C export/
 rm export/configuration.php
 rm export/shadow.php
 rm export/createexport.sh
+rm export/.gitignore
 
