@@ -1224,14 +1224,22 @@ function makeUndraggable(elm)
 
 function makeDraggable(elm)
 {
-	elm.onmousedown=function(e)
+    function mousedownDragHandler(e)
 	{
 		var ev=e || window.event;
 		ev.cancelBubble=true;
 		if (ev.stopPropagation()) ev.stopPropagation();
 		this.grabbed=true;
 	};
-	elm.onmouseout=function(e)
+    
+    function mouseUpOutCommon()
+    {
+        this.grabbed = false;
+        this.mouX = null;
+        this.mouY = null;
+    }
+    
+    function mouseoutDragHandler(e)
 	{
 		var ev=e || window.event;
 		var rtg=(e.relatedTarget) ? e.relatedTarget : e.toElement;
@@ -1240,20 +1248,16 @@ function makeDraggable(elm)
 			if (rtg==this) return;
 			rtg=rtg.parentNode;
 		}
-		return elm.onmouseup(e);
+        this.mouseUpOutCommon();
 	}
-	elm.onclick=function(e)
+    
+    function mouseupDragHandler(e)
 	{
-		bringElementToFront(this);
-	}
-	elm.onmouseup=function(e)
-	{
-		var ev=e || window.event;
-		this.grabbed=false;
-		this.mouX=null;
-		this.mouY=null;
+        this.mouseUpOutCommon();
+        bringElementToFront(this);
 	};
-	elm.onmousemove=function(e)
+    
+    function mousemoveDragHandler(e)
 	{
 		var ev=e || window.event;
 		ev.cancelBubble=true;
@@ -1270,11 +1274,27 @@ function makeDraggable(elm)
 		this.mouX=mc.x;
 		this.mouY=mc.y;
 	};
-	elm.onscroll=function()
+    
+    function scrollDragHandler(e)
 	{
 		if (this.grabbed) this.grabbed=false;
-//		makeUndraggable(elm);
 	};
+    
+    elm.mouseUpOutCommon = mouseUpOutCommon;
+
+	elm.onmousedown=mousedownDragHandler;
+    elm.addEventListener('touchstart', mousedownDragHandler, false);
+    
+	elm.onmouseout=mouseoutDragHandler;
+    elm.addEventListener('touchleave', mouseoutDragHandler, false);
+    
+	elm.onmouseup=mouseupDragHandler;
+    elm.addEventListener('touchend', mouseupDragHandler, false);
+    
+	elm.onmousemove=mousemoveDragHandler;
+    elm.addEventListener('touchmove', mousemoveDragHandler, false);
+    
+	elm.addEventListener('scroll', scrollDragHandler, true);
 }
 
 function genFloatingBox(iHTML,id,xPos,yPos)
@@ -2620,6 +2640,11 @@ function mouseCoords(ev)
         x = ev.touches[0].pageX;
         y = ev.touches[0].pageY;
     }
+    else if (ev.changedTouches && ev.changedTouches[0])
+    {
+        x = ev.changedTouches[0].pageX;
+        y = ev.changedTouches[0].pageY;
+    }
 	else if (ev.pageX || ev.pageY)
 	{ 
 		x=ev.pageX;
@@ -2720,52 +2745,86 @@ function bringElementToFront(elm)
 	befFrontElement=elm;
 }
 
-
+/*
 mapElm.onclick=function(e)
 {
 	var ev=e || window.event;
 	mouseMode.onclick(ev);
 }
-
+*/
 
 
 var mDown;	
+
+function updateMousePos(ev)
+{
+    var mc = mouseCoords(ev);
+   	mouseX=mc.x;
+	mouseY=mc.y;
+}
+
+function mouseupEvHandler(e)
+{
+	var ev=e || window.event;
+    updateMousePos(ev);
+	mouseMode.onmouseup(ev);
+	mouseMode.onclick(ev);
+    ev.preventDefault();
+	mDown=false;
+}
+
+function mousedownEvHandler(e)
+{
+	var ev=e || window.event;
+	mouseMode.onmousedown(ev);
+    ev.preventDefault();
+	mDown=true;
+}
+
+function mouseleaveEvHandler(e)
+{
+	var ev=e || window.event;
+	mouseMode.onmouseup(ev);
+    ev.preventDefault();
+	mDown=false;
+}
 
 
 mapElm.onmousedown=function(e)
 {
     if (isTouchDevice) return;
-	var ev=e || window.event;
-	mouseMode.onmousedown(ev);
-    ev.preventDefault();
-	mDown=true;
+    mousedownEvHandler(e);
 }
 
-mapElm.ontouchstart=function(e)
+mapElm.addEventListener('touchstart',function(e)
 {
 	var ev=e || window.event;
-	mouseMode.onmousedown(ev);
-    ev.preventDefault();
-	mDown=true;
-}
+    mousedownEvHandler(e);
+}, false);
 
-mapElm.onmouseup=mapElm.onmouseout=function(e)
+mapElm.onmouseup=function(e)
 {
     if (isTouchDevice) return;
-	var ev=e || window.event;
-	mouseMode.onmouseup(ev);
-    ev.preventDefault();
-	mDown=false;
+    mouseupEvHandler(e);
 }
 
-mapElm.ontouchend=mapElm.ontouchleave=function(e)
+mapElm.onmouseout=function(e)
+{
+    if (isTouchDevice) return;
+    mouseleaveEvHandler(e);
+}
+
+mapElm.addEventListener('touchend',function(e)
 {
     isTouchDevice = true;
-	var ev=e || window.event;
-	mouseMode.onmouseup(ev);
-    ev.preventDefault();
-	mDown=false;
-}
+    mouseupEvHandler(e);
+}, false);
+
+mapElm.addEventListener('touchleave',function(e)
+{
+    isTouchDevice = true;
+    mouseleaveEvHandler(e);
+}, false);
 
 var updateOnMouseMove=false;
 
@@ -2778,9 +2837,7 @@ document.addEventListener('mousemove',function(e)
 	}
 	var ev=e || window.event;
 	ev.preventDefault();
-	var mc=mouseCoords(ev);
-	mouseX=mc.x;
-	mouseY=mc.y;
+    updateMousePos(ev);
 },true);
 
 mapElm.onmousemove=function(e)
@@ -2798,7 +2855,7 @@ mapElm.onmousemove=function(e)
 	mouseMode.onmousemove(ev);
 }
 
-mapElm.ontouchmove=function(e)
+mapElm.addEventListener('touchmove', function(e)
 {
     isTouchDevice = true;
 	var ev=e || window.event;
@@ -2808,7 +2865,7 @@ mapElm.ontouchmove=function(e)
 	_("cellX").innerHTML=cellCoord.x;
 	_("cellY").innerHTML=cellCoord.y;
 	mouseMode.onmousemove(ev);
-}
+}, false);
 
 document.onkeydown=function(e)
 {

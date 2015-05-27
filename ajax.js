@@ -94,8 +94,6 @@ function ajaxPost(url,paramstring,callBack)
 	if ((xmlHttp.readyState!=0) && (xmlHttp.readyState!=4)) return false;
 	xmlHttp.open("POST",url,true);
 	xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	xmlHttp.setRequestHeader("Content-length", paramstring.length);
-	xmlHttp.setRequestHeader("Connection", "close");
 	if (!document.getElementById("throbberDiv"))
 	{
                 var elm=document.createElement("div");
