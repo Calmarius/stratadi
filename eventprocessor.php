@@ -795,21 +795,29 @@ function moveFreeHeroesIfNeeded()
 $toDelete=array();
 $elapsedEvents=array();
 
+define('WORKING_DIR', getcwd());
+
 function onShutdown()
 {
-	global $toDelete;
-	global $elapsedEvents;
-	if (count($toDelete)>0)
-	{
-		doMysqlQuery("DELETE FROM wtfb2_events WHERE (id IN (".implode(',',$toDelete)."))");	 //safe
-		$f=fopen('elapsedevents_uccsetalalodkimianevedhkashdjkhasjdhjkashdka.txt','a+t');
-		foreach($elapsedEvents as $key=>$value)
-		{
-			fwrite($f,json_encode($value)."\n");
-		}
-		fclose($f);
-	}
-	unlink('lockfile');
+    global $toDelete;
+    global $elapsedEvents;
+
+    chdir(WORKING_DIR);
+    if (count($toDelete)>0)
+    {
+        doMysqlQuery("DELETE FROM wtfb2_events WHERE (id IN (".implode(',',$toDelete)."))");	 //safe
+        $f=fopen('elapsedevents_uccsetalalodkimianevedhkashdjkhasjdhjkashdka.txt','a+t');
+        foreach($elapsedEvents as $key=>$value)
+        {
+            fwrite($f,json_encode($value)."\n");
+        }
+        fclose($f);
+    }
+    if (!unlink('lockfile'))
+    {
+        $e = error_get_last();
+        die('Failed to delete lockfile.');
+    }
 }
 
 if (!file_exists('lockfile'))
