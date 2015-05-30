@@ -1407,7 +1407,7 @@ function showVillageSummary(orderBy)
 		var village=playerVillages[i];
 		village._vsLastUpdate=(parseInt(playerInfo.nowstamp,10)-parseInt(village.updateTimestamp,10));
 		orderedVillages.push(playerVillages[i]);
-		if (village.lastUpdate)
+		if (village.lastUpdate) // lastUpdate indicates that the village is loaded.
 		{
 			loadedVillageCount++;
 			for(var j in UnitDescriptors)
@@ -1425,6 +1425,8 @@ function showVillageSummary(orderBy)
 				if (!sumRow[buildingLevelDbName]) sumRow[buildingLevelDbName]=0;
 				sumRow[buildingLevelDbName]+=parseInt(village[buildingLevelDbName],10);
 			}
+		    if (!sumRow['score']) sumRow['score']=0;
+		    sumRow['score']+=parseFloat(village['score']);
 		}
 	}
 	for(var j in BuildingDescriptors)
@@ -1541,7 +1543,8 @@ function showVillageSummary(orderBy)
 		var village=sumRow;
 		iHTML+='<tr>';
 		iHTML+='<td>'+loadedVillageCount+'</td>';
-		iHTML+='<td colspan="4">&nbsp;</td>';
+		iHTML+='<td colspan="3">&nbsp;</td>';
+		iHTML+='<td>'+sumRow['score']+'</td>';
 		for(var j in UnitDescriptors)
 		{
 			var uDesc=UnitDescriptors[j];
