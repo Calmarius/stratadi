@@ -14,7 +14,7 @@ global $config;
 	<head>
 		<title><?php echo $language['wtfbattles']; ?></title>
 		<link rel="stylesheet" href="main.css">
-        <meta name=viewport content="width=1024">
+        <meta name=viewport content="width=800">
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
 		<meta property="og:title" content="<?php echo ($this->altTitle!='' ? ($this->altTitle.' - '):'').($language['wtfbattles'].' BETA');?>">
 		<meta property="og:type" content="game">
