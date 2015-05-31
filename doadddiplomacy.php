@@ -3,61 +3,50 @@ require_once("userworkerphps.php");
 
 bounceSessionOver();
 $myId=$_SESSION['userId'];
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guildpermissions WHERE (userId='{1}') AND (permission='diplomacy')",array($myId)),'jumpErrorPage');
-if (mysql_num_rows($r)==0) jumpErrorPage($language['accessdenied']);
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($myId)),'jumpErrorPage');
-if (mysql_num_rows($r)==0) jumpErrorPage($language['accessdenied']);
-$myself=mysql_fetch_assoc($r);
+$guildPermission=runEscapedQuery("SELECT * FROM wtfb2_guildpermissions WHERE (userId={0}) AND (permission='diplomacy')",$myId);
+if (isEmptyResult($guildPermission)) jumpErrorPage($language['accessdenied']);
+$myself=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})",$myId);
+if (isEmptyResult($myself)) jumpErrorPage($language['accessdenied']);
+$myself = $myself[0][0];
 $guildId=$_POST['guildid'];
 $guildName=$_POST['guildname'];
 
-//jumpErrorPage($language['accessdenied']);
-
-
-$guild;
 if (is_numeric($guildId))
 {
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guilds WHERE (id='{1}')",array($guildId)),'jumpErrorPage');
-	if (mysql_num_rows($r)==0) jumpErrorPage($language['guildnotexist']);
+	$theirGuild=runEscapedQuery("SELECT * FROM wtfb2_guilds WHERE (id={0})",$guildId);
+	if (isEmptyResult($theirGuild)) jumpErrorPage($language['guildnotexist']);    
 }
 else
 {
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guilds WHERE (guildName='{1}')",array($guildName)),'jumpErrorPage');
-	if (mysql_num_rows($r)==0) jumpErrorPage($language['guildnotexist']);
+	$theirGuild=runEscapedQuery("SELECT * FROM wtfb2_guilds WHERE (guildName={0})",$guildName);
+	if (isEmptyResult($theirGuild)) jumpErrorPage($language['guildnotexist']);
 }
-$guild=mysql_fetch_assoc($r);
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guilds WHERE (id='{1}')",array($myself['guildId'])),'jumpErrorPage');
-if (mysql_num_rows($r)==0) jumpErrorPage($language['guildnotexist']);
-$myGuild=mysql_fetch_assoc($r);
+$theirGuild=$theirGuild[0][0];
+$myGuild = runEscapedQuery("SELECT * FROM wtfb2_guilds WHERE (id={0})",$myself['guildId']);
+if (isEmptyResult($myGuild)) jumpErrorPage($language['guildnotexist']);
+$myGuild=$myGuild[0][0];
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_diplomacy WHERE (guildId='{1}') AND (toGuildId='{2}')",array($myself['guildId'],$guild['id'])),'jumpErrorPage');
-if (mysql_fetch_assoc($r)>0) jumpErrorPage($language['diplomaticstancealreadyexist']);
-doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_diplomacy (attitude,guildId,toGuildId) VALUES ('{1}','{2}','{3}')",array($_POST['stance'],$myself['guildId'],$guild['id'])),'jumpErrorPage');
-doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (x,y,eventTime,type,guildId,recipientGuildId) VALUES (0,0,NOW(),'diplomacychanged','{1}','{2}')",array($guild['id']),$myself['guildId']),'jumpErrorPage'); // send event ourselves.
+$diplomaticStance=runEscapedQuery("SELECT * FROM wtfb2_diplomacy WHERE (guildId={0}) AND (toGuildId={1})",$myself['guildId'],$theirGuild['id']);
+if (!isEmptySet(diplomaticStance)) jumpErrorPage($language['diplomaticstancealreadyexist']);
+runEscapedQuery("INSERT INTO wtfb2_diplomacy (attitude,guildId,toGuildId) VALUES ({0},{1},{2})",$_POST['stance'],$myself['guildId'],$theirGuild['id']);
+runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,eventTime,type,guildId,recipientGuildId) VALUES (0,0,NOW(),'diplomacychanged',{0},{1})",$theirGuild['id'],$myself['guildId']); // send event ourselves.
 // notify users with diplomacy right about the change
-$r=doMySqlQuery(
-	sqlPrintf(
+$diplomatsInTheirGuild=runEscapedQuery(
 		"
 			SELECT u.* 
 			FROM wtfb2_users u
 			INNER JOIN wtfb2_guildpermissions p ON (p.userid=u.id)
 			INNER JOIN wtfb2_guilds g ON (u.guildId=g.id)
-			WHERE (g.id='{1}') AND (p.permission='diplomacy')
+			WHERE (g.id={0}) AND (p.permission='diplomacy')
 		",
-		array($guild['id'])
-	),
-	'jumpErrorPage'
+		$theirGuild['id']
 );
-$diplomatsInGuild=array();
-while($row=mysql_fetch_assoc($r))
-{
-	$diplomatsInGuild[]=$row;
-}
+$diplomatsInTheirGuild = $diplomatsInTheirGuild[0];
 // find out what diplomatic stance set by the recipient guild
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_diplomacy WHERE ((attitude='{1}') AND (guildId='{2}') AND (toGuildId='{3}'))",array($_POST['stance'],$guild['id'],$myself['guildId'])));
+$r=runEscapedQuery("SELECT * FROM wtfb2_diplomacy WHERE ((attitude={0}) AND (guildId={1}) AND (toGuildId={2}))",$_POST['stance'],$theirGuild['id'],$myself['guildId']);
 $reportTitle='';
 $reportText='';
-if (mysql_num_rows($r)==0)
+if (isEmptySet($r))
 {
 	// different or no stance set so set a diplomacy invitation
 	$reportTitle=xprintf($language['diplomacyreporttitle'],array($myGuild['guildName']));
@@ -70,13 +59,13 @@ else
 	$reportText=xprintf($language['diplomacyrequitedtext'],array('<a href="viewplayer.php?id='.$myself['id'].'">'.$myself['userName'].'</a>','<a href="viewguild.php?id='.$myGuild['id'].'">'.$myGuild['guildName'].'</a>'));
 }
 $reportValues=array();
-if (count($diplomatsInGuild)>0)
+if (count($diplomatsInTheirGuild)>0)
 {
-	foreach($diplomatsInGuild as $key=>$value)
+	foreach($diplomatsInTheirGuild as $key=>$value)
 	{
-		$reportValues[]=sqlPrintf("('{1}','{2}','{3}',NOW(),MD5(RAND()))",array($value['id'],$reportTitle,$reportText));
+		$reportValues[]=sqlvprintf("({0},{1},{2},NOW(),MD5(RAND()))",array($value['id'],$reportTitle,$reportText));
 	}
-	doMySqlQuery("INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,token) VALUES ".implode(',',$reportValues));
+	runEscapedQuery("INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,token) VALUES ".implode(',',$reportValues));
 }
 
 jumpTo('guildops.php?cmd=diplomacy');

@@ -3,8 +3,6 @@
 require_once('userworkerphps.php');
 bounceNoAdmin();
 
-//header('Content-Type: text/plain');
-
 $dir=opendir('avatars');
 $files=array();
 while(false !== ($file=readdir($dir)))
@@ -13,9 +11,7 @@ while(false !== ($file=readdir($dir)))
 	$files["avatars/$file"]=true;
 }
 
-//echo "<h1>Count of files: ".count($files)."</h1>\n";
-
-$r=doMySqlQuery(
+$avatarLinks=runEscapedQuery(
 	"
 		(SELECT avatarLink FROM wtfb2_users WHERE (avatarLink IS NOT NULL) AND (avatarLink<>''))
 		UNION
@@ -23,21 +19,16 @@ $r=doMySqlQuery(
 	"
 );
 
-while($row=mysql_fetch_assoc($r))
+foreach ($avatarLinks[0] as $avatarLink)
 {
-	unset($files[$row['avatarLink']]);
+	unset($files[$avatarLink['avatarLink']]);
 }
 
 foreach($files as $key=>$value)
 {
-//	echo '<img src="'.$key.'">';
 	unlink($key); //risky
 }
 
 jumpSuccessPage(count($files).' files deleted!','');
-
-//echo "<h1>Count of files that should be deleted: ".count($files)."</h1>";
-
-
 
 ?>

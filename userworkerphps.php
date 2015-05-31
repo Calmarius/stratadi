@@ -2,6 +2,7 @@
 
 require_once("presenterphps.php");
 require_once("setupmysql.php");
+require_once("setupmysqli.php");
 require_once("utils/gameutils.php");
 
 // do some logging.

@@ -7,17 +7,18 @@ $myId=$_SESSION['userId'];
 $referredId=$_GET['id'];
 
 // Check whether the the user is really referred
-$r=doMySqlQuery(
-	sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}') AND (refererId='{2}')",array($referredId,$myId))
-	);
-if (mysql_num_rows($r)==0) jumpErrorPage($language['playerisnotreferredbyyou']);
+$r=runEscapedQuery(
+	"SELECT * FROM wtfb2_users WHERE (id={0}) AND (refererId={1})",$referredId,$myId
+);
+if (isEmptyResult($r)) jumpErrorPage($language['playerisnotreferredbyyou']);
+
 // Check whether he reached the village count
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}') AND (villageCount>='{2}')",array($referredId,$config['referredRewardVillageCount'])));
-if (mysql_num_rows($r)==0) jumpErrorPage(xprintf($language['playernotreachedthevillagecount'],array($config['referredRewardVillageCount'])));
+$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0}) AND (villageCount>={1})", $referredId,$config['referredRewardVillageCount']);
+if (isEmptyResult($r)) jumpErrorPage(xprintf($language['playernotreachedthevillagecount'],array($config['referredRewardVillageCount'])));
 // Remove the referred status
-doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET refererId=0 WHERE (id='{1}')",array($referredId)));
+runEscapedQuery("UPDATE wtfb2_users SET refererId=0 WHERE (id={0})",$referredId);
 // Get the maximum amount of expansion points on the server
-$r=doMySqlQuery
+$maxE=runEscapedQuery
 (
 	'
 	SELECT MAX(cnt) AS maxExpansion FROM 
@@ -28,58 +29,51 @@ $r=doMySqlQuery
 	) tmp
 	'
 );
-$a=mysql_fetch_assoc($r);
-$maxE=$a['maxExpansion'];
+$maxE=$maxE[0][0]['maxExpansion'];
 // Get the player's expansion value;
-$r=doMySqlQuery
+$myE=runEscapedQuery
 (
-	sqlPrintf(
 	"
 		SELECT COUNT(*)+u.expansionPoints AS cnt FROM wtfb2_villages v
 		INNER JOIN wtfb2_users u ON (u.id=v.ownerId)
-		WHERE (u.id='{1}')
+		WHERE (u.id={0})
 		GROUP BY u.id
-	",array($myId)
-	)
+	",$myId
 );
-$a=mysql_fetch_assoc($r);
-$myE=$a['cnt'];
+$myE=$myE[0][0];
 $maxExpansionCanBeGiven=$maxE-$myE;
-//die($maxExpansionCanBeGiven);
-
-
 
 // Check whether they use the same internet connection the most
 $pointsYouGet=0;
-$r=doMySqlQuery(sqlPrintf("SELECT *,MAX(useCount) FROM wtfb2_iplog WHERE (userId='{1}') GROUP BY userId",array($myId)),'jumpErrorPage');
-$s=doMySqlQuery(sqlPrintf("SELECT *,MAX(useCount) FROM wtfb2_iplog WHERE (userId='{1}') GROUP BY userId",array($referredId)),'jumpErrorPage');
-$myRow=mysql_fetch_assoc($r);
-$refRow=mysql_fetch_assoc($s);
+$myRow=runEscapedQuery("SELECT *,MAX(useCount) FROM wtfb2_iplog WHERE (userId={0}) GROUP BY userId",$myId);
+$refRow=runEscapedQuery("SELECT *,MAX(useCount) FROM wtfb2_iplog WHERE (userId={0}) GROUP BY userId",$referredId);
+$myRow=$myRow[0][0];
+$refRow=$refRow[0][0];
 if ($myRow['ip']==$refRow['ip'])
 {
 	if ($maxExpansionCanBeGiven<$pointsYouGet) $pointsYouGet=$maxExpansionCanBeGiven;
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=expansionPoints+{1} WHERE (id={2})",array($pointsYouGet,$myId)));
+	runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints+{0} WHERE (id={1})",$pointsYouGet,$myId);
 	jumpSuccessPage($language['playerreachedthelevel'],xprintf($language['yougotexpansionpoints'],array($pointsYouGet)));
 }
-// Check whethet others use the referrers most used internet access the most.
+// Check whether others use the referrers most used internet access the most.
 $pointsYouGet=1;
 
 	// we know the referred users most used ip address $refRow
 	// which users are using the same ip address the most
-$r=doMySqlQuery
+$r=runEscapedQuery
 (
-	sqlPrintf("SELECT *,MAX(useCount) FROM wtfb2_iplog WHERE (ip='{1}')  AND (TIMESTAMPDIFF(SECOND,'{2}',NOW())<86400*7) GROUP BY userId",array($refRow['ip'],$refRow['lastUsed'])),'jumpErrorPage'
+	"SELECT *,MAX(useCount) FROM wtfb2_iplog WHERE (ip={0})  AND (TIMESTAMPDIFF(SECOND,{1},NOW())<86400*7) GROUP BY userId",$refRow['ip'],$refRow['lastUsed']
 );
-if (mysql_num_rows($r)>1)
+if (count($r[0])>1)
 {
 	// if more users using it then we are ready
 	if ($maxExpansionCanBeGiven<$pointsYouGet) $pointsYouGet=$maxExpansionCanBeGiven;
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=expansionPoints+{1} WHERE (id='{2}')",array($pointsYouGet,$myId)));
+	runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints+{0} WHERE (id={1})",$pointsYouGet,$myId);
 	jumpSuccessPage($language['playerreachedthelevel'],xprintf($language['yougotexpansionpoints'],array($pointsYouGet)));
 }
 // anybody ever logged in from the referred's ip address except him?
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_iplog WHERE (ip='{1}') AND (userId<>'{2}')",array($refRow['ip'],$refRow['userId'])));
-if (mysql_num_rows($r)>0)
+$r=runEscapedQuery("SELECT * FROM wtfb2_iplog WHERE (ip={0}) AND (userId<>{1})",$refRow['ip'],$refRow['userId']);
+if (!isEmptyResult($r))
 {
 	$pointsYouGet=2;
 }
@@ -88,14 +82,7 @@ else
 	$pointsYouGet=5;
 }
 if ($maxExpansionCanBeGiven<$pointsYouGet) $pointsYouGet=$maxExpansionCanBeGiven;
-doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=expansionPoints+{1} WHERE (id={2})",array($pointsYouGet,$myId)));
+runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints+{0} WHERE (id={1})",$pointsYouGet,$myId);
 jumpSuccessPage($language['playerreachedthelevel'],xprintf($language['yougotexpansionpoints'],array($pointsYouGet)));
-
-
-
-
-
-//jumpSuccessPage('FOO','BAR');
-
 
 ?>
