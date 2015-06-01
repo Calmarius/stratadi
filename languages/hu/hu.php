@@ -647,6 +647,7 @@ X
 	'unabletosendmail' => "Sajnos nem sikerült kiküldeni a levelet. Az ok egyelőre tisztázatlan. Bár regisztrálásra került a felhasználói fiók, az aktivációs kód hiányában nem fogod majd tudni aktiválni, így 24 órán belül automatikusan törlődik majd, próbálkozz holnap ilyenkor majd. Reméljük több szerencséd lesz.",  // in the registration when mail() function was unable to send the mail.
 	'unitinfotooltip'=>'{1} (ár: <b>{5}</b> arany),<br><b>{2}</b> db áll rendelkezésre,<br><b>{3}</b> db van kiképzés alatt,<br>A következő egység kiképzése <b>{4}</b>%-nál tart.<br><i>Írd be az alábbi szövegdobozba,<br>hogy mennyi egységet szeretnél kiképezni,<br>majd nyomj entert!</i>', // in game village view, the tooltip when you hover the unit icon. {1}: unit name (as string), {2}: available units (as js var), {3}: under training (as js var), {4}: the precentage of the progress of the training of the next unit (as js var), {5} its cost
 	'unitnotexist' => "Az egységfajta a {1} kóddal nem létezik", 		// in game, error when trying to refer a not unit type ({1} is the code of the unit)
+	'unknown' => 'Ismeretlen',
 	'unknownreport'=>'Ismeretlen típusú jelentés', // in reports window the image title
 	'unsubscribe'=>'Leíratkozás', // in messages window
 	'updatenow' => "frissítés most", // in game, village properties and player info

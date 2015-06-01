@@ -643,6 +643,7 @@ X
 	'unabletosendmail' => "I was unable to send out the mail. Please write an e-mail to the admin at ${config['adminMail']} for manual activation.",  // in the registration when mail() function was unable to send the mail.
 	'unitinfotooltip'=>'{1} (cost: <b>{5}</b> gold),<br><b>{2}</b> units available,<br><b>{3}</b> units training,<br>The training progress of next unit is at <b>{4}</b>%.<br><i>Type the number, the amount of units you want to train, in the textbox below<br> then press enter.</i>', // in game village view, the tooltip when you hover the unit icon. {1}: unit name (as string), {2}: available units (as js var), {3}: under training (as js var), {4}: the precentage of the progress of the training of the next unit (as js var), {5} its cost
 	'unitnotexist' => "The unit type with the code {1} does not exist.", 		// in game, error when trying to refer a not unit type ({1} is the code of the unit)
+	'unknown' => 'Unknown',
 	'unknownreport'=>'Report of unknown type', // in reports window the image title
 	'unsubscribe'=>'Unsubscribe', // in messages window
 	'updatenow' => "Update now", // in game, village properties and player info

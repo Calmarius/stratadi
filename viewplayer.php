@@ -28,7 +28,7 @@ $a['own']=$myId==$a['id'];
 
 if ((double)$a['ageBonus']<1) $a['ageBonus']=1;
 
-$r=doMySqlQuery(sqlPrintf("SELECT *,(id='{2}') AS isMaster FROM wtfb2_accesses WHERE (accountId='{1}')",array($_GET['id'],$_a['masterAccess'])));
+$r=doMySqlQuery(sqlPrintf("SELECT *,(id='{2}') AS isMaster FROM wtfb2_accesses WHERE (accountId='{1}')",array($_GET['id'],$a['masterAccess'])));
 $kings=array();
 while($row=mysql_fetch_assoc($r))
 {

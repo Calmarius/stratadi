@@ -21,7 +21,7 @@ function activateAccount($userId,$activationCode)
         jumpTo('activate.php');
     }
     $_SESSION['permission']='user';
-    runEscapedQuery("UPDATE wtfb2_accesses SET permission='user' WHERE (id={0})",$a['id']);
+    runEscapedQuery("UPDATE wtfb2_accesses SET permission='user' WHERE (id={0})",$access['id']);
     $_SESSION['activationparms']=array();
     jumpTo('game.php');
 }
