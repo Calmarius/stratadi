@@ -298,7 +298,7 @@ $config=array
 		)
 	),
 	'serverLanguage'=>'hu',         // Server's language.
-	'serverSpeed'=>1,					// server speed
+	'serverSpeed'=>100,					// server speed
 	'settlerUnit'=>'_4diplomat',				// unit you can settle width
 	'startGold'=>'500',					// start amount of gold
 	'superiorityExponent'=>'1.5',			// superiority exponent
