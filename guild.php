@@ -29,6 +29,7 @@ if (mysql_num_rows($r)>0)
 			GROUP BY u.id
 		",$guildInfo['id']);
 	$r=doMySqlQuery($q,'jumpErrorPage');
+	$guildInfo['members'] = array();
 	while($row=mysql_fetch_assoc($r))
 	{
 		$guildInfo['members'][]=$row;
@@ -42,11 +43,13 @@ if (mysql_num_rows($r)>0)
 			WHERE (guildId={1})",array($guildInfo['id'])
 		)
 	);
+	$guildInfo['diplomacy'] = array();
 	while($row=mysql_fetch_assoc($r))
 	{
 		$guildInfo['diplomacy'][]=$row;
 	}	
 	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_threads WHERE (guildId='{1}')",array($guildInfo['id'])));
+	$guildInfo['threads'] = array();
 	while($row=mysql_fetch_assoc($r))
 	{
 		$guildInfo['threads'][]=$row;

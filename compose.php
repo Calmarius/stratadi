@@ -9,14 +9,14 @@ $a=mysql_fetch_assoc($r);
 
 
 $param=array();
-$param['recipient']=$_GET['name'];
+$param['recipient']=@$_GET['name'];
 $param['subject']=isset($_GET['subject']) ? $_GET['subject']:@$_SESSION['lastcomposition']['subject'];
-$param['thread']=$_GET['thread'];
+$param['thread']=@$_GET['thread'];
 $param['extra']=$_GET['extra'];
 $param['entries']=array();
 $param['content']=@$_SESSION['lastcomposition']['content'];
 $param['nowstamp']=$a['nowstamp'];
-$param['notification']=$_GET['notification'];
+$param['notification']=@$_GET['notification'];
 
 if (isset($_GET['thread']))
 {

@@ -4,7 +4,7 @@ require_once("userworkerphps.php");
 bounceNoAdmin();
 
 $orderByText='';
-$orderBy=str_replace("`","",$_GET['orderby']);
+$orderBy=str_replace("`","",@$_GET['orderby']);
 if (isset($_GET['orderby']))
 {
 	$orderByText=sqlPrintf("ORDER BY {1}",array($orderBy));
