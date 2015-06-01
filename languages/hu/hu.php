@@ -196,6 +196,7 @@ X
 	'emailalreadyused' => "Ezzel az e-mail címmel már regisztrált valaki más.",  // registration form error
 	'enterpasswordtoconfirm'=>'Írd be a jelszavad újra a művelet megerősítéséhez:', // in abandon village window
 	'enterplayernametoinvite'=>'Írd be meghívandó játékos nevét: ', // in invite player window
+	'events' => 'Események',
 	'eventtime'=>'Esemény időpontja', // in world events
 	'eventtype'=>'Esemény típusa', // in event bar
 	'everyvillageyouselectedwilltrain'=>'A megadott mennyiségű egység kiképzése el lesz osztva a listában kiválasztott falvak között úgy, hogy a leghamarabb elkészüljön.', //in mass training window.
