@@ -162,7 +162,7 @@ $paramArray['offenseTop']=array();
 $paramArray['defenseTop']=array();
 $paramArray['theHighest']=mysql_fetch_assoc($theBiggest);
 $paramArray['hidden']=$hidden;
-$paramArray['inbuiltpieimg']=$public ? 'inbuiltpie.png':'showipie.php';
+$paramArray['inbuiltpieimg']=$public ? 'inbuiltpie.png?'.time():'showipie.php';
 
 while($row=mysql_fetch_assoc($goldTop)) $paramArray['goldTop'][]=$row;
 while($row=mysql_fetch_assoc($armyTop)) $paramArray['armyTop'][]=$row;
