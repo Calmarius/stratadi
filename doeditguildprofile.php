@@ -6,14 +6,14 @@ bounceSessionOver();
 
 $userId=$_SESSION['userId'];
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guildpermissions WHERE (userId='{1}') AND (permission='editprofile')",array($userId)),'jumpErrorPage');
-if (mysql_num_rows($r)==0) jumpErrorPage($language['accessdenied']);
+$r=runEscapedQuery("SELECT * FROM wtfb2_guildpermissions WHERE (userId={0}) AND (permission='editprofile')",$userId);
+if (isEmptyResult($r)) jumpErrorPage($language['accessdenied']);
 
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($userId)));
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})",$userId);
+$a=$r[0][0];
 $guildprofile=htmlspecialchars($_POST['guildprofile']);
-doMySqlQuery(sqlPrintf("UPDATE wtfb2_guilds SET profile='{1}' WHERE (id='{2}')",array($guildprofile,$a['guildId'])));
+runEscapedQuery("UPDATE wtfb2_guilds SET profile={0} WHERE (id={1})",$guildprofile,$a['guildId']);
 
 
 jumpTo("guild.php");
