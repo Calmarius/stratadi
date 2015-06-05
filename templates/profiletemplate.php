@@ -63,4 +63,16 @@ global $config;
 	</tr>
 	<tr><td><?php echo $language['profile']; ?></td><td><?php echo parseBBCode($this->profile);?></td></tr>
 </table>
+<p><?php echo $language['villages']; ?></p>
+<table class="center">
+<?php
+    foreach ($this->villages as $village)
+    {
+        $x = $village['x'];
+        $y = $village['y'];
+        $villageString = "${village['villageName']} ($x, $y)";
+        echo '<tr><td><a href="javascript:void(parent.initMap('.$x.','.$y.'))">'.$villageString.'</a></td></tr>';
+    }
+?>
+</table>
 

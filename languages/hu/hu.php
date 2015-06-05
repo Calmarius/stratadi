@@ -671,6 +671,7 @@ X
 	'villageisnotyours' => "A falu nem a tiéd, amin a műveletet akartad végezni!", // in dotasks.php report when you want to do things on someone else's village
 	'villagename' => "Falunév", // in game, village properties
 	'villagenotexist'=>'A falu nem létezik', // response from task manager php
+	'villages' => 'Falvak: ', // On the profile view before the village list.
 	'villagescoretext'=>'{1} pontos falu', // in village view the score text. {1} the score (inserted as javascript variable)
 	'villagesloaded'=>'Betöltött falvak (<i>csak azok</i>): ', // in mass training window and building window
 	'villagesselectedmap'=>'A falvak, amelyeket kiválasztottál a térképen, automatikusan kiválasztásra kerültek ebben a listában is.', // in mass training window

@@ -667,6 +667,7 @@ X
 	'villageisnotyours' => "The villages is not yours you want to operate on.", // in dotasks.php report when you want to do things on someone else's village
 	'villagename' => "Village name", // in game, village properties
 	'villagenotexist'=>'Village does not exist.', // response from task manager php
+	'villages' => 'Villages: ', // On the profile view before the village list.
 	'villagescoretext'=>'{1} score village', // in village view the score text. {1} the score (inserted as javascript variable)
 	'villagesloaded'=>'Loaded villages (<i>only those</i>): ', // in mass training window and building window
 	'villagesselectedmap'=>'Villages you selected on the map are selected on this list too.', // in mass training window
