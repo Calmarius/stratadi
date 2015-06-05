@@ -37,7 +37,7 @@ while($row=mysql_fetch_assoc($r))
 
 $a['kings']=$kings;
 
-$r = runEscapedQuery("SELECT x, y, villageName FROM wtfb2_villages WHERE (ownerId = {0})", $myId);
+$r = runEscapedQuery("SELECT x, y, villageName FROM wtfb2_villages WHERE (ownerId = {0})", $_GET['id']);
 $villages = array();
 foreach ($r[0] as $vill)
 {
