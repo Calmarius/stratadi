@@ -7,7 +7,7 @@ $orderByText='';
 $orderBy=str_replace("`","",@$_GET['orderby']);
 if (isset($_GET['orderby']))
 {
-	$orderByText=sqlPrintf("ORDER BY {1}",array($orderBy));
+	$orderByText=sqlvprintf("ORDER BY {0}", array($orderBy));
 }
 if (isset($_GET['desc']))
 {
@@ -15,11 +15,11 @@ if (isset($_GET['desc']))
 }
 
 if (isset($_GET['simple']))
-	$r=doMySqlQuery("SELECT id,userName FROM wtfb2_users $orderByText ORDER BY userName");
+	$r=runEscapedQuery("SELECT id,userName FROM wtfb2_users $orderByText ORDER BY userName");
 else
-	$r=doMySqlQuery("SELECT * FROM wtfb2_users $orderByText");
+	$r=runEscapedQuery("SELECT * FROM wtfb2_users $orderByText");
 $userInfos=array();
-while($row=mysql_fetch_assoc($r))
+foreach ($r[0] as $row)
 {
 	$userInfos[]=$row;
 }

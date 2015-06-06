@@ -10,6 +10,7 @@ if ($this->nightbonus>3) $this->nightbonus=3;
 
 <h1><?php echo $language['battlesimulator']; ?></h1>
 <form action="battlesim.php" method="POST">
+    <input type="hidden" name="calculatebattle" value="yes">
 	<p><?php echo $language['attacker']; ?></p>
 	<p><?php echo $language['attacklevelofhero'];?><input type="text" name="attackhero" style="width:7em" value="<?php echo (double)$this->attackhero?>"></p>
 	<table class="center">
