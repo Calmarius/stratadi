@@ -11,7 +11,7 @@ function activateAccount($userId,$activationCode)
 {
     global $language;
     $activationCode=trim($activationCode);
-    $access=runEscapedQuery("SELECT * FROM wtfb2_accesses WHERE (accountId={0})",$userId);
+    $access=runEscapedQuery("SELECT * FROM wtfb2_accesses WHERE (id={0})",$userId);
     if (!isset($access[0][0])) jumpErrorPage($language['usernamenotexist']);
     $access = $access[0][0];
     if ($access['activationToken']!=$activationCode)
@@ -28,7 +28,7 @@ function activateAccount($userId,$activationCode)
 
 if (!isset($_SESSION['userId'])) jumpTo('login.php');
 
-activateAccount($_SESSION['userId'],$_POST['activationcode']);
+activateAccount($_SESSION['accessId'],$_POST['activationcode']);
 
 
 ?>
