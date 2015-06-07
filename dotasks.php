@@ -1,17 +1,10 @@
 <?php
 
-
 $tasks=$_POST['tasks'];
 if (get_magic_quotes_gpc()) $tasks=stripslashes($tasks);
 
 
 error_reporting(E_ALL);
-
-/*$str='" \" \" \" " "BAR"  "ZIG" "ZAG"';
-preg_match_all('/"(\\.|[^\\"])*"/',$str,$arr);
-print_r($arr);
-die();*/
-
 
 require_once('userworkerphps.php');
 require_once("villageupdater.php");
@@ -22,10 +15,10 @@ if ($config['closed']) die($language['serverisclosed']);
 $responses='';
 
 updatePlayer($_SESSION['userId']);
-$q=sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($_SESSION['userId']));
-$r=doMySqlQuery($q);
-if (mysql_num_rows($r)<1) die($language['sessionisover']);
-$player=mysql_fetch_assoc($r);
+$q=sqlvprintf("SELECT * FROM wtfb2_users WHERE (id={0})", array($_SESSION['userId']));
+$r=runEscapedQuery($q);
+if (isEmptyResult($r)) die($language['sessionisover']);
+$player=$r[0][0];
 $scoreChangedVillages=array();
 
 $updatedVillages=array();
@@ -37,16 +30,16 @@ function fetchVillageRecord($villageId,$restrict=true)
 	$resFilter='';
 	if ($restrict)
 	{
-		$resFilter=sqlPrintf("AND (ownerId='{1}')",array($_SESSION['userId']));
+		$resFilter=sqlvprintf("AND (ownerId={0})",array($_SESSION['userId']));
 	}
-	$q=sqlPrintf("SELECT * FROM wtfb2_villages WHERE (wtfb2_villages.id='{1}') $resFilter",array($villageId,));
-	$r=doMySqlQuery($q);
-	if (mysql_num_rows($r)<1)
+	$q=sqlvprintf("SELECT * FROM wtfb2_villages WHERE (wtfb2_villages.id={0}) $resFilter",array($villageId));
+	$r=runEscapedQuery($q);
+	if (isEmptyResult($r))
 	{
 		$responses.=$language['villageisnotyours']."\n";
 		return FALSE;
 	}
-	$a=mysql_fetch_assoc($r);
+	$a=$r[0][0];
 	return $a;
 }
 
@@ -58,16 +51,16 @@ function upgradeBuilding($args)
 	global $updatedVillages;
 	global $responses;
 	global $scoreChangedVillages;
-	
+
 	$villageId=$args[1];
 	$buildingName=$args[2];
-	
+
 	if (!isset($updatedVillages[$villageId]))
 	{
 		updateVillage($villageId);
 		$updatedVillages[$villageId]=true;
 	}
-	
+
 
 	$village=fetchVillageRecord($villageId);
 	if ($village===FALSE) return;
@@ -75,29 +68,27 @@ function upgradeBuilding($args)
 	{
 		$responses.=(xprintf($language['buildingnotexist'],array($buildingName)))."\n";
 		return;
-	} 
+	}
 	$building=$config['buildings'][$buildingName];
 	if (!isset($building['buildingLevelDbName'])) die('Configuration fail: buildingLevelDbName not found.');
 	$levName=$building['buildingLevelDbName'];
 	if (!isset($building['costFunction'])) die('Configuration fail: cost function not found.');
 	$costFn=$building['costFunction'];
 	$cost=$costFn((int)$village[$levName]);
-	if ($village['buildPoints']<1) 
+	if ($village['buildPoints']<1)
 	{
 		$responses.=($language['notenoughbuildboints'])."\n";
 		return;
 	}
-	if ($player['gold']<$cost) 
+	if ($player['gold']<$cost)
 	{
 		$responses.=($language['notenoughgold'])."\n";
 		return;
 	}
 	$player['gold']-=$cost;
-	$q=sqlPrintf("UPDATE wtfb2_villages SET {1}={1}+1, buildPoints=buildPoints-1 WHERE (id='{2}')",array($levName,$villageId));
-	$r=doMySqlQuery($q,'jumpErrorPage');
+	$q=sqlvprintf("UPDATE wtfb2_villages SET $levName=$levName+1, buildPoints=buildPoints-1 WHERE (id={0})",array($villageId));
+	$r=runEscapedQuery($q);
 	$scoreChangedVillages[$village['id']]=$village;
-//	doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ('{1}','{2}',NOW(),'scorechanged')",array($village['x'],$village['y'])));
-	
 }
 
 function renameVillage($command)
@@ -106,13 +97,12 @@ function renameVillage($command)
 	$villageId=(int)$command[1];
 	$newName=$command[2];
 	if (strlen(trim($newName)) == 0) return;
-	$q=sqlPrintf("UPDATE wtfb2_villages SET villageName='{1}' WHERE (id='{2}') AND (ownerId='{3}')",array($newName,$villageId,$_SESSION['userId']));
-	$r=doMySqlQuery($q);
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_villages WHERE (id='{1}')",array($villageId)));
-	if (mysql_num_rows($r)==0) return;
-	//$responses.='X';
-	$village=mysql_fetch_assoc($r);
-	doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({1},{2},NOW(),'rename')",array($village['x'],$village['y'])));
+	$q=sqlvprintf("UPDATE wtfb2_villages SET villageName={0} WHERE (id={1}) AND (ownerId={2})",array($newName,$villageId,$_SESSION['userId']));
+	$r=runEscapedQuery($q);
+	$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (id={0})",$villageId);
+	if (isEmptyResult($r)) return;
+	$village=$r[0][0];
+	runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({0},{1},NOW(),'rename')",$village['x'],$village['y']);
 }
 
 function trainUnits($command)
@@ -122,18 +112,18 @@ function trainUnits($command)
 	global $language;
 	global $updatedVillages;
 	global $responses;
-	
+
 	$villageId=(int)$command[1];
 	$amount=(int)$command[2];
 	$unitType=$command[3];
 	if ($amount<0) $amount=0;
-	
+
 	if (!isset($updatedVillages[$villageId]))
 	{
 		updateVillage($villageId);
 		$updatedVillages[$villageId]=true;
 	}
-	if (!isset($config['units'][$unitType])) 
+	if (!isset($config['units'][$unitType]))
 	{
 		$responses.=(xprintf($language['unitnotexist'],array($unitType)))."\n";
 		return;
@@ -144,14 +134,14 @@ function trainUnits($command)
 	$a=fetchVillageRecord($villageId);
 	if ($a==FALSE) return;
 	if ($player['gold']<$unit['cost']*$amount) return; //die($language['notenoughgold']);
-	$q=sqlPrintf("UPDATE wtfb2_villages SET {1}={1}+{2} WHERE (id='{3}')",array($trDbName,$amount,$villageId));
-	$r=doMySqlQuery($q);
+	$q=sqlvprintf("UPDATE wtfb2_villages SET $trDbName=$trDbName+{0} WHERE (id={1})",array($amount,$villageId));
+	$r=runEscapedQuery($q);
 	$player['gold']-=$unit['cost']*$amount;
 }
 
 function launchSettling($command)
 {
-		
+
 	global $player;
 	global $config;
 	global $language;
@@ -160,7 +150,7 @@ function launchSettling($command)
 	$launcherVillageId=(int)$command[1];
 	$targetX=(int)$command[2];
 	$targetY=(int)$command[3];
-	
+
 	if (!isset($updatedVillages[$launcherVillageId]))
 	{
 		updateVillage($launcherVillageId);
@@ -173,16 +163,16 @@ function launchSettling($command)
 		$responses.=($language['notenoughexpansionpoints'])."\n";
 		return;
 	}
-	
+
 	// fetch village
-	$r=doMySqlQuery(sqlPrintf("SELECT *  FROM wtfb2_villages WHERE (id='{1}') AND (ownerId='{2}')",array($launcherVillageId,$player['id'])));
-	if (mysql_num_rows($r)==0)
+	$r=runEscapedQuery("SELECT *  FROM wtfb2_villages WHERE (id={0}) AND (ownerId={1})",$launcherVillageId,$player['id']);
+	if (isEmptyResult($r))
 	{
 		$responses.=($language['invalidlaunchervillage'])."\n";
 		return;
 	}
-	$launcherVillage=mysql_fetch_assoc($r);
-	
+	$launcherVillage=$r[0][0];
+
 	// enough settlers?
 	if (!isset($config['settlerUnit'])) die('Configuration failure: no settler unit specified. Config.settlerUnit');
 	$settlerType=$config['settlerUnit'];
@@ -196,42 +186,38 @@ function launchSettling($command)
 		$responses.=($language['notenoughsettlerunits'])."\n";
 		return;
 	}
-	
+
 	// anybody settled there?
-	
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_villages WHERE (x='{1}') AND (y='{2}')",array($targetX,$targetY)));
-	if(mysql_num_rows($r)>0)
+
+	$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (x={0}) AND (y={1})",$targetX,$targetY);
+	if(!isEmptyResult($r))
 	{
 		$responses.=($language["someonesettledthere"])."\n";
 		return;
 	}
-	
+
 	// so all is ok, set the event
-	
+
 	//* calculate the distance
 	$dx=$launcherVillage['x']-$targetX;
 	$dy=$launcherVillage['y']-$targetY;
 	$travelDistance=sqrt($dx*$dx+$dy*$dy);
 	$travelTime=$travelDistance/(int)$settlerDescriptor['speed']*3600/$config['serverSpeed'];
 	$moddedTime=randomizeTime($travelTime);
-	
+
 	// decrease the expansionPoints
 	$player['expansionPoints']=(double)$player['expansionPoints']-1;
-/*	print_r($player);
-	die();*/
-	doMySqlQuery(
-		sqlPrintf(
+	runEscapedQuery(
 			"
-				INSERT INTO wtfb2_events (eventType,estimatedTime,happensAt,launchedAt,launcherVillage,targetX,targetY,{1})
+				INSERT INTO wtfb2_events (eventType,estimatedTime,happensAt,launchedAt,launcherVillage,targetX,targetY,$amountName)
 				VALUES
-				('settle',TIMESTAMPADD(SECOND,{2},NOW()),TIMESTAMPADD(SECOND,{3},NOW()),NOW(),{4},{5},{6},1)
-			",array($amountName,$travelTime,$moddedTime,$launcherVillageId,$targetX,$targetY)
-		)
+				('settle',TIMESTAMPADD(SECOND,{0},NOW()),TIMESTAMPADD(SECOND,{1},NOW()),NOW(),{2},{3},{4},1)
+			",$travelTime,$moddedTime,$launcherVillageId,$targetX,$targetY
 	);
-	
-	
+
+
 	// take the settler
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_villages SET {1}={1}-1 WHERE (id={2})",array($amountName,$launcherVillageId)));
+	runEscapedQuery("UPDATE wtfb2_villages SET $amountName=$amountName-1 WHERE (id={0})",$launcherVillageId);
 }
 
 function sendTroops($command)
@@ -242,7 +228,7 @@ function sendTroops($command)
 	global $player;
 	$levelNames=array();
 	$costs=array();
-	
+
 	foreach($config['units'] as $key=>$value)
 	{
 		$levelNames[]=$value['countDbName'];
@@ -253,16 +239,16 @@ function sendTroops($command)
 	$ctr=1;
 	if ($command[$ctr++]!='FOR') die('Syntax error, the programmer proably did something wrong... FOR missing.');
 	$action=$command[$ctr++];
-	if ($command[$ctr++]!='TO') die('Syntax error, the programmer proably did something wrong... TO missing.'); 	
+	if ($command[$ctr++]!='TO') die('Syntax error, the programmer proably did something wrong... TO missing.');
 	$destinationVillageId=(int)$command[$ctr++];
-	if ($command[$ctr++]!='TARGET') die('Syntax error, the programmer proably did something wrong... TARGET missing.'); 	
+	if ($command[$ctr++]!='TARGET') die('Syntax error, the programmer proably did something wrong... TARGET missing.');
 	$catapultTarget=$command[$ctr++];
 	$heroModStr=$command[$ctr++];
 	$withHero=false;
 	if ($heroModStr=='WITHHERO') $withHero=true;
 	else if ($heroModStr=='WITHOUTHERO') $withHero=false;
 	else die('Syntax error, the programmer proably did something wrong... WITHHERO or WITHOUTHERO missing.');
-	if ($command[$ctr++]!='FROM') die('Syntax error, the programmer proably did something wrong... FROM missing.'); 
+	if ($command[$ctr++]!='FROM') die('Syntax error, the programmer proably did something wrong... FROM missing.');
 	$destinationVillage=fetchVillageRecord($destinationVillageId,false);
 	if ($destinationVillage==FALSE) return;
 	$ctr=6;
@@ -276,7 +262,7 @@ function sendTroops($command)
 	}
 	if ($ctr==$n) die('Syntax error,  the programmer proably did something wrong... AMOUNTS missing.');
 	$ctr++; // skip the amounts
-	$amounts=array();	
+	$amounts=array();
 	$index=0;
 	$armyCost=0;
 	for(;$ctr<$n;$ctr++)
@@ -292,10 +278,10 @@ function sendTroops($command)
 	// check against the age interaction limit.
 	if (($action=='move') && ($player['id']!=$destinationVillage['ownerId']))
 	{
-		$r=doMySqlQuery(sqlPrintf("SELECT TIMESTAMPDIFF(SECOND,'{1}',NOW()) AS senderPlayTime,TIMESTAMPDIFF(SECOND,regDate,NOW()) AS recipientPlayTime FROM wtfb2_users WHERE (id='{2}')",array($player['regDate'],$destinationVillage['ownerId'])));
-		if (mysql_num_rows($r)>0)
+		$r=runEscapedQuery("SELECT TIMESTAMPDIFF(SECOND,{0},NOW()) AS senderPlayTime,TIMESTAMPDIFF(SECOND,regDate,NOW()) AS recipientPlayTime FROM wtfb2_users WHERE (id={1})",$player['regDate'],$destinationVillage['ownerId']);
+		if (!isEmptyResult($r))
 		{
-			$a=mysql_fetch_assoc($r);
+			$a=$r[0][0];
 			$spt=$a['senderPlayTime'];
 			$rpt=$a['recipientPlayTime'];
 			if ($spt<$rpt)
@@ -322,7 +308,7 @@ function sendTroops($command)
 			if ($destinationVillage['ownerId']!=$_SESSION['userId'])
 			{
 				$responses.=$language['youcantgiveawayasdeputy'];
-				return;				
+				return;
 			}
 		}
 	}
@@ -330,17 +316,10 @@ function sendTroops($command)
 	$index=0;
 	$speed=100;
 	$queryPart=array();
-/*	foreach($config['units'] as $key=>$value)
-	{
-		$amount=$amounts[$value['countDbName']];
-		$unitAmounts[]=$language[$value['languageEntry']].': '.$amount;
-		$queryPart[]="SIGN(FLOOR(${value['countDbName']})*SIGN($amount))*1/${value['speed']}";
-	}
-	$speedModPart="GREATEST(".implode(',',$queryPart).") AS timeMod";*/
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_heroes WHERE (ownerId='{1}')",array($player['id'])));
+	$r=runEscapedQuery("SELECT * FROM wtfb2_heroes WHERE (ownerId={0})",$player['id']);
 	$hero;
-	if (mysql_num_rows($r)==0) $withHero=false;
-	else $hero=mysql_fetch_assoc($r);
+	if (isEmptyResult($r)) $withHero=false;
+	else $hero=$r[0][0];
 
 	if (count($senderVillages)==0)
 	{
@@ -348,20 +327,18 @@ function sendTroops($command)
 		return;
 	}
 
-	$r=doMySqlQuery(
-		sqlPrintf(
+	$r=runEscapedQuery(
 		"
-			SELECT *,SQRT(POW({1}-x,2)+POW({2}-y,2)) AS distance
+			SELECT *,SQRT(POW({0}-x,2)+POW({1}-y,2)) AS distance
 			FROM wtfb2_villages
-			WHERE (id IN (".implode(',',$senderVillages).")) AND (ownerId={3})
-		",array($destinationVillage['x'],$destinationVillage['y'],$player['id'])
-		)
+			WHERE (id IN (".implode(',',$senderVillages).")) AND (ownerId={2})
+		",$destinationVillage['x'],$destinationVillage['y'],$player['id']
 	);
 	$sum=array();
 	$rows=array();
 	$orgRows=array();
-	while($row=mysql_fetch_assoc($r))
-	{	
+	foreach ($r[0] as $row)
+	{
 		$orgRows[]=$row;
 		foreach($levelNames as $key=>$countName)
 		{
@@ -371,13 +348,6 @@ function sendTroops($command)
 		}
 		$rows[]=$row;
 	}
-/*	if ($player['id']==4)
-	{
-		ob_start();
-		print_r($orgRows);
-		logText(ob_get_contents());
-		ob_end_clean();
-	}*/
 	foreach($levelNames as $key2=>$countName)
 	{
 		if ($sum[$countName]<$amounts[$countName])
@@ -386,21 +356,10 @@ function sendTroops($command)
 			return;
 		}
 	}
-/*	if ($player['id']==4)
-	{
-		ob_start();
-		print_r($rows);
-		logText(ob_get_contents());
-		ob_end_clean();
-	}*/
-//	echo implode(',',$sum)."\n\n";
-//	echo implode(',',$amounts)."\n\n";
 	$modSum=array();
 	$pluses=array();
 	foreach($rows as $key=>$row)
-	{		
-//		$modamounts[$row['id']]=array();
-//		echo '[';
+	{
 		foreach($levelNames as $key2=>$countName)
 		{
 			if ($sum[$countName]!=0)
@@ -425,18 +384,8 @@ function sendTroops($command)
 					$pluses[$countName]=0;
 				}
 			}
-//			echo $rows[$key][$countName].' '.$countName;
 		}
-//		echo "]\n";
 	}
-/*	if ($player['id']==4)
-	{
-		ob_start();
-		print_r($rows);
-		logText(ob_get_contents());
-		ob_end_clean();
-		logText("\n\n============================\n\n");
-	}*/
 	$toInsertEvent=array();
 	foreach($rows as $key=>$row)
 	{
@@ -456,40 +405,45 @@ function sendTroops($command)
 				$tf=1.0/(double)$value['speed'];
 				if ($timeFactor<$tf) $timeFactor=$tf;
 			}
-			$countDec[]=sqlPrintf("{1}={1}-{2}",array($countName,$amount));
+			$countDec[]=sqlvprintf("$countName=$countName-{0}",array($amount));
 			$unitVector[]=$amount;
 		}
 		// check troop cost
 		$armyCost=0;
 		foreach($unitVector as $key=>$value)
 		{
-                        $armyCost+=$value*$costs[$key];
+            $armyCost+=$value*$costs[$key];
 		}
-                if (($armyCost<$config['minimalArmyValueRate']*$player['goldProduction']) && ($action!='move') && ($action!='heromove'))
-                {
-                        echo $action.'\n';
-                        $responses.=xprintf($language['pleasesendmoretroops'],array($config['minimalArmyValueRate']*$player['goldProduction']))."\n";
-                        continue;
-                }
-		
+        if (($armyCost<$config['minimalArmyValueRate']*$player['goldProduction']) && ($action!='move') && ($action!='heromove'))
+        {
+            echo $action.'\n';
+            $responses.=xprintf($language['pleasesendmoretroops'],array($config['minimalArmyValueRate']*$player['goldProduction']))."\n";
+            continue;
+        }
+
 		if ($timeFactor==0) continue;
-		doMySqlQuery(sqlPrintf("UPDATE wtfb2_villages SET ".implode(',',$countDec)." WHERE (id='{1}') AND (ownerId='{2}')",array($row['id'],$player['id'])));
-		$secs=3600*$row['distance']*$timeFactor/$config['serverSpeed']; // less seconds travel time 
+		runEscapedQuery("UPDATE wtfb2_villages SET ".implode(',',$countDec)." WHERE (id={0}) AND (ownerId={1})",$row['id'],$player['id']);
+		$secs=3600*$row['distance']*$timeFactor/$config['serverSpeed']; // less seconds travel time
 		$realSecs=randomizeTime($secs);
 		$sendHeroId='0';
 		if (($withHero) && ($hero['inVillage']==$row['id']))
 		{
-			doMySqlQuery(sqlPrintf("UPDATE wtfb2_heroes SET inVillage=0 WHERE (id='{1}')",array($hero['id']))); // hogy ne legyen ott a hős.
+			runEscapedQuery("UPDATE wtfb2_heroes SET inVillage=0 WHERE (id={0})",$hero['id']); // hogy ne legyen ott a hős.
 			$sendHeroId=$hero['id'];
 		}
 		$toInsertEvent[]=
-		sqlPrintf(
-			"('{1}',TIMESTAMPADD(SECOND,{2},NOW()),TIMESTAMPADD(SECOND,{3},NOW()),NOW(),{4},{5},".implode(',',$unitVector).",'{6}','{7}')",
+		sqlvprintf(
+			"({0},TIMESTAMPADD(SECOND,{1},NOW()),TIMESTAMPADD(SECOND,{2},NOW()),NOW(),{3},{4},".implode(',',$unitVector).",{5},{6})",
 			array($action,$secs,$realSecs,$row['id'],$destinationVillageId,$catapultTarget,$sendHeroId)
 		);
 	}
 	if (count($toInsertEvent)>0)
-		doMySqlQuery("INSERT INTO wtfb2_events (eventType,estimatedTime,happensAt,launchedAt,launcherVillage,destinationVillage,".implode(',',$levelNames).",catapultTarget,heroId) VALUES ".implode(',',$toInsertEvent)."\n");
+		runEscapedQuery("
+		    INSERT INTO wtfb2_events
+		        (eventType,estimatedTime,happensAt,launchedAt,launcherVillage,destinationVillage,".implode(',',$levelNames).",catapultTarget,heroId)
+		        VALUES ".implode(',',$toInsertEvent).
+		        "\n"
+		);
 }
 
 function getTimeToFinish(&$v)
@@ -511,7 +465,7 @@ function compareVillage(&$v1,&$v2)
 
 function planMassTraining(&$villages,$amountToTrain) // not taking database village record!
 {
-	
+
 	usort($villages,'compareVillage');
 
 	$n=count($villages);
@@ -537,21 +491,14 @@ function planMassTraining(&$villages,$amountToTrain) // not taking database vill
 				$amount=$diff*$villages[$k]['rate']*$krate;
 				$amountToTrain-=$amount;
 				enqueue($villages[$k],$amount);
-//				echo "ENQUEUING $amount, DIFF WAS $diff, KRATE WAS $krate, RATE WAS ".$villages[$k]['rate']."\n";
 			}
-/*			echo "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n";
-			print_r($villages);
-			echo "$amountToTrain\n";
-			echo "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n";*/
 			if ($krate<1)
 			{
-//				echo "WE R READY GETTIN OUT!";
 				break;
 			}
 		}
 		else
 		{
-//			echo 'FINAL CREATION';
 			$sr=0;
 			for($k=0;$k<$n;$k++)
 			{
@@ -561,7 +508,7 @@ function planMassTraining(&$villages,$amountToTrain) // not taking database vill
 			for($k=0;$k<$n;$k++)
 			{
 				$amount=$unitPerTimeUnit*$villages[$k]['rate'];
-				enqueue($villages[$k],$amount);	
+				enqueue($villages[$k],$amount);
 				$amountToTrain-=$amount;
 			}
 		}
@@ -570,7 +517,7 @@ function planMassTraining(&$villages,$amountToTrain) // not taking database vill
 	$frac=0;
 	for($i=0;$i<$n;$i++)
 	{
-		if (!isset($villages[$i]['newTraining'])) 
+		if (!isset($villages[$i]['newTraining']))
 		{
 			$villages[$i]['newTraining']=0;
 			continue;
@@ -591,11 +538,6 @@ function massTraining($command)
 	global $language;
 	global $responses;
 	global $player;
-/*	if ($player['permission']!='admin')
-	{
-		$responses.="Sajna még szar.... Rakd be kézzel a kiképzendőt, vagy ne rakj be egységet addig. :(\n";
-		return;
-	}*/
 
 	$ctr=1;
 	$n=count($command);
@@ -635,23 +577,21 @@ function massTraining($command)
 		$responses.=$language['notenoughgold']."\n";
 		return;
 	}
-	// 
+	//
 	foreach($villages as $key=>$value)
 	{
 		updateVillage($value);
 	}
 	// Now load the villages
-	$q=sqlPrintf("SELECT * FROM wtfb2_villages WHERE (id IN (".implode(',',$villages).")) AND (ownerId='{1}')",array($player['id']));
-	$r=doMySqlQuery($q);
+	$q=sqlvprintf("SELECT * FROM wtfb2_villages WHERE (id IN (".implode(',',$villages).")) AND (ownerId={0})",array($player['id']));
+	$r=runEscapedQuery($q);
 	$villageRecords=array();
-	while($row=mysql_fetch_assoc($r))
+	foreach ($r[0] as $row)
 	{
 		$villageRecords[]=$row;
 	}
 	// Now calculate how many units needed
 	$actr=0;
-//	print_r($villageRecords);
-//	$f=fopen('mtsuck','w+t');
 	foreach($config['units'] as $key=>$unitDescriptor)
 	{
 		$amount=$amounts[$actr++];
@@ -669,16 +609,7 @@ function massTraining($command)
 			$mtVillage['enqueued']=(double)$village[$trainingDbName];
 			$mtVillages[]=$mtVillage;
 		}
-/*		ob_start();
-		usort($mtVillages,'compareVillage');
-		print_r($mtVillages);
-		echo "-----------\n";*/
 		planMassTraining($mtVillages,$amount);
-/*		print_r($mtVillages);
-		echo "=====\n";
-		$contents=ob_get_contents();
-		fwrite($f,$contents);
-		ob_end_clean();*/
 		// organize them by id
 		$byId=array();
 		foreach($mtVillages as $key=>$value)
@@ -691,35 +622,18 @@ function massTraining($command)
 			$villageRecords[$key2][$trainingDbName]=(double)$villageRecords[$key2][$trainingDbName]+$mtVillage['newTraining'];
 		}
 	}
-/*	fclose($f);
-	die();*/
-/*	print_r($villageRecords);
-	die();*/
 	// prepare writing back.
 	foreach($villageRecords as $key=>$village)
 	{
 		$updateStr=array();
 		foreach($village as $key2=>$col)
 		{
-			$updateStr[]=$key2.'=\''.mysql_real_escape_string($col)."'";
+			$updateStr[]=$key2 . sqlvprintf('={0}', array($col));
 		}
-		$q=sqlPrintf("UPDATE wtfb2_villages SET ".implode(',',$updateStr)." WHERE (id='{1}') AND (ownerId='{2}')",array($village['id'],$player['id']));
-		doMySqlQuery($q);
+		$q=sqlvprintf("UPDATE wtfb2_villages SET ".implode(',',$updateStr)." WHERE (id={0}) AND (ownerId={1})",array($village['id'],$player['id']));
+		runEscapedQuery($q);
 	}
 	$player['gold']-=$gold;
-	
-	// Now set up the query
-/*	$trainingPart=array();
-	$i=0;
-	foreach($config['units'] as $key=>$value)
-	{
-		$trainingPart[]=sqlPrintf("{1}={1}+{2}",array($value['trainingDbName'],$amounts[$i++]));
-	}
-	
-	$q=sqlPrintf("UPDATE wtfb2_villages SET ".implode(',',$trainingPart)." WHERE (id IN (".implode(',',$villages).")) AND (ownerId='{1}')",array($player['id'])); // set up training
-	doMySqlQuery($q);
-	$player['gold']-=$gold; // take the gold*/
-	
 }
 
 function moveHero($command)
@@ -728,37 +642,35 @@ function moveHero($command)
 	global $language;
 	global $responses;
 	global $player;
-	
+
 	$destinationVillageId=(int)$command[1];
-	
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_heroes WHERE (ownerId='{1}')",array($player['id'])),'jumpErrorPage');
-	if (mysql_num_rows($r)==0)
+
+	$r=runEscapedQuery("SELECT * FROM wtfb2_heroes WHERE (ownerId={0})",$player['id']);
+	if (isEmptyResult($r))
 	{
 		$responses.=($language['heronotexist']);
 		return;
 	}
-	$hero=mysql_fetch_assoc($r);
-	
+	$hero=$r[0][0];
+
 	$fromVillage=fetchVillageRecord($hero['inVillage'],false);
 	$toVillage=fetchVillageRecord($destinationVillageId,false);
 	if (($fromVillage===FALSE) || ($toVillage===FALSE)) return;
-	
+
 	$dx=(int)$fromVillage['x']-(int)$toVillage['x'];
 	$dy=(int)$fromVillage['y']-(int)$toVillage['y'];
 	$distance=sqrt($dx*$dx+$dy*$dy);
 	$travelTime=$distance*3600/(double)$config['heroSpeed']/$config['serverSpeed'];
 	$realTravelTime=randomizeTime($travelTime);
-	
-	doMySqlQuery(
-		sqlPrintf(
+
+	runEscapedQuery(
 			"
 				INSERT INTO wtfb2_events (eventType,launchedAt,estimatedTime,happensAt,launcherVillage,destinationVillage,heroId)
 				VALUES
-				 ('heromove',NOW(),TIMESTAMPADD(SECOND,{1},NOW()),TIMESTAMPADD(SECOND,{2},NOW()),{3},{4},{5})
-			",array($travelTime,$realTravelTime,$fromVillage['id'],$toVillage['id'],$hero['id'])
-		)
+				 ('heromove',NOW(),TIMESTAMPADD(SECOND,{0},NOW()),TIMESTAMPADD(SECOND,{1},NOW()),{2},{3},{4})
+			",$travelTime,$realTravelTime,$fromVillage['id'],$toVillage['id'],$hero['id']
 	);
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_heroes SET inVillage=0 WHERE ('{1}'=id)",array($hero['id'])));
+	runEscapedQuery("UPDATE wtfb2_heroes SET inVillage=0 WHERE ({0}=id)",$hero['id']);
 }
 
 function setSpareBuildPoints($command)
@@ -767,10 +679,10 @@ function setSpareBuildPoints($command)
 	global $language;
 	global $responses;
 	global $player;
-	
+
 	$villageId=$command[1];
 	$newValue=(int)$command[2];
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_villages SET spareBuildPoints='{2}' WHERE (id='{1}') AND (ownerId='{3}')",array($villageId,$newValue,$player['id'])));	
+	runEscapedQuery("UPDATE wtfb2_villages SET spareBuildPoints={1} WHERE (id={0}) AND (ownerId={2})",$villageId,$newValue,$player['id']);
 }
 
 function doMassBuilding(&$villageArray,$buildingId,$maxGold,$maxLevel)
@@ -780,47 +692,45 @@ function doMassBuilding(&$villageArray,$buildingId,$maxGold,$maxLevel)
 	$levelName=$bd['buildingLevelDbName'];
 	$costFn=$bd['costFunction'];
 	$n=count($villageArray);
-	
-	
+
+
 	$tmpLevels=array();
 	for($i=0;$i<$n;$i++)
 	{
 		$tmpLevels[$i]=$villageArray[$i][$levelName];
 	}
-	
-	
+
+
 	$spent=0;
 	$built=false;
 	for($i=0;$i<$n;$i++)
 	{
 		$iLevel=$tmpLevels[$i];
-	
+
 		if (($iLevel>=$maxLevel) && ($maxLevel>0))
 		{
-//			echo "X";
 			return $spent;
 		}
-	
+
 		$bLevel=$villageArray[$i][$levelName];
 		$uCost=$costFn($bLevel);
 		$bp=$villageArray[$i]['buildPoints'];
-	
-		if ($bp>=$villageArray[$i]['spareBuildPoints']+1) 
+
+		if ($bp>=$villageArray[$i]['spareBuildPoints']+1)
 		{
 			if ($spent+$uCost>$maxGold)
 			{
-//				echo "Y";
 				return $spent;
-			}		
+			}
 			$villageArray[$i][$levelName]++;
 			$villageArray[$i]['buildPoints']--;
 			$spent+=$uCost;
 			$built=true;
 		}
-	
+
 		$tmpLevels[$i]++;
-	
-	
+
+
 		if ($i+1<$n)
 		{
 			if ($tmpLevels[$i+1]>$iLevel)
@@ -837,16 +747,6 @@ function doMassBuilding(&$villageArray,$buildingId,$maxGold,$maxLevel)
 				$built=false;
 			}
 		}
-		
-/*		echo "tmpArray:\n";
-		print_r($tmpLevels);
-		echo "levelArray:\n";
-		print_r($levelsArray);
-		echo "bpArray:\n";
-		print_r($bpArray);
-		echo "-----------\n";
-		$maxIter--;*/
-//		if ($maxIter<=0) return $spent;
 	}
 	return $spent;
 }
@@ -859,7 +759,7 @@ function massBuild($command)
 	global $responses;
 	global $player;
 	global $scoreChangedVillages;
-	
+
 	$ctr=1;
 	$n=count($command);
 	$villageIds=array();
@@ -900,14 +800,14 @@ function massBuild($command)
 	{
 		updateVillage($value);
 	}
-	
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_villages WHERE (id IN (".implode(',',$villageIds).")) AND (ownerId='{1}') ".($maxLevel>0 ? 'AND ({2}<{3})':'')."ORDER BY {2}",array($player['id'],$bldn,$maxLevel)));
+
+	$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (id IN (".implode(',',$villageIds).")) AND (ownerId={0}) ".($maxLevel>0 ? 'AND ($bldn<{1})':'')."ORDER BY $bldn",$player['id'],$maxLevel);
 	$villages=array();
-	while($a=mysql_fetch_assoc($r))
+	foreach ($r[0] as $a)
 	{
 		$villages[]=$a;
 	}
-	
+
 	$oldVillages=$villages;
 	$spent=doMassBuilding($villages,$building,$maxGold,$maxLevel);
 	$player['gold']-=$spent;
@@ -917,14 +817,14 @@ function massBuild($command)
 		$tmp=array();
 		foreach($village as $column=>$value)
 		{
-			$tmp[]=sqlPrintf("{1}='{2}'",array($column,$value));
+			$tmp[]=sqlvprintf("$column={0}",array($value));
 		}
-		doMySqlQuery(sqlPrintf("UPDATE wtfb2_villages SET ".implode(', ',$tmp)." WHERE (id='{1}')",array($village['id'])));
+		runEscapedQuery("UPDATE wtfb2_villages SET ".implode(', ',$tmp)." WHERE (id={0})",$village['id']);
 		if ($oldVillages[$key][$bldn]!=$village[$bldn])
 			$scoreChangedVillages[$village['id']]=$village;
 	}
-	
-	
+
+
 }
 
 function mergeEscaped($pre,$separatorWas)
@@ -947,7 +847,7 @@ function mergeEscaped($pre,$separatorWas)
 			$value=substr($value,0,$len-1);
 		if (!isset($after[$arrayIndex])) $after[$arrayIndex]=$value; else $after[$arrayIndex].=$separatorWas.$value;
 		if (($slashCount%2)==0) $arrayIndex++;
-		
+
 	}
 	return $after;
 }
@@ -955,22 +855,10 @@ function mergeEscaped($pre,$separatorWas)
 $tasklines=mergeEscaped(explode("\n",$tasks),"\n");
 
 
-/*print_r($tasks);
-echo "\r\n\r\n";
-print_r($tasklines);
-echo "\r\n\r\n";*/
 foreach($tasklines as $key=>$commandLine)
 {
-//	preg_match_all('/"(\\.|[^\\"])*"/',$commandLine,$arguments); //explode(' ',preg_replace('/\s\s+/',' ',$commandLine));
 	$arguments=mergeEscaped(explode(' ',$commandLine),' ');
 	foreach($arguments as $key=>$value) $arguments[$key]=str_replace('\\\\','\\',$value);
-/*	echo "\r\n\r\n";
-	print_r($arguments);
-	die();*/
-	foreach($arguments as $key=>$value)
-	{
-		$arguments[$key]=mysql_real_escape_string($value);
-	}
 	$commandName=$arguments[0];
 	if ($commandName=='UPGRADEBUILDING') upgradeBuilding($arguments);
 	else if ($commandName=='RENAMEVILLAGE') renameVillage($arguments);
@@ -991,14 +879,11 @@ foreach($player as $key=>$value)
 {
 	if (!$first) $setString.=', ';
 	$first=false;
-	if ($value=='')
-		$setString.=$key."=NULL";
-	else
-		$setString.=$key."='".mysql_real_escape_string($value)."'";
+	$setString.=$key . sqlvprintf('={0}', array($value == '' ? NULL : $value));
 }
 
-$q=sqlPrintf("UPDATE wtfb2_users SET $setString WHERE (id={1})",array($_SESSION['userId']));
-$r=doMySqlQuery($q);
+$q=sqlvprintf("UPDATE wtfb2_users SET $setString WHERE (id={0})",array($_SESSION['userId']));
+$r=runEscapedQuery($q);
 recalculatePlayerInfo($_SESSION['userId']);
 if ($responses!='')
 {
@@ -1007,7 +892,7 @@ if ($responses!='')
 
 foreach ($scoreChangedVillages as $key=>$village)
 {
-	doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ('{1}','{2}',NOW(),'scorechanged')",array($village['x'],$village['y'])));
+	runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({0},{1},NOW(),'scorechanged')",$village['x'],$village['y']);
 }
 
 header('content-type: application/xml; charset=utf-8');

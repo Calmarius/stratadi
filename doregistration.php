@@ -10,6 +10,7 @@ function bounceBack()
 	die();
 }
 
+// TODO: Cleanup inactive accounts. 
 function cleanupInactiveAccounts()
 {
 	global $config;
