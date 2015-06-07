@@ -801,7 +801,7 @@ function massBuild($command)
 		updateVillage($value);
 	}
 
-	$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (id IN (".implode(',',$villageIds).")) AND (ownerId={0}) ".($maxLevel>0 ? 'AND ($bldn<{1})':'')."ORDER BY $bldn",$player['id'],$maxLevel);
+	$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (id IN (".implode(',',$villageIds).")) AND (ownerId={0}) ".($maxLevel>0 ? "AND ($bldn<{1})":'')."ORDER BY $bldn",$player['id'],$maxLevel);
 	$villages=array();
 	foreach ($r[0] as $a)
 	{
