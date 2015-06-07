@@ -25,7 +25,7 @@ global $config;
 <table class="center">
 	<tr><td><?php echo $language['city']; ?></td><td><?php echo $this->city;?></td></tr>
 	<tr><td><?php echo $language['age']; ?></td><td><?php echo $this->age;?></td></tr>
-	<tr><td><?php echo $language['gender']; ?></td><td><?php echo $language[$this->gender];?></td></tr>
+	<tr><td><?php echo $language['gender']; ?></td><td><?php if (isset($this->gender)) echo $language[$this->gender];?></td></tr>
 	<tr><td><?php echo $language['spokenlanguages']; ?></td><td><?php echo $this->languages;?></td></tr>
 </table>
 
