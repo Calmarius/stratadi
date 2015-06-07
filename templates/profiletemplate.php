@@ -10,6 +10,7 @@ global $config;
 <p class="center">#<?php echo $this->id;?></p>
 <p class="center"><?php echo xprintf($language['villagecountscoretext'],array($this->villageCount,$this->totalScore)); ?></p>
 <p class="center"><?php echo xprintf($language['agebonustext'],array(round($this->ageBonus,2))); ?></p>
+<p class="center"><?php echo xprintf($language['revagebonustext'],array(round($this->revAgeBonus,2))); ?></p>
 <p><img src="<?php echo $this->avatarLink; ?>" onerror="this.parentNode.removeChild(this);"></p>
 <?php
 	if ($this->heroId=='')
@@ -39,10 +40,6 @@ global $config;
 ?>
 <table class="center">
 	<tr><td><?php echo $language['guildname']; ?></td><td><a href="viewguild.php?id=<?php echo $this->guildId; ?>"><?php echo $this->guildName;?></a></td></tr>
-	<!--<tr><td><?php echo $language['city']; ?></td><td><?php echo $this->city;?></td></tr>
-	<tr><td><?php echo $language['age']; ?></td><td><?php echo $this->age;?></td></tr>
-	<tr><td><?php echo $language['gender']; ?></td><td><?php echo $language[$this->gender];?></td></tr>
-	<tr><td><?php echo $language['spokenlanguages']; ?></td><td><?php echo $this->languages;?></td></tr>-->
 	
 	<tr>
 		<td>

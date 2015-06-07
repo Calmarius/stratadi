@@ -550,6 +550,7 @@ X
 		</table>
 X
 	, // the description of the move event {1} event type, {2} launcher village name (as link), {3} destination village name (as link), {4} with units, {5} coordinates, {6} gold, {7}: event time, {8}: hero (as link), some of these may be undefined., {9}: catapult target (image), {10} cancel this event link
+	'revagebonustext'=>"Fordított korbónusz: {1}×", // In the profile
 	'revoke'=>'Visszavon', // in the invite player window
 	'revokeinvitationtext'=>'{1} klán toborzója visszavonta a meghívást a klánjába.', // in the invitation revocation report. {1}: is the link to the guild
 	'revokeinvitationtitle'=>'Meghívás visszavonva', // in the invitation revocation report title.

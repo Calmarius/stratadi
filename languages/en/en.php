@@ -546,6 +546,7 @@ X
 		</table>
 X
 	, // the description of the move event {1} event type, {2} launcher village name (as link), {3} destination village name (as link), {4} with units, {5} coordinates, {6} gold, {7}: event time, {8}: hero (as link), some of these may be undefined., {9}: catapult target (image), {10} cancel this event link
+	'revagebonustext'=>"Reverse age bonus: {1}×", // In the profile
 	'revoke'=>'Revoke', // in the invite player window
 	'revokeinvitationtext'=>'The {1} guild\'s recruiter revoked the invition to their guild.', // in the invitation revocation report. {1}: is the link to the guild
 	'revokeinvitationtitle'=>'Invitation revoked', // in the invitation revocation report title.
