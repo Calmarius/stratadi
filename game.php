@@ -82,7 +82,7 @@ else
 }
 
 $content=$gameViewTemplate->getContents();
-$page=new Template('templates/basiclayout.php',array('title'=>'WTFBattles II','content'=>$content,'scripts'=>($enteredGame ? array('timer.js','map.js.php','ajax.js','debug.js'):''),'loadScript'=>'initMap('.(int)$_GET['x'].','.(int)$_GET['y'].'); getPlayerInfo(); loadAllVillages(); '.($needsTutorial ? 'openInWindow(\'tutorial.php\')':'')));
+$page=new Template('templates/basiclayout.php',array('title'=>'WTFBattles II','content'=>$content,'scripts'=>(@$enteredGame ? array('timer.js','map.js.php','ajax.js','debug.js'):''),'loadScript'=>'initMap('.(int)@$_GET['x'].','.(int)@$_GET['y'].'); getPlayerInfo(); loadAllVillages(); '.(@$needsTutorial ? 'openInWindow(\'tutorial.php\')':'')));
 $page->render();
 
 ?>
