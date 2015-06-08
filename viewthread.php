@@ -7,7 +7,7 @@ if (!isset($_SESSION['userId'])) jumpErrorPage($language['sessionisover']);
 $threadId=(int)$_GET['id'];
 $linkId=(int)$_GET['link'];
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($_SESSION['userId'])),jumpErrorPage);
+$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($_SESSION['userId'])),'jumpErrorPage');
 $me=mysql_fetch_assoc($r);
 
 $r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_threads WHERE (id='{1}') AND ((guildId IS NULL) OR (guildId='{2}'))",array($threadId,$me['guildId'])),'jumpErrorPage');

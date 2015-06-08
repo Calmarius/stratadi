@@ -159,6 +159,21 @@ BuildingNames=<?php echo json_encode($buildingNames)?>;
 minimalArmyValueRate=<?php echo $config["minimalArmyValueRate"]; ?>;
 WorldEventName=<?php echo json_encode($worldEventNames); ?>;
 
+if (!String.format)
+{
+    String.format = function(format)
+    {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return format.replace(/{(\d+)}/g, function(match, number)
+        {
+            return typeof args[number] != 'undefined'
+            ? args[number]
+            : match
+            ;
+        });
+    };
+}
+
 // performs deep copy
 function clone(o)
 {
@@ -177,7 +192,7 @@ function clone(o)
 		var property=o[i];
 		if (typeof(property)=='object') newObj[i]=clone(property);
 		else newObj[i]=property;
-	}	
+	}
 	return newObj;
 }
 
@@ -210,7 +225,7 @@ function reloadImages()
 		var src=image.src;
 		var uriPath=src.match(/nightimage.php\?img=[a-z0-9]+/gim);
 		image.src=uriPath+'&rnd='+Math.random();
-//		_('debugspan').innerHTML+='<span>'+image.src+'</span>';		
+//		_('debugspan').innerHTML+='<span>'+image.src+'</span>';
 	}
 }
 
@@ -248,7 +263,7 @@ function openInWindow(url)
 	'<iframe src="'+(url+separator+'parentdivid='+rId)+'" style="width:740px; height:600px">'+'<?php echo xprintf($language["yourbrowsernotsupportiframe"],array("'+url+'"));?>'+'</iframe>'+
 	''
 	;
-	var elm=genFloatingBox(iHTML,rId,0,0);	
+	var elm=genFloatingBox(iHTML,rId,0,0);
 	elm.style.width="800px";
 	document.body.appendChild(elm);
 	centerElement(elm);
@@ -298,7 +313,7 @@ function genericAjaxEventHandler()
 function setPercent(countControlId,percentControlId,maxAmount)
 {
 	var amount=parseInt(_(countControlId).value,10);
-	if (isNaN(amount)) 
+	if (isNaN(amount))
 	{
 		_(countControlId).value='0';
 		amount=0;
@@ -338,12 +353,12 @@ function sendTroops(launcherVillages,destinationVillageId,action,operationName)
 	for(var i in UnitDescriptors)
 	{
 		var amount=parseFloat(_('amount_'+i).value);
-		task.command.push(amount);		
+		task.command.push(amount);
 		unitsToSend.push(Math.floor(amount));
 		emptyWave&=amount<=0;
 		armyValue+=UnitDescriptors[i].cost*amount;
 	}
-	if (emptyWave && (!_('launchhero').checked)) 
+	if (emptyWave && (!_('launchhero').checked))
 	{
 		alert('<?php echo $language["cantlaunchemptywave"]; ?>');
 		return false;
@@ -354,10 +369,10 @@ function sendTroops(launcherVillages,destinationVillageId,action,operationName)
 		return false;
 	}
 	task.text='<?php echo xprintf($language["sendtroopscommand"],array("['+launcherVillages+']","['+unitsToSend+']","'+destinationVillage.villageName+'","'+operationName+'")); ?>';
-	
+
 	tasklist.push(task);
 	return true;
-	
+
 }
 
 function setArmyValue(armyInputIdPrefix,armyValueSpanId)
@@ -403,7 +418,7 @@ if (!toggleElement)
 
 function setupAction(action,launcherVillages,x,y,destinationVillageId,mp)
 {
-	if (prevCellInfo) 
+	if (prevCellInfo)
 	{
 		prevCellInfo.close();
 	}
@@ -438,7 +453,7 @@ function setupAction(action,launcherVillages,x,y,destinationVillageId,mp)
 		if (action=='attack') operationname='<?php echo $language[$config["operations"]["attack"]["langName"]]; ?>';
 		if (action=='recon') operationname='<?php echo $language[$config["operations"]["recon"]["langName"]]; ?>';
 		if (action=='raid') operationname='<?php echo $language[$config["operations"]["raid"]["langName"]]; ?>';
-		
+
 		var heroVillage=0;
 		if (playerInfo && playerInfo.hero && playerInfo.hero[0] && playerInfo.hero[0].inVillage)
 		{
@@ -460,7 +475,7 @@ function setupAction(action,launcherVillages,x,y,destinationVillageId,mp)
 				unitAmounts[j]+=parseInt(village[levelName],10);
 			}
 		}
-		
+
 		var valueText='<p><?php echo xprintf($language["armyvaluetext"],array("'+Math.ceil(playerInfo.goldProduction*minimalArmyValueRate)+'","<span id=\"armyvalue\">0</span>")); ?></p>';
 		var amountText='<table class="center">';
 		amountText+='<tr>';
@@ -499,10 +514,10 @@ function setupAction(action,launcherVillages,x,y,destinationVillageId,mp)
 			unitKeys.push("'"+i+"'");
 		}*/
 		amountText+='</table>';
-		
+
 		var catapultText='';
 			catapultText='<p><?php echo $language["pleasechoosecatapulttarget"]; ?><?php echo generateBuildingSelector("catapulttarget","catapulttarget");?></p>';
-		
+
 		var rId=generateRandomId();
 		var iHTML=
 //		'<p><a href="javascript:void(_(\''+rId+'\').close())"><?php echo $language["close"];?></a></p>'+
@@ -541,9 +556,9 @@ function cellAction(cellX,cellY,mp)
 	{
 		village=mapCache[cellX][cellY].villageInfo;
 	}
-	
-	
-	
+
+
+
 	var launcherVillagesText='<ul>';
 	launcherVillagesIdArray=new Array();
 	var myVillage=true;
@@ -580,7 +595,7 @@ function cellAction(cellX,cellY,mp)
 			var senderVillage=villagesById[launcherVillagesIdArray[0]];
 			if (senderVillage.id[0]==playerInfo.hero[0].inVillage[0])
 			{
-				possibleCommandText+='<li><a href="javascript:void((function(){setupAction(\'heromove\',['+launcherVillagesIdArray+'],'+cellX+','+cellY+','+village.id+',{\'x\':'+mp.x+',\'y\':'+mp.y+'});_(\''+rId+'\').close();})())"><?php echo $language["movehero"]; ?></a></li>';		
+				possibleCommandText+='<li><a href="javascript:void((function(){setupAction(\'heromove\',['+launcherVillagesIdArray+'],'+cellX+','+cellY+','+village.id+',{\'x\':'+mp.x+',\'y\':'+mp.y+'});_(\''+rId+'\').close();})())"><?php echo $language["movehero"]; ?></a></li>';
 			}
 		}
 		if (myVillage)
@@ -601,13 +616,13 @@ function cellAction(cellX,cellY,mp)
 		}
 	}
 	possibleCommandText+='</ul>';
-	
+
 	iHTML=
 //		'<p><a href="javascript:void(_(\''+rId+'\').close())"><?echo $language["close"];?></a></p>'+
 		'<p style="width:400px"><?echo $language["launchervillages"];?></p>'+launcherVillagesText+
 		'<p style="width:400px"><?echo $language["targetcell"];?>['+cellX+';'+cellY+']</p>'+
 		'<p style="width:400px"><?echo $language["targetvillage"];?>'+(village ?
-			 '<a href="javascript:void(showCellInfo('+cellX+','+cellY+',{\'x\':'+mp.x+',\'y\':'+mp.y+'}))"><?php echo xprintf($language["villageanduser"],array("'+village.villageName+'","'+village.userName+'")); ?></a>' 
+			 '<a href="javascript:void(showCellInfo('+cellX+','+cellY+',{\'x\':'+mp.x+',\'y\':'+mp.y+'}))"><?php echo xprintf($language["villageanduser"],array("'+village.villageName+'","'+village.userName+'")); ?></a>'
 			 :'<?php echo $language["na"];?>')+'</p>'+
 		'<?php echo $language["possiblecommands"]; ?>' +possibleCommandText+
 		'';
@@ -707,7 +722,7 @@ function upgradeBuilding(villageId,buildingName)
 	{
 		counters['goldindicator'].value+=cost;
 		village[buildingDescriptor.buildingLevelDbName]=level;
-		village.buildPoints+=1;		
+		village.buildPoints+=1;
 	}
 	tasklist.push(task);
 	updateCurrentCellInfo();
@@ -728,7 +743,7 @@ function constrainElementInside(element,padding)
 	if ((width>pageWidth) || (height>pageHeight))
 	{
 		element.style.overflow="auto";
-		if (width>pageWidth-2*padding) 
+		if (width>pageWidth-2*padding)
 		{
 			element.style.width=pageWidth-2*padding+"px";
 			width=pageWidth-2*padding;
@@ -806,14 +821,14 @@ function renameVillage(villageId,x,y)
 				span.innerHTML=value;
 				pNode.appendChild(span);*/
 				pNode.innerHTML=value;
-				
+
 			}
 			ev.cancelBubble=true;
 		};
 	})(villageId,x,y,text);
 	span.appendChild(input);
 	input.focus();
-	
+
 }
 
 function doMassTraining()
@@ -826,7 +841,7 @@ function doMassTraining()
 		var option=select.options[i];
 		if (option.selected) selectedVillageIds.push(option.value);
 	}
-	if (selectedVillageIds.length==0) 
+	if (selectedVillageIds.length==0)
 	{
 		alert('<?php echo $language["onevillagemustbeselected"]; ?>');
 		return;
@@ -853,7 +868,7 @@ function doMassTraining()
 		return;
 	}
 	// do the modification client side;
-	counters['goldindicator'].value-=goldNeeded;	
+	counters['goldindicator'].value-=goldNeeded;
 	for(var i=0;i<selectedVillageIds.length;i++)
 	{
 		var village=villagesById[selectedVillageIds[i]];
@@ -941,7 +956,7 @@ function getOwnVillageOptions()
 		{
 			var selected=selectedCells.isSelected(village.x,village.y);
 			anySelected|=selected;
-			launcherVillagesText+='<option value="'+village.id+'" '+(selected || !anySelected ? 'selected="selected"':'')+'>'+village.villageName+'</option>';				
+			launcherVillagesText+='<option value="'+village.id+'" '+(selected || !anySelected ? 'selected="selected"':'')+'>'+village.villageName+'</option>';
 		}
 	}
 	return launcherVillagesText;
@@ -960,7 +975,7 @@ function massTraining()
 	var launcherVillagesText=getOwnVillageOptions();
 	var selectedOwnVillageCount=0;
 	var myVillage=true;
-	
+
 	var selId='mtVillageSelector';
 	var unitTable='<table>';
 	for(var i in UnitDescriptors)
@@ -971,7 +986,7 @@ function massTraining()
 	unitTable+=
 	'<tr><td colspan="2"><input type="button" value="<?php echo $language["train"]; ?>" onclick="doMassTraining()"></td></tr>'+
 	'</table>';
-	
+
 	var iHTML=
 	'<h1><?php echo $language["masstraining"]; ?></h1>'+
 	'<table>'+
@@ -1072,9 +1087,9 @@ function doMassBuilding()
 	task.command.push(buildingType);
 	tasklist.push(task);
 	_(prevMbDivId).close();
-	
-	
-	
+
+
+
 }
 
 var mbPos;
@@ -1198,7 +1213,7 @@ function showUnitTrainingInput(villageId,unitName,sId)
 			return function(e)
 			{
 				var ev=e || window.event;
-			
+
 				if ((ev.keyCode==13) || (ev.keyCode==27))
 				{
 					if (ev.keyCode==13)
@@ -1231,14 +1246,14 @@ function makeDraggable(elm)
 		if (ev.stopPropagation()) ev.stopPropagation();
 		this.grabbed=true;
 	};
-    
+
     function mouseUpOutCommon()
     {
         this.grabbed = false;
         this.mouX = null;
         this.mouY = null;
     }
-    
+
     function mouseoutDragHandler(e)
 	{
 		var ev=e || window.event;
@@ -1250,13 +1265,13 @@ function makeDraggable(elm)
 		}
         this.mouseUpOutCommon();
 	}
-    
+
     function mouseupDragHandler(e)
 	{
         this.mouseUpOutCommon();
         bringElementToFront(this);
 	};
-    
+
     function mousemoveDragHandler(e)
 	{
 		var ev=e || window.event;
@@ -1274,26 +1289,26 @@ function makeDraggable(elm)
 		this.mouX=mc.x;
 		this.mouY=mc.y;
 	};
-    
+
     function scrollDragHandler(e)
 	{
 		if (this.grabbed) this.grabbed=false;
 	};
-    
+
     elm.mouseUpOutCommon = mouseUpOutCommon;
 
 	elm.onmousedown=mousedownDragHandler;
     elm.addEventListener('touchstart', mousedownDragHandler, false);
-    
+
 	elm.onmouseout=mouseoutDragHandler;
     elm.addEventListener('touchleave', mouseoutDragHandler, false);
-    
+
 	elm.onmouseup=mouseupDragHandler;
     elm.addEventListener('touchend', mouseupDragHandler, false);
-    
+
 	elm.onmousemove=mousemoveDragHandler;
     elm.addEventListener('touchmove', mousemoveDragHandler, false);
-    
+
 	elm.addEventListener('scroll', scrollDragHandler, true);
 }
 
@@ -1329,7 +1344,7 @@ function genFloatingBox(iHTML,id,xPos,yPos)
 				'<td class="leftright" style="background-image: url(img/r.png)"></td></tr>'+
 				'<tr><td class="corner" style="background-image: url(img/bl.png)"></td><td class="topbottom" style="background-image: url(img/b.png)"></td><td class="corner" style="background-image: url(img/br.png)"></td></tr>'+
 			'</table>';*/
-	
+
 //	'<div>HEADER</div><div style="width:auto; height:auto">'+iHTML+'</div><div>FOOTER</div>';
 	return elm;
 }
@@ -1343,10 +1358,10 @@ function makeLoadingSquare(id,value)
 	if (!cnv) return;
 	cnv.width=cnv.width; // clears the contents
 	var ctx=cnv.getContext("2d");
-	
+
 	var angle=value*Math.PI*2;
 	var sangle=-Math.PI*0.5
-	
+
 	ctx.fillStyle="rgba(0,255,0,0.2)";
 	ctx.beginPath();
 	ctx.moveTo(25,25);
@@ -1458,8 +1473,8 @@ function showVillageSummary(orderBy)
 			}
 		);
 	}
-	
-	
+
+
 	var rId=generateRandomId();
 	var iHTML='';
 	var orderPngName,orderPngTitle;
@@ -1538,7 +1553,7 @@ function showVillageSummary(orderBy)
 			iHTML+='<td><?php echo xprintf($language["lastupdatesecondstext"],array("'+village._vsLastUpdate+'"));?></td>';
 		}
 		iHTML+='</tr>';
-	}	
+	}
 	{
 		var village=sumRow;
 		iHTML+='<tr>';
@@ -1563,7 +1578,7 @@ function showVillageSummary(orderBy)
 		}
 		iHTML+='<td>&nbsp;</td>';
 		iHTML+='</tr>';
-	}	
+	}
 	iHTML+='</table>';
 	var elm=genFloatingBox(iHTML,rId,0,0);
 //	elm.style.width="800px";
@@ -1597,7 +1612,7 @@ function showBuildingCosts(building)
 	bringElementToFront(elm);
 	document.body.appendChild(elm);
 	constrainElementInside(elm);
-	
+
 }
 
 function buttonizeElement(id)
@@ -1698,7 +1713,7 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 {
 	if (refreshIfUpdateNeeded===null) refreshIfUpdateNeeded=true;
 	if (!cellInfo.showPosition && mouseX && mouseY) cellInfo.showPosition={'x':mouseX,'y':mouseY};
-	if (cellInfo.element) 
+	if (cellInfo.element)
 	{
 		cellInfo.element.close();
 	}
@@ -1707,7 +1722,7 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 	if (e.placeholder)
 	{
 		updateVillage(e.id,e.x,e.y);
-		return;		
+		return;
 	}
 	if (e && e.userId)
 	{
@@ -1718,7 +1733,7 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 	var rId=generateRandomId();
 	var bpId=generateRandomId();
 	var ownedVillage=false;
-	
+
 	var canvasIds=[];
 	if (e.lastUpdate && !guestMode) // if we know the last update time then, we than it's an own village.
 	{
@@ -1728,7 +1743,7 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 			updateVillage(e.id,e.x,e.y);
 		}
 		//
-		
+
 		ownedVillage=true;
 		var unitTrainingTable='<table class="villagestats"><tr>';
 		var unitTrainingSpanIdsByUnitName={};
@@ -1786,7 +1801,7 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 			buildingDivs[key]=sId;
 		}
 		buildingTable+='</tr></table>';
-		
+
 		var sbpId=generateRandomId();
 		detailedInfo+=
 		'<table class="villagestats">'+
@@ -1811,7 +1826,7 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 	}
 	if ((playerInfo) && (playerInfo.hero) && (!playerInfo.hero[0].name))
 	{
-		heroText='<tr><td colspan="3"><a href="javascript:void(openInWindow(\'docreatenewhero.php?at='+e.id[0]+'&rnd='+Math.random()+'\'))"><?php echo $language["createnewhero"];?></a></td></tr>';		
+		heroText='<tr><td colspan="3"><a href="javascript:void(openInWindow(\'docreatenewhero.php?at='+e.id[0]+'&rnd='+Math.random()+'\'))"><?php echo $language["createnewhero"];?></a></td></tr>';
 	}
 
 	var renText='';
@@ -1826,7 +1841,7 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 	'<p class="center"><?php echo xprintf($language["miscvillageinfotext"],array("'+e.score+'","'+e.x+'","'+e.y+'","'+e.id+'")); ?></p>'+
 	'<table class="villagestats">'+
 	(
-		!e.lastUpdate ? 
+		!e.lastUpdate ?
 		'<tr><td><?php echo $language["ownername"]; ?></td><td colspan="2"><a href="javascript:openInWindow(\'viewplayer.php?id='+e.userId+'\')">'+e.userName+'</a></td></tr>'+
 		'<tr><td><?php echo $language["guildname"]; ?></td><td colspan="2"><a href="javascript:openInWindow(\'viewguild.php?id='+e.guildId+'\')">'+e.guildName+'</a></td></tr>'+
 		'<tr><td colspan="3"><span style="color:'+Colors[e.diplomaticStance]+'">'+DiplomacyName[e.diplomaticStance]+'</span></td></tr>':''
@@ -1856,7 +1871,7 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 		if (canvasIds[key])
 		{
 			trainingDbName=value.trainingDbName;
-			makeLoadingSquare(canvasIds[key],(Math.ceil(e[trainingDbName])-e[trainingDbName]));				
+			makeLoadingSquare(canvasIds[key],(Math.ceil(e[trainingDbName])-e[trainingDbName]));
 		}
 	}
 	// create unit Traning inputs:
@@ -1875,7 +1890,7 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 
 function objectFromXMLNode(node)
 {
-	if (node.childNodes[0]) 
+	if (node.childNodes[0])
 	{
 		if (node.childNodes[0].nodeType==3)return node.childNodes[0].nodeValue; //if it's a text node
 	}
@@ -2053,9 +2068,9 @@ function calculateRbRectangles(region)
 	{
 		possibleSizes.push([yCase[i],parseInt(i)]);
 	}*/
-	
+
 	region.rbDefinitions=clone(possibleSizes);
-	
+
 	region.rbCalculated=true;
 }
 
@@ -2066,7 +2081,7 @@ function mergeRegions()
 		var region=updateRegions[i];
 		delete region.rbCalculated;
 	}
-	
+
 	for(var i in updateRegions)
 	{
 		var region=updateRegions[i];
@@ -2116,12 +2131,12 @@ function updateMapRegion()
 	updateTop=region.top-(maxRbSize[1]-1)*UPDATEREGIONSIZE;
 	updateRight=region.left+UPDATEREGIONSIZE;
 	updateBottom=region.top+UPDATEREGIONSIZE;
-	
+
 /*	updateLeft=Math.floor(updateLeft/UPDATEREGIONSIZE)*UPDATEREGIONSIZE;
 	updateRight=Math.ceil(updateRight/UPDATEREGIONSIZE)*UPDATEREGIONSIZE;
 	updateTop=Math.floor(updateTop/UPDATEREGIONSIZE)*UPDATEREGIONSIZE;
 	updateBottom=Math.ceil(updateBottom/UPDATEREGIONSIZE)*UPDATEREGIONSIZE;*/
-	
+
 	if (ajaxPost("areainfo.php?left="+encodeURIComponent(updateLeft)+"&right="+encodeURIComponent(updateRight)+"&top="+encodeURIComponent(updateTop)+"&bottom="+encodeURIComponent(updateBottom)+(slowNet ? "&placeholdersonly":"")," ",updateCallback))
 	{
 		for(var i=updateLeft;i<=updateRight;i++)
@@ -2143,7 +2158,7 @@ function updateMapRegion()
 	}
 	else
 		return false;
-		
+
 //	}
 	return true;
 }
@@ -2163,7 +2178,7 @@ function addUpdatable(x,y)
 	var left=parseInt(Math.floor(x/UPDATEREGIONSIZE)*UPDATEREGIONSIZE,10);
 	var top=parseInt(Math.floor(y/UPDATEREGIONSIZE)*UPDATEREGIONSIZE,10);
 	mergeExperimentRegions[left+';'+top]=updateRegions[left+';'+top]={'left':left,'top':top,'width':UPDATEREGIONSIZE,'height':UPDATEREGIONSIZE};
-	
+
 	if (!needUpdate)
 	{
 		updateLeft=updateRight=x;
@@ -2202,7 +2217,7 @@ function getDiplomaticStance(cell)
 	if (vInfo.diplomaticStance) return vInfo.diplomaticStance;
 	var gId=vInfo.guildId[0];
 	var owner=vInfo.userId[0];
-	if (owner==playerInfo.id[0]) 
+	if (owner==playerInfo.id[0])
 	{
 		vInfo.diplomaticStance='own';
 		return 'own';
@@ -2222,7 +2237,7 @@ function getDiplomaticStance(cell)
 			var array=dArray[0].guildId;
 			for(var i in array)
 			{
-				if (array[i]==gId) 
+				if (array[i]==gId)
 				{
 					vInfo.diplomaticStance=cArray[j];
 					return cArray[j];
@@ -2314,15 +2329,15 @@ function oldRenderingMethod(highLightX,highLightY)
 					if (parseInt(mcEntry.villageInfo.userId)==parseInt(selectedPlayer))
 						hdc.fillRect((i+0.75)*cellSizeX+rendercornerX,(j+0.75)*cellSizeY+rendercornerY,0.2*cellSizeX,0.2*cellSizeY);
 					else
-						hdc.strokeRect((i+0.75)*cellSizeX+rendercornerX,(j+0.75)*cellSizeY+rendercornerY,0.2*cellSizeX,0.2*cellSizeY);	
+						hdc.strokeRect((i+0.75)*cellSizeX+rendercornerX,(j+0.75)*cellSizeY+rendercornerY,0.2*cellSizeX,0.2*cellSizeY);
 				}
-				
+
 				if ((realX==highLightX) && (realY==highLightY))
 				{
 					hdc.strokeStyle='orange';
 					hdc.strokeRect(i*cellSizeX+rendercornerX,j*cellSizeY+rendercornerY,cellSizeX,cellSizeY);
 				}
-				
+
 			}
 		}
 	}
@@ -2415,7 +2430,7 @@ function showRecentWorldEventsType(type)
 			'<td>'+(event.recipientId!='' ? '<a href="javascript:void(openInWindow(\'viewplayer.php?id='+event.recipientId+'\'))">'+event.recipientPlayer+'</a>':'<?php echo $language["public"];?>')+'</td>'+
 			'<td>'+event.eventTime+'</td>'+
 			'</tr>';
-		
+
 	}
 	eventList+='</table>';
 	var iHTML=
@@ -2440,14 +2455,14 @@ function showRecentWorldEvents()
 	{
 		var newEvents=newWorldEventCount[i];
 		eventList+='<li><a href="javascript:void(showRecentWorldEventsType(\''+i+'\'))">'+WorldEventName[i]+' ('+(newEvents ? newEvents:'')+')</a></li>';
-		
+
 	}
 	eventList+='</ul>';
-	
+
 	var iHTML=
 		'<h1><?php echo $language["recentevents"]; ?></h1>'+
 		eventList
-		
+
 		;
 
 	var elm=genFloatingBox(iHTML,generateRandomId(),0,0);
@@ -2455,7 +2470,7 @@ function showRecentWorldEvents()
 	makeDraggable(elm);
 	centerElement(elm);
 	recentEventCount=0;
-	newWorldEventCount={};	
+	newWorldEventCount={};
 }
 
 function processPlayerInfoXML(xml)
@@ -2467,14 +2482,34 @@ function processPlayerInfoXML(xml)
 		location.href='doreset.php';
 		return;
 	}
+	var mLink = _('messageslink');
+	var rLink = _('reportslink');
+
 	if (info.newMessages>0)
-		_('mailnotify').innerHTML='('+info.newMessages+')';
+	{
+		mLink.innerHTML=String.format("<?php echo $language['xnewmails']; ?>", info.newMessages);
+		mLink.style.color = 'red';
+		mLink.onmouseenter = function(){this.style.color = 'orange';};
+		mLink.onmouseleave = function(){this.style.color = 'red';};
+	}
 	else
-		_('mailnotify').innerHTML='';
+	{
+		mLink.innerHTML="<?php echo $language['messages']; ?>";
+		mLink.style.color = '';
+	}
+
 	if (info.newReports>0)
-		_('reportnotify').innerHTML='('+info.newReports+')';
+	{
+		rLink.innerHTML=String.format("<?php echo $language['xnewreports']; ?>", info.newReports);
+		rLink.style.color = 'red';
+		rLink.onmouseenter = function(){this.style.color = 'orange';};
+		rLink.onmouseleave = function(){this.style.color = 'red';};
+	}
 	else
-		_('reportnotify').innerHTML='';
+	{
+		rLink.innerHTML="<?php echo $language['reports']; ?>";
+		rLink.style.color = '';
+	}
 	var div=_('trdiv');
 	var str=
 	'<img class="image16" style="vertical-align:middle;" src="img/gold.png" alt="<?php echo $language["gold"]; ?>" title="<?php echo $language["gold"]; ?>"> <?php echo xprintf($language["goldtext"],array("<span id=\"goldindicator\"></span>","'+Math.round(info.goldProduction)+'")); ?>'+
@@ -2509,7 +2544,7 @@ function processPlayerInfoXML(xml)
 					{
 						addUpdatable(village.x[0],village.y[0]);
 					}
-				}				
+				}
 			}
 			else if (event.playerId[0]!='')
 			{
@@ -2556,7 +2591,7 @@ function processPlayerInfoXML(xml)
 		setTimeout(function(){renderMap()},4000);
 		lastNbIndex=nightBonusIndex;
 	}
-	
+
 	var iHTML='';
 /*	if (playerInfo.events && playerInfo.events[0].event)
 	{
@@ -2594,7 +2629,7 @@ function processPlayerInfoXML(xml)
 		_('recentnotify').innerHTML='('+recentEventCount+')';
 	else
 		_('recentnotify').innerHTML='';
-	
+
 }
 
 function playerInfoCallback()
@@ -2649,14 +2684,14 @@ function mouseCoords(ev)
         y = ev.changedTouches[0].pageY;
     }
 	else if (ev.pageX || ev.pageY)
-	{ 
+	{
 		x=ev.pageX;
 		y=ev.pageY;
-	} 
+	}
     else
     {
         x=ev.clientX + document.body.scrollLeft - document.body.clientLeft;
-        y=ev.clientY + document.body.scrollTop  - document.body.clientTop; 
+        y=ev.clientY + document.body.scrollTop  - document.body.clientTop;
     }
 	return {'x': x, 'y': y};
 }
@@ -2669,7 +2704,7 @@ function cancelTask(taskNumber)
 		if (task.undo) task.undo();
 	}
 	tasklist.splice(taskNumber,1);
-	
+
 }
 
 prevTasklistLength=0;
@@ -2723,7 +2758,7 @@ function showCellTooltip(x,y)
 	}
 	var village=mapCache[x][y].villageInfo;
 	showTooltip('<?php echo xprintf($language["villagetooltip"],array("'+(village.villageName)+'","'+(village.userName)+'","'+(village.guildName)+'","'+(village.score)+'","'+village.x+'","'+village.y+'")); ?>');
-	
+
 }
 
 function loadAllVillages()
@@ -2757,7 +2792,7 @@ mapElm.onclick=function(e)
 */
 
 
-var mDown;	
+var mDown;
 
 function updateMousePos(ev)
 {
@@ -2853,7 +2888,7 @@ mapElm.onmousemove=function(e)
 	_("cellX").innerHTML=cellCoord.x;
 	_("cellY").innerHTML=cellCoord.y;
 	if ((mouseMode.constructor!=SelectMouseMode) && !mDown)
-		showCellTooltip(cellCoord.x,cellCoord.y);	
+		showCellTooltip(cellCoord.x,cellCoord.y);
 	if (mDown) removeTooltip();
 	mouseMode.onmousemove(ev);
 }

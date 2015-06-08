@@ -12,8 +12,8 @@ global $config
 			{
 				?>
 					<ul>
-						<li><a href="registration.php" id="registrationlink"><?php echo $language['registration'] ?></a></li> 
-						<li><a href="login.php" id="loginlink"><?php echo $language['login'] ?></a></li> 
+						<li><a href="registration.php" id="registrationlink"><?php echo $language['registration'] ?></a></li>
+						<li><a href="login.php" id="loginlink"><?php echo $language['login'] ?></a></li>
 					</ul>
 				<?php
 			}
@@ -21,9 +21,9 @@ global $config
 			{
 				?>
 					<ul>
-						<li><a href="messages.php" id="messageslink"><?php echo $language['messages'] ?></a><span id="mailnotify"></span></li> 
-						<li><a href="reports.php" id="reportslink"><?php echo $language['reports'] ?></a><span id="reportnotify"></span></li> 
-						<li><a href="javascript:void(showRecentWorldEvents())"><?php echo $language['recentevents'] ?></a><span id="recentnotify"></span></li> 
+						<li><a href="messages.php" id="messageslink"><?php echo $language['messages'] ?></a></li>
+						<li><a href="reports.php" id="reportslink"><?php echo $language['reports'] ?></a></li>
+						<li><a href="javascript:void(showRecentWorldEvents())"><?php echo $language['recentevents'] ?></a><span id="recentnotify"></span></li>
 						<li><a href="notes.php" id="noteslink"><?php echo $language['notes'];?></a></li>
 					</ul>
 					<ul>
@@ -43,7 +43,7 @@ global $config
 				if ($this->tutorial)
 				{
 					?>
-						<li><a href="javascript:void(openInWindow('tutorial.php'));"><?php echo $language['tutorial'];?></a></li>						
+						<li><a href="javascript:void(openInWindow('tutorial.php'));"><?php echo $language['tutorial'];?></a></li>
 					<?php
 				}
 			?>
@@ -61,9 +61,9 @@ global $config
 					<ul>
 						<li><a id="sittinglink" href="sitting.php"><?php echo $language['deputies'] ?></a></li>
 						<li><a id="guildlink" href="guild.php"><?php echo $language['guild'] ?></a></li>
-						<li><a id="viewplayerlink" href="viewplayer.php"><?php echo $language['kingdomprofile'] ?></a></li> 
-						<li><a id="viewaccesslink" href="viewaccess.php"><?php echo $language['myprofile'] ?></a></li> 
-						<li><a id="editkingslink" href="editkings.php"><?php echo $language['managekings'] ?></a></li> 
+						<li><a id="viewplayerlink" href="viewplayer.php"><?php echo $language['kingdomprofile'] ?></a></li>
+						<li><a id="viewaccesslink" href="viewaccess.php"><?php echo $language['myprofile'] ?></a></li>
+						<li><a id="editkingslink" href="editkings.php"><?php echo $language['managekings'] ?></a></li>
 						<li><a href="javascript:void(window.open('<?php echo $config['forumLink']; ?>'))"><?php echo $language['forum'];?></a></li>
 					</ul>
 				</div>
@@ -149,7 +149,7 @@ global $config
 	{
 		?>
 			<div class="gamediv gdbasestyle bottomleft" id="eventlist">
-	
+
 			</div>
 			<div class="gamediv gdbasestyle bottomright">
 				<p><? echo $language['tasklist'] ?></p>
@@ -228,23 +228,23 @@ global $config
 					elm.onmousemove=eHandler;*/
 				}
 			}
-			
+
 		}
 	)()
 	// activate links
-	
+
 	function openerGenerator(link)
 	{
                 return function(e)
                 {
                         var ev=e || window.event;
-                        
+
                         ev.cancelBubble=true;
                         ev.preventDefault();
                         openInWindow(link);
                 }
 	}
-	
+
 	if (document.getElementById('messageslink')) document.getElementById('messageslink').onclick=openerGenerator('messages.php');
 	if (document.getElementById('reportslink')) document.getElementById('reportslink').onclick=openerGenerator('reports.php');
 	if (document.getElementById('noteslink')) document.getElementById('noteslink').onclick=openerGenerator('notes.php');

@@ -708,6 +708,8 @@ X
 	'wtfbattles' => "StraTaDi",  // the game's name
 	'wtfbattleslong' => "Stratégia, Taktika és Diplomácia",  // the game's name
 	'xcoord'=>'X koordináta:', // name of the X coordinate
+	'xnewmails'=>'{0} új levél',
+	'xnewreports'=>'{0} új jelentés',
 	'ycoord'=>'Y koordináta:', // name of the Y coordinate
 	'youalreadyhaveahero'=>'Már van hősöd!', //error message when you try to create a hero when you have one.
 	'youarebanned' => "Sajnos ki vagy tiltva a játékból. Írj az adminnak a ${config['adminMail']} e-mail címen, hogy megtudd, mi a helyzet.", 		// fatal error in the login form

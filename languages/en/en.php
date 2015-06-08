@@ -704,6 +704,8 @@ X
 	'wtfbattles' => "StraTaDi",  // the game's name
 	'wtfbattleslong' => "Strategy, Tactics and Diplomacy",  // the game's name
 	'xcoord'=>'X coordinate:', // name of the X coordinate
+	'xnewmails'=>'New mails: {0}',
+	'xnewreports'=>'New reports: {0}',
 	'ycoord'=>'Y coordinate:', // name of the Y coordinate
 	'youalreadyhaveahero'=>'You already have a hero.', //error message when you try to create a hero when you have one.
 	'youarebanned' => "Unfortunately you are banned. Please write to the admin at ${config['adminMail']} to know what's up.", 		// fatal error in the login form
