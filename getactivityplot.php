@@ -3,13 +3,11 @@
 ini_set('memory_limit', '-1');
 
 require_once("setupsession.php");// outputs image don't user userworkerphps.php then.
-require_once("setupmysql.php");// outputs image don't user userworkerphps.php then.
+require_once("setupmysqli.php");// outputs image don't user userworkerphps.php then.
 require_once("utils/gameutils.php");
 bounceSessionOver();
-//bounceNoAdmin();
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_accesses WHERE (id='{1}') AND (permission='admin')",array($_SESSION['accessId'])));
-$isAdmin=mysql_num_rows($r)>0;
-//if (!$isAdmin) die('nem admin');
+$r=runEscapedQuery("SELECT * FROM wtfb2_accesses WHERE (id={0}) AND (permission='admin')",$_SESSION['accessId']);
+$isAdmin=!isEmptyResult($r);
 
 $g=-(int)$_GET['daybefore'];
 $plotWidth=(int)$_GET['width'];
@@ -18,37 +16,27 @@ $byIp=isset($_GET['byip']);
 
 $restrictUser='';
 if (!$isAdmin)
-	$restrictUser=sqlPrintf("AND (u.id='{1}')",array($_SESSION['userId']));
+	$restrictUser=sqlvprintf("AND (u.id={0})",array($_SESSION['userId']));
 
-/*$q=
-sqlPrintf(
-"
-	SELECT r.*,u.userName,TIMESTAMPDIFF(SECOND,DATE(requestTime),requestTime) AS secondsDay
-	FROM `wtfb2_requestlog` r
-	JOIN wtfb2_users u ON (r.userId=u.id)
-	WHERE (TIMESTAMPDIFF(DAY,DATE(requestTime),DATE(NOW()))='{1}') $restrictUser
-",array($g)
-);*/
-
-$r=doMysqlQuery(sqlPrintf("SELECT ADDDATE(CURDATE(),INTERVAL '{1}' DAY) AS imageDate",array($g)));
-$curDate=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT ADDDATE(CURDATE(),INTERVAL {0} DAY) AS imageDate",$g);
+$curDate=$r[0][0];
 $curDate=$curDate['imageDate'];
 
 $q=
-sqlPrintf(
+sqlvprintf(
 "
 	SELECT r.*,u.userName,TIMESTAMPDIFF(SECOND,DATE(requestTime),requestTime) AS secondsDay
 	FROM `wtfb2_requestlog` r
 	JOIN wtfb2_users u ON (r.userId=u.id)
-	WHERE (requestTime BETWEEN ADDDATE(CURDATE(),INTERVAL '{1}' DAY) AND ADDDATE(CURDATE(),INTERVAL ('{1}'+1) DAY) ) $restrictUser
+	WHERE (requestTime BETWEEN ADDDATE(CURDATE(),INTERVAL {0} DAY) AND ADDDATE(CURDATE(),INTERVAL ({0}+1) DAY) ) $restrictUser
 ",array($g)
 );
 
-$r=doMySqlQuery($q);
+$r=runEscapedQuery($q);
 $selectedData=array();
 $first=true;
 $time;
-while($row=mysql_fetch_assoc($r))
+foreach ($r[0] as $row)
 {
 	if ($first) $time=$row['requestTime'];
 	$first=false;
@@ -71,7 +59,8 @@ $imageHeight=$lines*$lineHeight+$titleHeight;
 $img=imagecreatetruecolor($plotWidth+$nameBarWidth+$extraPadding,$imageHeight+$extraPadding+$legendHeight);
 
 // put title
-imagettftext($img,8,0,0,12,0xFFFFFF,'Verdana',"Activity plot beginning from: ".$time);
+$fontPath = realPath('Verdana.ttf');
+imagettftext($img,8,0,0,12,0xFFFFFF,$fontPath,"Activity plot beginning from: ".$time);
 // put hour lines
 for($i=0;$i<=24;$i++)
 {
@@ -79,8 +68,8 @@ for($i=0;$i<=24;$i++)
 		$color=0x800000;
 	else
 		$color=0xFF0000;
-	imageline($img,$nameBarWidth+$i*($plotWidth/24),$titleHeight,$nameBarWidth+$i*($plotWidth/24),$imageHeight,$color);	
-	imagettftext($img,8,0,$nameBarWidth+$i*($plotWidth/24),$titleHeight,0x303030,'Verdana',$i);	
+	imageline($img,$nameBarWidth+$i*($plotWidth/24),$titleHeight,$nameBarWidth+$i*($plotWidth/24),$imageHeight,$color);
+	imagettftext($img,8,0,$nameBarWidth+$i*($plotWidth/24),$titleHeight,0x303030,$fontPath,$i);
 }
 // plot data
 $height=$titleHeight+$lineHeight;
@@ -89,10 +78,10 @@ ksort($selectedData);
 foreach($selectedData as $key=>$value)
 {
 	// write name@IP
-	imagettftext($img,8,0,0,$height,0xFFFFFF,'Verdana',$key);	
+	imagettftext($img,8,0,0,$height,0xFFFFFF,$fontPath,$key);
 	for($x=$writeNameStep;$x<$plotWidth;$x+=$writeNameStep)
 	{
-		imagettftext($img,8,0,$x,$height,0x303030,'Verdana',$key);	
+		imagettftext($img,8,0,$x,$height,0x303030,$fontPath,$key);
 	}
 	// put lines below names
 	imageline($img,0,$height,$plotWidth+$nameBarWidth+$extraPadding,$height,IMG_COLOR_STYLED);
@@ -114,25 +103,25 @@ $x=5;
 imagefilledrectangle($img,$x,$height,$x+20,$height+20,0x00FF00);
 $x+=25;
 $text=$language['youractivity'];
-$bbox=imagettfbbox(10,0,'Verdana',$text);
+$bbox=imagettfbbox(10,0,$fontPath,$text);
 $w=$bbox[2]-$bbox[0];
-imagettftext($img,10,0,$x,$height+10,0xFFFFFF,'Verdana',$text);
+imagettftext($img,10,0,$x,$height+10,0xFFFFFF,$fontPath,$text);
 $x+=$w+5;
 
 imagefilledrectangle($img,$x,$height,$x+20,$height+20,0x0000FF);
 $x+=25;
 $text=$language['sitteractivity'];
-$bbox=imagettfbbox(10,0,'Verdana',$text);
+$bbox=imagettfbbox(10,0,$fontPath,$text);
 $w=$bbox[2]-$bbox[0];
-imagettftext($img,10,0,$x,$height+10,0xFFFFFF,'Verdana',$text);
+imagettftext($img,10,0,$x,$height+10,0xFFFFFF,$fontPath,$text);
 $x+=$w+5;
 
 imagefilledrectangle($img,$x,$height,$x+20,$height+20,0xFFFF00);
 $x+=25;
 $text=$language['adminactivity'];
-$bbox=imagettfbbox(10,0,'Verdana',$text);
+$bbox=imagettfbbox(10,0,$fontPath,$text);
 $w=$bbox[2]-$bbox[0];
-imagettftext($img,10,0,$x,$height+10,0xFFFFFF,'Verdana',$text);
+imagettftext($img,10,0,$x,$height+10,0xFFFFFF,$fontPath,$text);
 $x+=$w+5;
 
 header('Content-type: image/png');

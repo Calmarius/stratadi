@@ -9,10 +9,10 @@ bounceSessionOver();
 $setPasswordText='';
 if ($_POST['password']!='')
 {
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_accesses WHERE (userName='{1}') AND (id='{2}')",array($config['demoAccountName'], $_SESSION['accessId'])));
-	if (mysql_num_rows($r)!=0) jumpErrorPage($language['demoaccesscannotbechanged']);
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_accesses WHERE (id='{1}') AND (passwordHash=MD5('{2}') )",array($_SESSION['accessId'],$_POST['oldpassword'])));
-	if (mysql_num_rows($r)==0) jumpErrorPage($language['badpassword']);
+	$r=runEscapedQuery("SELECT * FROM wtfb2_accesses WHERE (userName={0}) AND (id={1})",$config['demoAccountName'], $_SESSION['accessId']);
+	if (!isEmptyResult($r)) jumpErrorPage($language['demoaccesscannotbechanged']);
+	$r=runEscapedQuery("SELECT * FROM wtfb2_accesses WHERE (id={0}) AND (passwordHash=MD5({1}) )",$_SESSION['accessId'],$_POST['oldpassword']);
+	if (isEmptyResult($r)) jumpErrorPage($language['badpassword']);
 	$s=$_POST['password'];
 	if (strlen($s)<$config['minUserPasswordLength'])
 	{
@@ -22,7 +22,7 @@ if ($_POST['password']!='')
 	{
 		jumpErrorPage($language['passwordnotmatch']);
 	}
-	$setPasswordText=sqlPrintf(",passwordHash=MD5('{1}')",array($s));
+	$setPasswordText=sqlvprintf(",passwordHash=MD5({0})",array($s));
 }
 
 //checking day
@@ -41,25 +41,25 @@ if (($s!="") && ($date['year']<(int)$s))
 
 $date="${_POST['year']}-${_POST['month']}-${_POST['day']} 0:00:00";
 
-$genderStr=$_POST['gender']=='' ? "NULL" : sqlPrintf("'{1}'",array($_POST['gender']));
+$genderStr=$_POST['gender']=='' ? "NULL" : sqlvprintf("{0}",array($_POST['gender']));
 
-$q=sqlPrintf(
+$q=sqlvprintf(
 	"
 	UPDATE wtfb2_accesses
-	SET gender=$genderStr,city='{1}',birth='{2}' $setPasswordText
-	WHERE (id='{3}')
+	SET gender=$genderStr,city={0},birth={1} $setPasswordText
+	WHERE (id={2})
 	",array($_POST['town'],$date,$_SESSION['accessId']));
-$r=doMySqlQuery($q,'jumpErrorPage');
+$r=runEscapedQuery($q);
 
 // set languages
-doMySqlQuery("DELETE FROM wtfb2_spokenlanguages WHERE (playerId='${_SESSION['accessId']}')");
+runEscapedQuery("DELETE FROM wtfb2_spokenlanguages WHERE (playerId={0})", $_SESSION['accessId']);
 $values=array();
 foreach($_POST['spokenlanguages'] as $key=>$value)
 {
-	$values[]=sqlPrintf("('{1}','{2}')",array($_SESSION['accessId'],$value));
+	$values[]=sqlvprintf("({0},{1})",array($_SESSION['accessId'],$value));
 }
 if (count($values))
-	doMySqlQuery("INSERT INTO wtfb2_spokenlanguages (playerId,languageId) VALUES ".implode(',',$values));
+	runEscapedQuery("INSERT INTO wtfb2_spokenlanguages (playerId,languageId) VALUES ".implode(',',$values));
 
 jumpTo('viewaccess.php');
 
