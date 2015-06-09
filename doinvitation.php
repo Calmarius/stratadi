@@ -6,22 +6,22 @@ bounceSessionOver();
 $myId=$_SESSION['userId'];
 $invitationId=$_GET['id'];
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guildinvitations WHERE (id='{1}') AND (recipientId='{2}')",array($invitationId,$myId)));
-if (mysql_num_rows($r)==0) jumpErrorPage($language['accessdenied']);
-$invitation=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT * FROM wtfb2_guildinvitations WHERE (id={0}) AND (recipientId={1})",$invitationId,$myId);
+if (isEmptyResult($r)) jumpErrorPage($language['accessdenied']);
+$invitation=$r[0][0];
 
 $command=$_GET['cmd'];
 if ($command=='accept')
 {
-	doMySqlQuery(sqlPrintf("DELETE FROM wtfb2_guildpermissions WHERE (userId='{1}')",array($myId)),'jumpErrorPage');
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET guildId='{1}' WHERE (id='{2}')",array($invitation['guildId'],$myId)),'jumpErrorPage');
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guilds WHERE (id='{1}')",array($invitation['guildId'])));
-	if (mysql_num_rows($r)==0) jumpErrorPage($language['accessdenied']);
-	$guild=mysql_fetch_assoc($r);
+	runEscapedQuery("DELETE FROM wtfb2_guildpermissions WHERE (userId={0})",$myId);
+	runEscapedQuery("UPDATE wtfb2_users SET guildId={0} WHERE (id={1})",$invitation['guildId'],$myId);
+	$r=runEscapedQuery("SELECT * FROM wtfb2_guilds WHERE (id={0})",$invitation['guildId']);
+	if (isEmptyResult($r)) jumpErrorPage($language['accessdenied']);
+	$guild=$r[0][0];
 	$_SESSION['successtitle']=$language['successfulguildenter'];
 	$_SESSION['successcontent']=xprintf($language['nowyoumemberoftheguild'],array($guild['guildName']));
-	doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (eventTime,playerId,type) VALUES (NOW(),'{1}','guildchange')",array($myId))); // a játékos klánváltoztatását világgákürtöljük
-	doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (eventTime,guildId,type,recipientId,needFullRefresh) VALUES (NOW(),'{1}','diplomacychange','{2}',1)",array($invitation['guildId'],$myId))); // a játékosnak is küldünk egy eseményt.
+	runEscapedQuery("INSERT INTO wtfb2_worldevents (eventTime,playerId,type) VALUES (NOW(),{0},'guildchange')",$myId); // a játékos klánváltoztatását világgákürtöljük
+	runEscapedQuery("INSERT INTO wtfb2_worldevents (eventTime,guildId,type,recipientId,needFullRefresh) VALUES (NOW(),{0},'diplomacychange',{1},1)",$invitation['guildId'],$myId); // a játékosnak is küldünk egy eseményt.
 	
 }
 else if ($command=='refuse')
@@ -31,7 +31,7 @@ else if ($command=='refuse')
 }
 else jumpErrorPage('Command doesn\'t exist. If you arrived here from a link in the game, please contact administrator.');
 
-doMySqlQuery(sqlPrintf("DELETE FROM wtfb2_guildinvitations WHERE (id='{1}')",array($invitationId)),'jumpErrorPage');
+runEscapedQuery("DELETE FROM wtfb2_guildinvitations WHERE (id={0})", $invitationId);
 
 jumpTo("success.php");
 

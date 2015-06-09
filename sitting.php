@@ -2,9 +2,9 @@
 
 require_once('userworkerphps.php');
 
-$r=doMySqlQuery(sqlPrintf("SELECT d.*,u.userName FROM wtfb2_deputies d JOIN wtfb2_users u ON (d.sponsorId=u.id) WHERE (deputyId='{1}')",array($_SESSION['userId'])));
+$r=runEscapedQuery("SELECT d.*,u.userName FROM wtfb2_deputies d JOIN wtfb2_users u ON (d.sponsorId=u.id) WHERE (deputyId={0})",$_SESSION['userId']);
 $deputies=array();
-while($a=mysql_fetch_assoc($r))
+foreach ($r[0] as $a)
 {
 	$deputies[]=$a;
 }
