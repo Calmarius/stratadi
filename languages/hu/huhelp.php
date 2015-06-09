@@ -83,7 +83,7 @@ function vectorCalculator($amounts,&$vector,$isAttack=true,$bonus=1)
 	}
 	else
 	{
-		return $bonus.'&middot;('.implode('+',$calcString).')=('.implode(';',$vector).')';		
+		return $bonus.'&middot;('.implode('+',$calcString).')=('.implode(';',$vector).')';
 	}
 }
 
@@ -237,11 +237,11 @@ function applyFactorToVector($vector,$factor,&$newVector)
 				</div>
 				<a href="javascript:void(toggleElement('build'))">Épületek építése a falvakban</a><br>
 				<div id="build" class="helpdiv">
-					<p>Épületeket úgy építhetsz a falvadban, hogy az ikonjukat ábrázoló gombra kattintasz, ekkor a feladat listába bekerül a művelet, amit végre kell hajtanod, hogy ténylegesen megtörténjen az építés. Az építkezés építési 
+					<p>Épületeket úgy építhetsz a falvadban, hogy az ikonjukat ábrázoló gombra kattintasz, ekkor a feladat listába bekerül a művelet, amit végre kell hajtanod, hogy ténylegesen megtörténjen az építés. Az építkezés építési
 					pontokkal történik (illetve aranyba is kerül)), egy faluban annyit építhetsz, amennyit az építési pontok engednek. Minden nap 1 építési pont termelődik a faluban, de ezt a termelést lehet növelni, a városközpont fejlesztésével.</p>
 				</div>
 				<a href="javascript:void(toggleElement('trainunits'))">Katonák kiképzése</a><br>
-				<div id="trainunits" class="helpdiv">	
+				<div id="trainunits" class="helpdiv">
 					<p>Az egységek neve alatti szövegdobozokba számot beírva majd entert nyomva tehetsz be katonákat a kiképzésre.
 					A megfelelő mennyiségű aranyat levonja majd. A véglegesítéshez végre kell hajtanod a feladatlistát (jobbra lent van). </p>
 				</div>
@@ -422,7 +422,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 					<p>Ez arról szól, hogy nem adhatsz át olyan játékosnak egységeket, akinek a játékban eltöltött ideje te eltöltött időd harmadánál kevesebb, vagy háromszor több. Így egy 30 napos játékos nem küldhet olyannak, aki
 					10 napnál kevesebb ideje játszik, de egy olyannak sem, aki 90-nél több ideje.
 					</p>
-				</div>	
+				</div>
 				<a href="javascript:void(toggleElement('fakerule'))">Fake szabály</a><br>
 				<div id="fakerule" class="helpdiv">
 					<p>Ez azért van, hogy elkerüljük a flood szerű támadásokat, amelynek a célja csak az, hogy a játékosra olyan sok támadást indítsunk, hogy használhatatlanná válljon a bejövő támadások lap. Az elküldendő sereg értékének
@@ -562,7 +562,6 @@ function applyFactorToVector($vector,$factor,&$newVector)
 							</td>
 						</tr>
 					</table>
-					<!--img style="vertical-align:middle" src="../img/powerrate.png" alt="k=\displaystyle\sum_{i=1}^{3} \frac{a_i}{d_i}">-->
 					<p>Ha k&gt;1, akkor a támadósereg az erősebb; ha k&lt;1, akkor  a védősereg erősebb.</p>
 				<h3>Beütő katapultok száma</h3>
 					<p>Az összes katapult csak akkor lő, hogy ha üres falut támadsz vele. Ha veszteségeid vannak, akkor kevesebb lő. Hogy hányad része, azt a következő képlet adja meg:</p>
@@ -579,12 +578,12 @@ function applyFactorToVector($vector,$factor,&$newVector)
 				<h3>Veszteségarányok kiszámolása</h3>
 					<p>Tehát ismerjük a seregek erőarányát, akkor most már kiszámolhatjuk, hogy a veszteségek arányát.</p>
 					<h4>Utolsó emberig tartó támadás</h4>
-						<p>Ha k&gt;1, akkor támadósereg győz, tehát a védősereg vesztesége 100%. A támadóseregé pedig:</p> <!--<img style="vertical-align:middle" src="../img/lmac.png" alt="\frac{1}{k^{1,2}}">-->
+						<p>Ha k&gt;1, akkor támadósereg győz, tehát a védősereg vesztesége 100%. A támadóseregé pedig:</p>
 						<table class="math">
 							<tr><td style="border-bottom:1px solid black">1</td></tr>
 							<tr><td>k<sup><?php echo toComma($config['superiorityExponent']); ?></sup></td></tr>
 						</table>
-						<p>Ha k&lt;1, akkor védősereg győz, tehát a támadósereg vesztesége 100%. A védőseregé pedig: k<sup><?php echo toComma($config['superiorityExponent']); ?></sup></p><!--<img style="vertical-align:middle" src="../img/lmdc.png" alt="k^{1,2}"></p>-->
+						<p>Ha k&lt;1, akkor védősereg győz, tehát a támadósereg vesztesége 100%. A védőseregé pedig: k<sup><?php echo toComma($config['superiorityExponent']); ?></sup></p>
 					<h4>Rablótámadás</h4>
 						<p>A támadósereg vesztesége:</p>
 						<table class="math">
@@ -602,8 +601,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 								<td style="vertical-align:top"><sup><?php echo toComma($config['superiorityExponent']); ?></sup></td>
 							</tr>
 						</table>
-						<!--<img style="vertical-align:middle" src="../img/rac.png" alt="\left(1-\frac{k}{1+k}\right)^{1,2}"></p>-->
-						<p>A védősereg vesztesége:</p><!-- <img style="vertical-align:middle" src="../img/rdc.png" alt="\left(\frac{k}{1+k}\right)^{1,2}"></p>-->
+						<p>A védősereg vesztesége:</p>
 						<table class="math">
 							<tr>
 								<td style="border-left: 1px solid black;border-top: 1px solid black;border-bottom: 1px solid black;">&nbsp;</td>
@@ -618,7 +616,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 							</tr>
 						</table>
 					<h4>Kémlelőtámadás</h4>
-						<p>A támadósereg vesztesége: </p><!--<img style="vertical-align:middle" src="../img/sac.png" alt="\left(1-\frac{k}{1+k}\right)^{1+\left(1-\frac{k}{1+k}\right)}"></p>-->
+						<p>A támadósereg vesztesége: </p>
 						<table class="math">
 							<tr>
 								<td style="border-left: 1px solid black;border-top: 1px solid black;border-bottom: 1px solid black;">&nbsp;</td>
@@ -660,7 +658,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 									</table>
 								</td>
 								<td  style="border-right: 1px solid black;border-top: 1px solid black;border-bottom: 1px solid black;">&nbsp;</td>
-								<td style="vertical-align:top"><sup>2</sup></td>								
+								<td style="vertical-align:top"><sup>2</sup></td>
 							</tr>
 						</table>
 					<h4>Veszteségarányok, amikor a katapult a falra lő</h4>
@@ -677,8 +675,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 							</td>
 						</tr>
 					</table>
-					<!--<img style="vertical-align:middle" src="../img/rac.png" alt="\left(1-\frac{k}{1+k}\right)^{1,2}"></p>-->
-					<p>A védősereg vesztesége:</p><!-- <img style="vertical-align:middle" src="../img/rdc.png" alt="\left(\frac{k}{1+k}\right)^{1,2}"></p>-->
+					<p>A védősereg vesztesége:</p>
 					<table class="math">
 						<tr>
 							<td>
@@ -708,7 +705,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 									<tr><td style="border-bottom: 1px solid black">k</td></tr>
 									<tr><td>(1+k)l</td></tr>
 								</table>
-							</td>							
+							</td>
 							<td style="border-right: 1px solid black;border-top: 1px solid black;border-bottom: 1px solid black;">&nbsp;</td>
 							<td style="vertical-align:top"><sup><?php echo toComma($config['superiorityExponent']); ?></sup></td>
 						</tr>
@@ -730,13 +727,13 @@ function applyFactorToVector($vector,$factor,&$newVector)
 										<td>l&middot;</td>
 										<td style="border-left: 1px solid black;border-top: 1px solid black;border-bottom: 1px solid black;">&nbsp;</td>
 										<td>1</td>
-										<td>&ndash;</td>							
+										<td>&ndash;</td>
 										<td>
 											<table class="math">
 												<tr><td style="border-bottom: 1px solid black">k</td></tr>
 												<tr><td>1+k</td></tr>
 											</table>
-										</td>							
+										</td>
 										<td style="border-right: 1px solid black;border-top: 1px solid black;border-bottom: 1px solid black;">&nbsp;</td>
 									</tr>
 								</table>
@@ -865,7 +862,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 									?>
 								</td>
 							</tr>
-						</table>			
+						</table>
 						<p>Tehát a támadósereg vesztesége: <?php echo casualtyCalculator($attackers,$attCasualties); ?>.</p>
 						<p>Tehát a védősereg vesztesége: <?php echo casualtyCalculator($defenders,$defCasualties); ?>.</p>
 					<h4>Kémtámadás</h4>
@@ -920,7 +917,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 									</table>
 								</td>
 								<td  style="border-right: 1px solid black;border-top: 1px solid black;border-bottom: 1px solid black;">&nbsp;</td>
-								<td style="vertical-align:top"><sup>2</sup></td>								
+								<td style="vertical-align:top"><sup>2</sup></td>
 								<td>=</td>
 								<td>
 									<?php
@@ -930,7 +927,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 									?>
 								</td>
 							</tr>
-						</table>		
+						</table>
 						<p>Tehát a támadósereg vesztesége: <?php echo casualtyCalculator($attackers,$attCasualties); ?>.</p>
 						<p>Tehát a védősereg vesztesége: <?php echo casualtyCalculator($defenders,$defCasualties); ?>.</p>
 					<h4>Katapultos támadás</h4>
@@ -1111,8 +1108,8 @@ function applyFactorToVector($vector,$factor,&$newVector)
 							</tr>
 						</table>
 						<p>Ezeket a veszteségeket ezután alkalmazzuk a támadó és védővektorainkra.</p>
-						<p>Tehát az új támadóvektor: <?php echo applyCasualtiesToVector($attackVector,$attCasualties,$attackVector); ?>.</p>						
-						<p>A védők veszteségét a falbónusz nélküli vektorra alkalmazzuk, mivel azt kell majd felszorozni a rombolás után falbónusszal: <?php echo applyCasualtiesToVector($baseDefenseVector,$defCasualties,$baseDefenseVector); ?>.</p>						
+						<p>Tehát az új támadóvektor: <?php echo applyCasualtiesToVector($attackVector,$attCasualties,$attackVector); ?>.</p>
+						<p>A védők veszteségét a falbónusz nélküli vektorra alkalmazzuk, mivel azt kell majd felszorozni a rombolás után falbónusszal: <?php echo applyCasualtiesToVector($baseDefenseVector,$defCasualties,$baseDefenseVector); ?>.</p>
 						<p>Ezután lőnek a katapultok. Tudnunk kell, hogy mennyi katapult lő:</p>
 						<table class="math">
 							<tr>
@@ -1220,17 +1217,17 @@ function applyFactorToVector($vector,$factor,&$newVector)
 						<p>A támadósereg vesztesége:
 							<?php
 								$attCasualties=pow($oldAttCasualties+$newAttCasualties*(1-$oldAttCasualties),$config['superiorityExponent']);
-								echo '('.toComma(round($oldAttCasualties,3)).'+'.toComma(round($newAttCasualties,3)).'&middot;(1&ndash;'.toComma(round($oldAttCasualties,3)).'))<sup>'.toComma(round($config['superiorityExponent'],3)).'</sup>='.toComma(round($attCasualties,3));  
+								echo '('.toComma(round($oldAttCasualties,3)).'+'.toComma(round($newAttCasualties,3)).'&middot;(1&ndash;'.toComma(round($oldAttCasualties,3)).'))<sup>'.toComma(round($config['superiorityExponent'],3)).'</sup>='.toComma(round($attCasualties,3));
 							?>
 						</p>
 						<p>A védősereg vesztesége:
 							<?php
 								$defCasualties=pow($oldDefCasualties+$newDefCasualties*(1-$oldDefCasualties),$config['superiorityExponent']);
-								echo '('.toComma(round($oldDefCasualties,3)).'+'.toComma(round($newDefCasualties,3)).'&middot;(1&ndash;'.toComma(round($oldDefCasualties,3)).'))<sup>'.toComma(round($config['superiorityExponent'],3)).'</sup>='.toComma(round($defCasualties,3));  
+								echo '('.toComma(round($oldDefCasualties,3)).'+'.toComma(round($newDefCasualties,3)).'&middot;(1&ndash;'.toComma(round($oldDefCasualties,3)).'))<sup>'.toComma(round($config['superiorityExponent'],3)).'</sup>='.toComma(round($defCasualties,3));
 							?>
 						</p>
 						<p>Tehát a támadósereg vesztesége: <?php echo casualtyCalculator($attackers,$attCasualties); ?>.</p>
-						<p>Tehát a védősereg vesztesége: <?php echo casualtyCalculator($defenders,$defCasualties); ?>.</p>						
+						<p>Tehát a védősereg vesztesége: <?php echo casualtyCalculator($defenders,$defCasualties); ?>.</p>
 			</div>
 			<a href="javascript:void(toggleElement('miscfaq'))">Egyéb GYÍK :)</a><br>
 			<div class="helpdiv" id="miscfaq">
@@ -1248,7 +1245,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 					<p>Ha támadásod vagy egységátadásod van, az a foglalás után is támadásként és egységátadásként fog beérni, hacsak nem a támadó a foglalás után leállítja az eseményt.
 					Ha kimenő alapításod van, akkor visszakapsz minden terjeszkedési pontot, amit az alapítás megkezdéséért vont le a rendszer, míg a támadódtól levonásra kerül, mert az alapítás ezentúl az ő nevében történik.
 					A terjeszkedési pontok ilyenkor a támadónál akár negatívba is átmehetnek. Persze a támadó azonnal vissza tudja szerezni a pontjait, ha az alapításokat visszavonja.
-					Ha falufoglaló támadást indítóttál diplomatával, akkor amikor az beér, az új tulajdonostól vonja le a pontot, és a falut neki foglalod.</p>		
+					Ha falufoglaló támadást indítóttál diplomatával, akkor amikor az beér, az új tulajdonostól vonja le a pontot, és a falut neki foglalod.</p>
 				</div>
 				<a href="javascript:void(toggleElement('faq2'))">Mi történik, ha leombolják a falut, amelyből éppen kimenő egységmozgásom van?</a><br>
 				<div class="helpdiv" id="faq2">
