@@ -3,7 +3,11 @@
 global $config;
 global $language;
 
-//print_r($_SESSION);
+$subjectText = @$this->subject;
+
+if (substr($subjectText, 0, strlen('RE:')) != 'RE:') $subjectText = 'RE:' . $subjectText;
+
+// TODO: Check all echo's if they need to use htmlspecialchars. Consider using a new function that prints escaped string.
 
 ?>
 
@@ -11,8 +15,8 @@ global $language;
 <p><span class="positive"><?php echo @$this->notification; ?></span></p>
 <form method="POST" action="dosendmessage.php">
 	<table class="center">
-		<tr><td><?php echo $language['addparticipant']; ?></td><td><input type="text" name="recipient" value="<?php echo $this->recipient; ?>" <?php echo $this->extra!='' ? 'disabled="disabled"':'';  ?>><input type="hidden" name="thread" value="<?php echo $this->thread; ?>"></td></tr>
-		<tr><td><?php echo $language['subject']; ?></td><td><input type="text" name="subject" value="<?php echo $this->subject; ?>"></td></tr>
+		<tr><td><?php echo $language['addparticipant']; ?></td><td><input type="text" name="recipient" value="<?php echo htmlspecialchars($this->recipient); ?>" <?php echo $this->extra!='' ? 'disabled="disabled"':'';  ?>><input type="hidden" name="thread" value="<?php echo $this->thread; ?>"></td></tr>
+		<tr><td><?php echo $language['subject']; ?></td><td><input type="text" name="subject" value="<?php echo htmlspecialchars($subjectText); ?>"></td></tr>
 		<?php
 			if ($this->extra=='circular')
 			{

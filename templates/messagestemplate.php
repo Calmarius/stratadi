@@ -40,7 +40,7 @@ global $config;
 			foreach($this->letterlinks as $key=>$value)
 			{
 				$subject=$value['subject'];
-				$subject=$subject=='' ? $language['nosubject'] : $subject;
+				$subject=trim($subject)=='' ? $language['nosubject'] : $subject;
 				echo "<tr>";
 				echo '<td><input type="checkbox" name="thread[]" value="'.$value['linkId'].'"></td>';
 				echo "<td><a href=\"viewplayer.php?id=${value['senderId']}\">${value['userName']}</a></td>";
