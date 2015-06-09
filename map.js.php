@@ -2496,6 +2496,8 @@ function processPlayerInfoXML(xml)
 	{
 		mLink.innerHTML="<?php echo $language['messages']; ?>";
 		mLink.style.color = '';
+		mLink.onmouseenter = null;
+		mLink.onmouseleave = null;
 	}
 
 	if (info.newReports>0)
@@ -2509,6 +2511,8 @@ function processPlayerInfoXML(xml)
 	{
 		rLink.innerHTML="<?php echo $language['reports']; ?>";
 		rLink.style.color = '';
+		rLink.onmouseenter = null;
+		rLink.onmouseleave = null;
 	}
 	var div=_('trdiv');
 	var str=
