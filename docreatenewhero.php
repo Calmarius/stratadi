@@ -3,18 +3,18 @@
 require_once('userworkerphps.php');
 
 $myId=$_SESSION['userId'];
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_heroes WHERE (ownerId='{1}')",array($myId)));
-if (mysql_num_rows($r)>0) jumpErrorPage($language['youalreadyhaveahero']);
+$r=runEscapedQuery("SELECT * FROM wtfb2_heroes WHERE (ownerId={0})",$myId);
+if (!isEmptyResult($r)) jumpErrorPage($language['youalreadyhaveahero']);
 
 $whereToCreate=(int)$_GET['at'];
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_villages WHERE (id='{1}') AND (ownerId='{2}')",array($whereToCreate,$myId)));
-if (mysql_num_rows($r)==0) jumpErrorPage($language['accessdenied']);
-$village=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (id={0}) AND (ownerId={1})",$whereToCreate,$myId);
+if (isEmptyResult($r)) jumpErrorPage($language['accessdenied']);
+$village=$r[0][0];
 
 // give him hero
-doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_heroes (ownerId,name,inVillage) VALUES ('{1}','{2}','{3}')",array($myId,$language['newhero'],$whereToCreate)),'jumpErrorPage');
+runEscapedQuery("INSERT INTO wtfb2_heroes (ownerId,name,inVillage) VALUES ({0},{1},{2})",$myId,$language['newhero'],$whereToCreate);
 // set him a world event
-doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (x,y,type,recipientId,eventTime) VALUES ('{1}','{2}','eventhappened','{3}',NOW())",array($village['x'],$village['y'],$myId)));
+runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,type,recipientId,eventTime) VALUES ({0},{1},'eventhappened',{2},NOW())",$village['x'],$village['y'],$myId);
 
 $_SESSION['successtitle']=$language['herocreated'];
 $_SESSION['successcontent']=$language['heroinfo'];
