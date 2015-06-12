@@ -4,7 +4,7 @@ $rawQuery=get_magic_quotes_gpc() ? stripslashes(@$_POST['query']) : @$_POST['que
 $rawError=get_magic_quotes_gpc() ? stripslashes(@$_GET['error']) : @$_GET['query'];
 
 require_once('presenterphps.php');
-require_once('setupmysql.php');
+require_once('setupmysqli.php');
 require_once('utils/gameutils.php');
 bounceNoAdmin();
 
@@ -23,12 +23,15 @@ $affectedRows=0;
 if (isset($_POST['query']))
 {
 	$_SESSION['sqlRawQuery']=$rawQuery;
-	$r=doMySqlQuery($rawQuery,'sqlStuffFunc');
-	$numRows=@mysql_num_rows($r);
-	$affectedRows=mysql_affected_rows();
-	while($row=@mysql_fetch_assoc($r))
+	$r=runEscapedQuery($rawQuery);
+	$numRows=isset($r[0]) ? count($r[0]) : 0;
+	$affectedRows=getAffectedRowCount();
+	if (isset($r[0]))
 	{
-		$rows[]=$row;
+	    foreach ($r[0] as $row)
+	    {
+		    $rows[]=$row;
+	    }
 	}
 	if (isset($rows[0]))
 	{
@@ -47,7 +50,7 @@ if (isset($_POST['query']))
 	</head>
 	<body>
 		<form method="POST" action="sql.php">
-			<textarea name="query" rows="25" cols="80" id="queryArea"><?php echo $_SESSION['sqlRawQuery']; ?></textarea>
+			<textarea name="query" rows="25" cols="80" id="queryArea"><?php echo @$_SESSION['sqlRawQuery']; ?></textarea>
 			<input type="submit">
 		</form>
 		<p class="negative"><?php echo htmlspecialchars(@$rawError); ?></p>

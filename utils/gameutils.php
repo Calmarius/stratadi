@@ -16,7 +16,7 @@ function loginUpdateAll($playerId)
 {
 	updateAllVillages($playerId);
 	updatePlayer($playerId);
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET lastLoaded=NOW() WHERE (id='{1}')",array($playerId)));
+	runEscapedQuery("UPDATE wtfb2_users SET lastLoaded=NOW() WHERE (id={0})", $playerId);
 }
 
 function logText($str)
@@ -43,8 +43,8 @@ function bounceNoAdmin()
 {
 	global $language;
 	if (isset($_SESSION['asdeputy'])) jumpErrorPage($language['accessdenied']);
-	$r=doMySqlQuery("SELECT * FROM wtfb2_accesses WHERE (accountId='${_SESSION['userId']}') AND (permission='admin')");
-	if (mysql_num_rows($r)<1) jumpErrorPage($language['accessdenied']);
+	$r=runEscapedQuery("SELECT * FROM wtfb2_accesses WHERE (accountId={0}) AND (permission='admin')", $_SESSION['userId']);
+	if (isEmptyResult($r)) jumpErrorPage($language['accessdenied']);
 }
 
 function jumpTo($url)
@@ -66,9 +66,8 @@ function generateRandomId()
 
 function villageCount($userId)
 {
-	$q="SELECT COUNT(*) AS vc FROM wtfb2_villages WHERE (ownerId='$userId')";
-	$r=mysql_query($q) or jumpErrorPage(__FILE__.':'.__LINE__.':'.mysql_error().':'.$q);
-	$a=mysql_fetch_assoc($r);
+    $r = runEscapedQuery("SELECT COUNT(*) AS vc FROM wtfb2_villages WHERE (ownerId={0})", $userId);
+	$a=$r[0][0];
 	return (int)$a['vc'];
 }
 
@@ -122,8 +121,8 @@ function jumpInformationPage($title,$message)
 
 function imAccountMaster()
 {
-	$r=doMySqlQuery(sqlPrintf("SELECT id FROM wtfb2_users WHERE (id='{1}') AND (masterAccess='{2}')",array($_SESSION['userId'],$_SESSION['accessId'])));
-	return mysql_num_rows($r)>0;
+	$r=runEscapedQuery("SELECT id FROM wtfb2_users WHERE (id={0}) AND (masterAccess={1})", $_SESSION['userId'],$_SESSION['accessId']);
+	return !isEmptyResult($r);
 }
 
 function makeErrorMessage($msg)
