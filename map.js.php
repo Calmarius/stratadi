@@ -502,27 +502,19 @@ function setupAction(action,launcherVillages,x,y,destinationVillageId,mp)
 			amountText+='<td>'+'<a href="javascript:void((function(){_(\'amount_'+i+'\').value='+unitAmounts[i]+';setArmyValue(\'amount_\',\'armyvalue\')})())">('+unitAmounts[i]+')</a></td>';
 		}
 		amountText+='</tr>';
-/*		for(var i in UnitDescriptors)
-		{
-			amountText+=
-			'<tr>'+
-			'<td>'+UnitNames[i]+'</td>'+
-			'<td><input type="text" style="width:7em" id="amount_'+i+'" onclick="this.select()" onkeyup="setPercent(\'amount_'+i+'\',\'percent_'+i+'\','+unitAmounts[i]+'); setArmyValue(\'amount_\',\'armyvalue\')" value="0"></td>'+
-			'<td>'+'<a href="javascript:void((function(){_(\'amount_'+i+'\').value='+unitAmounts[i]+';setPercent(\'amount_'+i+'\',\'percent_'+i+'\','+unitAmounts[i]+'); setArmyValue(\'amount_\',\'armyvalue\')})())">('+unitAmounts[i]+')</a></td>'+
-			'<td><span id="percent_'+i+'">0</span>%</td>'+
-			'</tr>' ;
-			unitKeys.push("'"+i+"'");
-		}*/
 		amountText+='</table>';
 
 		var catapultText='';
 			catapultText='<p><?php echo $language["pleasechoosecatapulttarget"]; ?><?php echo generateBuildingSelector("catapulttarget","catapulttarget");?></p>';
 
 		var rId=generateRandomId();
+		var ageBonus = +villagesById[destinationVillageId].ageBonus;
+		var ageBonusStyle = ageBonus > 2 ? 'class="alert"' : '';
+
 		var iHTML=
-//		'<p><a href="javascript:void(_(\''+rId+'\').close())"><?php echo $language["close"];?></a></p>'+
 		'<h3><?php echo $language["launchtroops"]; ?></h3>'+
 		'<p style="width:400px"><?php echo $language["operation"]; ?>'+operationname+'</p>'+
+        '<p '+ageBonusStyle+'>'+String.format('<?php echo $language["agebonusjstext"];?>', ageBonus.toFixed(2))+'</p>'+
 		'<a href="javascript:void(toggleElement(\'sendtroopsinfo\'))"><?php echo $language["moreinfo"];?></a>'+
 		'<div id="sendtroopsinfo" style="display:none">'+
 			'<p style="width:400px"><?php echo $language["becarefulsendtroopsmultiplevillages"]; ?></p>'+
@@ -2597,15 +2589,6 @@ function processPlayerInfoXML(xml)
 	}
 
 	var iHTML='';
-/*	if (playerInfo.events && playerInfo.events[0].event)
-	{
-		var eventArray=playerInfo.events[0].event;
-		for(var i=0;i<eventArray.length;i++)
-		{
-			var text=eventArray[i];
-			iHTML+=text+'<br>';
-		}
-	}*/
 	iHTML='<table>';
 	if (playerInfo.eventSummary && playerInfo.eventSummary[0].event)
 	{

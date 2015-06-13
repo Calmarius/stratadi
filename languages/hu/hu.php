@@ -58,6 +58,7 @@ if (!isset($_languageIncluded))
 	'age' => "Kor",  // In the profile
 	'agebonus'=>"Korbónusz: ", // In battle simulator
 	'agebonustext'=>"Korbónusz: {1}×", // In the profile
+	'agebonusjstext'=>"Korbónusz: {0}×", // When attacking a village. // TODO make string formatters {0} based.
 	'ally'=>'szövetséges', // diplomatic stance
 	'amountform' => '{1}db {2}', // general from of amounts, {1} means the amount, {2} is the subject. Eg.: 1 pieces of furniture would be "{1} pieces of {2}", for in game example: 2 spearmen
 	'april' => "április",  // in the date picker control
