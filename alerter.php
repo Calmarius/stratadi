@@ -1,6 +1,7 @@
 <?php
 
 require_once('userworkerphps.php');
+bounceSessionOver();
 
 $r = runEscapedQuery(
 "

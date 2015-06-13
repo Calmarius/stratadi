@@ -354,6 +354,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 						<li>Kinevezel új hőst (aki tiszta lappal 0. szintről indul)</li>
 						<li>Megvárod, míg véletlenül betoppan valamelyik szabad hős a falvadba, ha megérkezik szerződtetheted magadhoz, így téged fog szolgálni.</li>
 					</ul>
+					<p>A hősök sebessége <?php echo $config['heroSpeed']; ?> mező/h, amikor egyedül közlekednek.</p>
 				</div>
 				<a href="javascript:void(toggleElement('troopmovement'))">Egységmozgások</a><br>
 				<div id="troopmovement" class="helpdiv">

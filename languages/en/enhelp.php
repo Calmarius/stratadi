@@ -364,6 +364,7 @@ function applyFactorToVector($vector,$factor,&$newVector)
 						<li>Create a new hero which will be level 1.</li>
 						<li>Or you can wait for a strong hero to show up in one of your village. You can hire him and will serve you.</li>
 					</ul>
+					<p>The speed of heroes are <?php echo $config['heroSpeed']; ?> fields/hour when traveling alone.</p>
 				</div>
 				<a href="javascript:void(toggleElement('troopmovement'))">Troop movements</a><br>
 				<div id="troopmovement" class="helpdiv">
