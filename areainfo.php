@@ -41,6 +41,7 @@ echo '<villages>';
 $placeholdersOnly=isset($_GET['placeholdersonly']);
 foreach ($r[0] as $row)
 {
+    if (($row['ageBonus'] !== null) && ($row['ageBonus'] < 1)) $row['ageBonus'] = 1;
 
 	echo '<village>';
 	if ($placeholdersOnly)
