@@ -103,9 +103,9 @@ X;
 function generateLanguagePicker($name,$languageTableName,$selectedLangs=array())
 {
 	$name.='[]';
-	$r=doMySqlQuery("SELECT * FROM $languageTableName ORDER BY language");
+	$r=runEscapedQuery("SELECT * FROM $languageTableName ORDER BY language");
 	$options='';
-	while($row=mysql_fetch_assoc($r))
+	foreach ($r[0] as $row)
 	{
 		$options.='<option value="'.$row['id'].'" '.(in_array($row['id'],$selectedLangs) ? 'selected="selected"':'').'>'.$row['language'].'</option>';
 	}

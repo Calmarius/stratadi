@@ -4,8 +4,8 @@ require_once("userworkerphps.php");
 
 bounceSessionOver();
 
-$r=doMySqlQuery("SELECT UNIX_TIMESTAMP(NOW()) AS nowstamp");
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT UNIX_TIMESTAMP(NOW()) AS nowstamp");
+$a=$r[0][0];
 
 
 $param=array();
@@ -20,20 +20,17 @@ $param['notification']=@$_GET['notification'];
 
 if (isset($_GET['thread']))
 {
-//	$q="SELECT * FROM wtfb2_threadentries WHERE (posterId='${_SESSION['userId']}') AND (threadId='${_GET['thread']}')";
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_threadlinks WHERE (userId='{1}') AND (threadId='{2}')",array($_SESSION['userId'],$_GET['thread'])),'jumpErrorPage');
-	if (mysql_num_rows($r)==0) jumpErrorPage($language['threadnotexist']);
-	$r=doMySqlQuery
+	$r=runEscapedQuery("SELECT * FROM wtfb2_threadlinks WHERE (userId={0}) AND (threadId={1})",$_SESSION['userId'],$_GET['thread']);
+	if (isEmptyResult($r)) jumpErrorPage($language['threadnotexist']);
+	$r=runEscapedQuery
 	(
-		sqlPrintf
-		(
-			"
-				SELECT wtfb2_threadentries.*,wtfb2_users.userName FROM wtfb2_threadentries LEFT JOIN wtfb2_users ON (wtfb2_threadentries.posterId=wtfb2_users.id) WHERE (threadId='{1}') ORDER BY  `when` DESC LIMIT 0,{2}
-			",array($_GET['thread'],$config['pageSize'])
-		)
-	,'jumpErrorPage'
+		"
+			SELECT wtfb2_threadentries.*,wtfb2_users.userName
+			FROM wtfb2_threadentries LEFT JOIN wtfb2_users ON (wtfb2_threadentries.posterId=wtfb2_users.id)
+			WHERE (threadId={0}) ORDER BY  `when` DESC LIMIT 0, {1}
+	    ",$_GET['thread'], (int)$config['pageSize']
 	);
-	while($row=mysql_fetch_assoc($r))
+	foreach ($r[0] as $row)
 	{
 		$param['entries'][]=$row;
 	}

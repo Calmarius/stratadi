@@ -3,7 +3,7 @@
 /*require_once('setupsession.php');
 require_once('setupmysql.php');*/
 require_once('userworkerphps.php');
-mysql_set_charset("utf8");
+//mysql_set_charset("utf8");
 
 $bLevelNames=array();
 foreach($config['buildings'] as $key=>$value)
@@ -22,7 +22,7 @@ $q=sqlPrintf(
 	"
 	,array($_GET['left'],$_GET['right'],$_GET['top'],$_GET['bottom'])
 );
-$r=doMySqlQuery($q);
+$r=runEscapedQuery($q);
 
 
 
@@ -30,7 +30,7 @@ header('Content-type: application/xml; charset=UTF-8');
 echo '<?xml version="1.0" encoding="UTF-8"?>';
 echo '<villages>';
 $placeholdersOnly=isset($_GET['placeholdersonly']);
-while($row=mysql_fetch_assoc($r))
+foreach ($r[0] as $row)
 {
 	
 	echo '<village>';
@@ -67,14 +67,6 @@ while($row=mysql_fetch_assoc($r))
 		}
 	}
 	echo '</village>';
-/*	if ($row['ownerId']==$_SESSION['userId'])
-	{
-		
-	}
-	else
-	{
-		'<id>'
-	}*/
 }
 echo '</villages>';
 

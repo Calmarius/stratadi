@@ -14,10 +14,10 @@ function fetchAllVillagesWithScore($playerId)
 		$bLevelnames[]=$buildingDescriptor['buildingLevelDbName'];
 	}
 	$scoreQuery=$config['villageScoreFunction']($bLevelnames);
-	$q=sqlPrintf("SELECT *,$scoreQuery AS score  FROM wtfb2_villages WHERE (ownerId='{1}')",array($playerId));
-	$r=doMySqlQuery($q);
+	$q=sqlvprintf("SELECT *,$scoreQuery AS score  FROM wtfb2_villages WHERE (ownerId={0})",array($playerId));
+	$r=runEscapedQuery($q);
 	$villages=array();
-	while($row=mysql_fetch_assoc($r))
+    foreach ($r[0] as $row)
 	{
 		$villages[]=$row;
 	}
@@ -44,7 +44,7 @@ function updateAggregatedPlayerInfo($playerId,$villages)
 		$goldProduction+=$goldProducer['goldProductionSpeedFunction']($value[$goldProducerLevelName])*$config['serverSpeed'];
 		$score+=$value['score'];
 	}
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET goldProduction='{1}',villageCount='{2}',totalScore='{3}' WHERE (id='{4}')",array($goldProduction,$count,$score,$playerId)));
+	runEscapedQuery("UPDATE wtfb2_users SET goldProduction={0},villageCount={1},totalScore={2} WHERE (id={3})",$goldProduction,$count,$score,$playerId);
 }
 
 function updateAllVillages($playerId,$toWhen=null)
@@ -52,16 +52,15 @@ function updateAllVillages($playerId,$toWhen=null)
 	global $config;
 	$when='NOW()';
 	if ($toWhen!=null) $when="'$toWhen'";
-	$r=doMySqlQuery(sqlPrintf("SELECT TIMESTAMPDIFF(SECOND,lastMassVillageUpdate,$when) AS lastMassUpdate FROM wtfb2_users WHERE (id='{1}')",array($playerId)));
-	if (mysql_num_rows($r)<1) return;
-	$a=mysql_fetch_assoc($r);
-//	if ((int)$a['lastMassUpdate']<(int)$config['forceUpdatePeriod']) return;
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET lastMassVillageUpdate=$when WHERE (id='{1}')",array($playerId)));
+	$r=runEscapedQuery("SELECT TIMESTAMPDIFF(SECOND,lastMassVillageUpdate,$when) AS lastMassUpdate FROM wtfb2_users WHERE (id={0})",$playerId);
+	if (isEmptyResult($r)) return;
+	$a=$r[0][0];
+	runEscapedQuery("UPDATE wtfb2_users SET lastMassVillageUpdate=$when WHERE (id={0})",$playerId);
 	$villages=fetchAllVillagesWithScore($playerId);
 	foreach($villages as $key=>$value)
 	{
 		updateVillage($value['id'],$toWhen);
-	}	
+	}
 	updateAggregatedPlayerInfo($playerId,$villages);
 }
 
@@ -70,14 +69,15 @@ function updatePlayer($playerId,$toWhen=null)
 	$when='NOW()';
 	if ($toWhen!=null) $when="'$toWhen'";
 	global $config;
-	doMySqlQuery
+	runEscapedQuery
 	(
-		sqlPrintf
-		(
 			"UPDATE wtfb2_users
-			SET expansionPoints=expansionPoints+TIMESTAMPDIFF(SECOND,lastUpdate,$when)/86400*{2},gold=gold+goldProduction*TIMESTAMPDIFF(SECOND,lastUpdate,$when)/3600, lastUpdate=$when WHERE (id='{1}'
-			)",array($playerId,$config['serverSpeed'])
-		)
+			SET
+			    expansionPoints=expansionPoints+TIMESTAMPDIFF(SECOND,lastUpdate,$when)/86400*{1},
+			    gold=gold+goldProduction*TIMESTAMPDIFF(SECOND,lastUpdate,$when)/3600,
+			    lastUpdate=$when
+			WHERE (id={0}
+			)",$playerId, (float)$config['serverSpeed']
 	);
 }
 
@@ -87,10 +87,10 @@ function updateVillage($villageId,$toWhen=null)
 	global $language;
 	$when='NOW()';
 	if ($toWhen!=null) $when="'$toWhen'";
-	$q=sqlPrintf("SELECT TIMESTAMPDIFF(SECOND,lastUpdate,$when) AS secsElapsed,wtfb2_villages.* FROM wtfb2_villages WHERE (id='{1}')",array($villageId));
-	$r=doMySqlQuery($q);
-	if (mysql_num_rows($r)==0) return;
-	$a=mysql_fetch_assoc($r);
+	$q=sqlvprintf("SELECT TIMESTAMPDIFF(SECOND,lastUpdate,$when) AS secsElapsed,wtfb2_villages.* FROM wtfb2_villages WHERE (id={0})",array($villageId));
+	$r=runEscapedQuery($q);
+	if (isEmptyResult($r)) return;
+	$a=$r[0][0];
 
 	$secsElapsed=$a['secsElapsed']*$config['serverSpeed']; // more secs elapsed with speed factor
 	$trainedCounts=array();
@@ -100,7 +100,7 @@ function updateVillage($villageId,$toWhen=null)
 		$trainedCounts[$key]=0;
 		if (!isset($a[$value['trainingDbName']])) die('Configuration failure: unit.trainingDbName is not exist. Unit name was: '.$key);
 		if (!isset($a[$value['countDbName']])) die('Configuration failure: unit.countDbName is not exist. Unit name was: '.$key);
-		if (!isset($config['buildings'][$value['trainedAt']])) die('Configuration failure: buildings[unit.trainedAt] is not exist. Unit name was: '.$key.', the index was: '.$value['trainedAt']);	
+		if (!isset($config['buildings'][$value['trainedAt']])) die('Configuration failure: buildings[unit.trainedAt] is not exist. Unit name was: '.$key.', the index was: '.$value['trainedAt']);
 		$training=$a[$value['trainingDbName']];
 		$count=$a[$value['countDbName']];
 		$building=$config['buildings'][$value['trainedAt']];
@@ -146,7 +146,7 @@ function updateVillage($villageId,$toWhen=null)
 	unset($a['villageName']);
 	foreach($a as $key => $value)
 	{
-		$a[$key]="'".mysql_real_escape_string($value)."'";
+		$a[$key]=sqlvprintf('{0}', array($value));
 	}
 	$a['lastUpdate']="$when";
 	//assembling request
@@ -154,14 +154,10 @@ function updateVillage($villageId,$toWhen=null)
 	foreach($a as $key => $value)
 	{
 		$assignments[]="$key=$value";
-//		$assignments[]=mysql_real_escape_string("$key=$value");
 	}
-	
+
 	$q="UPDATE wtfb2_villages SET ".implode(',',$assignments)." WHERE (id=${a['id']})"; // escaped
-	$r=doMySqlQuery($q);
-
-
+	$r=runEscapedQuery($q);
 }
-//echo $q;
 
 ?>

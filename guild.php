@@ -5,66 +5,63 @@ require_once('userworkerphps.php');
 $guildInfo=array();
 
 $q="SELECT wtfb2_guilds.* FROM wtfb2_users INNER JOIN wtfb2_guilds ON (wtfb2_guilds.id=wtfb2_users.guildId) WHERE (wtfb2_users.id='${_SESSION['userId']}')";
-$r=doMySqlQuery($q,'jumpErrorPage');
+$r=runEscapedQuery($q);
 $inGuild=false;
 $invitations=array();
 
-if (mysql_num_rows($r)>0)
+if (!isEmptyResult($r))
 {
-	$guildInfo=mysql_fetch_assoc($r);
+	$guildInfo=$r[0][0];
 	$inGuild=true;
-	$q=sqlPrintf("SELECT * FROM wtfb2_guildpermissions WHERE (userId='{1}')",array($_SESSION['userId']));
-	$r=doMySqlQuery($q,'jumpErrorPage');
-	while($row=mysql_fetch_assoc($r))
+	$q=sqlvprintf("SELECT * FROM wtfb2_guildpermissions WHERE (userId={0})",array($_SESSION['userId']));
+	$r=runEscapedQuery($q);
+	foreach ($r[0] as $row)
 	{
 		$guildInfo['permissions'][$row['permission']]=true;
 	}
 	$q=
-		sqlPrintf(
+		sqlvprintf(
 		"
 			SELECT u.*,SUM(p.permission='diplomacy') AS diplomacyRight, SUM(p.permission='invite') AS inviteRight
 			FROM wtfb2_users u
 			LEFT JOIN wtfb2_guildpermissions p ON (u.id=p.userId)
-			WHERE (guildId='{1}')
+			WHERE (guildId={0})
 			GROUP BY u.id
-		",$guildInfo['id']);
-	$r=doMySqlQuery($q,'jumpErrorPage');
+		",array($guildInfo['id']));
+	$r=runEscapedQuery($q);
 	$guildInfo['members'] = array();
-	while($row=mysql_fetch_assoc($r))
+	foreach ($r[0] as $row)
 	{
 		$guildInfo['members'][]=$row;
 	}
-	$r=doMySqlQuery
+	$r=runEscapedQuery
 	(
-		sqlPrintf
-		(
-			"SELECT wtfb2_diplomacy.*,wtfb2_guilds.guildName,wtfb2_guilds.id AS guildsId
-			FROM wtfb2_diplomacy INNER JOIN wtfb2_guilds ON (wtfb2_diplomacy.toGuildId=wtfb2_guilds.id)
-			WHERE (guildId={1})",array($guildInfo['id'])
-		)
+		"SELECT wtfb2_diplomacy.*,wtfb2_guilds.guildName,wtfb2_guilds.id AS guildsId
+		FROM wtfb2_diplomacy INNER JOIN wtfb2_guilds ON (wtfb2_diplomacy.toGuildId=wtfb2_guilds.id)
+		WHERE (guildId={0})",$guildInfo['id']
 	);
 	$guildInfo['diplomacy'] = array();
-	while($row=mysql_fetch_assoc($r))
+	foreach ($r[0] as $row)
 	{
 		$guildInfo['diplomacy'][]=$row;
 	}	
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_threads WHERE (guildId='{1}')",array($guildInfo['id'])));
+	$r=runEscapedQuery("SELECT * FROM wtfb2_threads WHERE (guildId={0})",$guildInfo['id']);
 	$guildInfo['threads'] = array();
-	while($row=mysql_fetch_assoc($r))
+	foreach ($r[0] as $row)
 	{
 		$guildInfo['threads'][]=$row;
 	}	
 }
 else
 {
-	$q=sqlPrintf(
+	$q=sqlvprintf(
 	"
 		SELECT wtfb2_guilds.guildName,wtfb2_guilds.id,wtfb2_guildinvitations.id AS  invitationId
 		FROM wtfb2_guildinvitations INNER JOIN wtfb2_guilds ON (wtfb2_guildinvitations.guildId=wtfb2_guilds.id)
-		WHERE (recipientId='{1}')
+		WHERE (recipientId={0})
 	",array($_SESSION['userId']));
-	$r=doMySqlQuery($q,'jumpErrorPage');
-	while($row=mysql_fetch_assoc($r))
+	$r=runEscapedQuery($q);
+	foreach ($r[0] as $row)
 	{
 		$invitations[]=$row;
 	}

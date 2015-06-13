@@ -5,7 +5,7 @@ global $language;
 
 $subjectText = @$this->subject;
 
-if (substr($subjectText, 0, strlen('RE:')) != 'RE:') $subjectText = 'RE:' . $subjectText;
+if ($subjectText != '' && (substr($subjectText, 0, strlen('RE:')) != 'RE:')) $subjectText = 'RE:' . $subjectText;
 
 // TODO: Check all echo's if they need to use htmlspecialchars. Consider using a new function that prints escaped string.
 

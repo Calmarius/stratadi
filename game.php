@@ -15,13 +15,13 @@ if (!$asGuest)
 $deputized=false;
 if (!isset($_SESSION['asdeputy']))
 {
-	$r=doMySqlQuery(sqlPrintf("SELECT d.*,u.userName FROM wtfb2_deputies d JOIN wtfb2_users u ON (d.deputyId=u.id) WHERE (sponsorId='{1}')",array($_SESSION['userId'])));
-	$deputized=mysql_num_rows($r)>0;
+	$r=runEscapedQuery("SELECT d.*,u.userName FROM wtfb2_deputies d JOIN wtfb2_users u ON (d.deputyId=u.id) WHERE (sponsorId={0})",$_SESSION['userId']);
+	$deputized= !isEmptyResult($r);
 }
 if ($deputized)
 {
 	$deps=array();
-	while($row=mysql_fetch_assoc($r))
+	foreach ($r[0] as $row)
 	{
 		$deps[]=$row['userName'];
 	}
@@ -29,9 +29,9 @@ if ($deputized)
 }
 else
 {
-	$r=doMySqlQuery(sqlPrintf("SELECT id,x,y FROM wtfb2_villages WHERE (ownerId='{1}')",array($_SESSION['userId'])),'jumpErrorPage');
+	$r=runEscapedQuery("SELECT id,x,y FROM wtfb2_villages WHERE (ownerId={0})",$_SESSION['userId']);
 	$villages=array();
-	while($row=mysql_fetch_assoc($r))
+	foreach ($r[0] as $row)
 	{
 		$villages[$row['id']]=$row;
 	}
@@ -51,12 +51,12 @@ else
 		}
 	}
 
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($_SESSION['userId'])));
+	$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})",$_SESSION['userId']);
 	$player=array();
-	if (mysql_num_rows($r)>0) $player=mysql_fetch_assoc($r);
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_accesses WHERE (id='{1}')",array($_SESSION['accessId'])));
+	if (!isEmptyResult($r)) $player=$r[0][0];
+	$r=runEscapedQuery("SELECT * FROM wtfb2_accesses WHERE (id={0})",$_SESSION['accessId']);
 	$access=array();
-	if (mysql_num_rows($r)>0) $access=mysql_fetch_assoc($r);
+	if (!isEmptyResult($r)) $access=$r[0][0];
 
 	$gameViewTemplate;
 	$needsTutorial=false;
