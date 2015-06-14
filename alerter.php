@@ -33,7 +33,14 @@ $r = runEscapedQuery(
         <meta http-equiv="refresh" content="60">
     </head>
     <body>
-        <p>Last update: <?php echo date(DATE_RSS); ?></p>
+        <script>
+            function beep()
+            {
+                var snd = new Audio('alert.mp3');
+                snd.play();
+            }
+        </script>
+        <p>Last update: <?php echo date(DATE_RSS); ?> <a href="javascript:void(beep())">Test alert</a></p>
         <?php
             if (isEmptyResult($r))
             {
@@ -45,10 +52,7 @@ $r = runEscapedQuery(
             {
                 ?>
                     <p>You are under attack!</p>
-                    <script>
-                        var snd = new Audio('alert.mp3');
-                        snd.play();
-                    </script>
+                    <script>beep();</script>
                 <?php
             }
         ?>
