@@ -3,9 +3,18 @@
 require_once("userworkerphps.php");
 //bounceSessionOver();
 
-$myId=$_SESSION['userId'];
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($myId)));
-$me=mysql_fetch_assoc($r);
+// TODO: Add fetch player by id function.
+if (isset($_SESSION['userId']))
+{
+    $myId=$_SESSION['userId'];
+    $r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($myId)));
+    $me=mysql_fetch_assoc($r);
+}
+else
+{
+    $me['regDate'] = date('Y-m-d H:i:s');
+    $myId = -1;
+}
 
 if (!isset($_GET['id'])) $_GET['id']=$myId;
 
@@ -26,7 +35,14 @@ if (mysql_num_rows($r)==0) jumpErrorPage($language['']);
 $a=mysql_fetch_assoc($r);
 $a['own']=$myId==$a['id'];
 
-$a['revAgeBonus'] = 1/(float)$a['ageBonus'];
+if ($a['ageBonus'] != 0)
+{
+    $a['revAgeBonus'] = 1/(float)$a['ageBonus'];
+}
+else
+{
+    $a['revAgeBonus'] = 1;
+}
 if ((double)$a['ageBonus']<1) $a['ageBonus']=1;
 if ((double)$a['revAgeBonus']<1) $a['revAgeBonus']=1;
 

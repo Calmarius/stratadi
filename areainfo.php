@@ -1,7 +1,7 @@
 <?php
 
 require_once('userworkerphps.php');
-bounceSessionOver();
+//bounceSessionOver(); // Do not bounce if session is over, because we need it for guest access.
 
 $bLevelNames=array();
 foreach($config['buildings'] as $key=>$value)
@@ -11,9 +11,16 @@ foreach($config['buildings'] as $key=>$value)
 
 $scoreQuery=$config['villageScoreFunction']($bLevelNames);
 
-$myId=$_SESSION['userId'];
-$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})", $myId);
-$me=$r[0][0];
+if (isset($_SESSION['userId']))
+{
+    $myId=$_SESSION['userId'];
+    $r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})", $myId);
+    $me=$r[0][0];
+}
+else
+{
+    $me['regDate'] = date('Y-m-d H:i:s');
+}
 
 $q=sqlPrintf(
 	"
@@ -55,7 +62,7 @@ foreach ($r[0] as $row)
 	}
 	else
 	{
-		if ($row['ownerId']==$_SESSION['userId'])
+		if ($row['ownerId']==@$_SESSION['userId'])
 		{
 			foreach($row as $key=>$value)
 			{

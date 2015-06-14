@@ -15,7 +15,7 @@ if (!$asGuest)
 $deputized=false;
 if (!isset($_SESSION['asdeputy']))
 {
-	$r=runEscapedQuery("SELECT d.*,u.userName FROM wtfb2_deputies d JOIN wtfb2_users u ON (d.deputyId=u.id) WHERE (sponsorId={0})",$_SESSION['userId']);
+	$r=runEscapedQuery("SELECT d.*,u.userName FROM wtfb2_deputies d JOIN wtfb2_users u ON (d.deputyId=u.id) WHERE (sponsorId={0})",@$_SESSION['userId']);
 	$deputized= !isEmptyResult($r);
 }
 if ($deputized)
@@ -29,7 +29,7 @@ if ($deputized)
 }
 else
 {
-	$r=runEscapedQuery("SELECT id,x,y FROM wtfb2_villages WHERE (ownerId={0})",$_SESSION['userId']);
+	$r=runEscapedQuery("SELECT id,x,y FROM wtfb2_villages WHERE (ownerId={0})",@$_SESSION['userId']);
 	$villages=array();
 	foreach ($r[0] as $row)
 	{
@@ -51,17 +51,17 @@ else
 		}
 	}
 
-	$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})",$_SESSION['userId']);
+	$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})",@$_SESSION['userId']);
 	$player=array();
 	if (!isEmptyResult($r)) $player=$r[0][0];
-	$r=runEscapedQuery("SELECT * FROM wtfb2_accesses WHERE (id={0})",$_SESSION['accessId']);
+	$r=runEscapedQuery("SELECT * FROM wtfb2_accesses WHERE (id={0})",@$_SESSION['accessId']);
 	$access=array();
 	if (!isEmptyResult($r)) $access=$r[0][0];
 
 	$gameViewTemplate;
 	$needsTutorial=false;
 	$enteredGame=0;
-	if ($player['willDeleteAt']!==null)
+	if (@$player['willDeleteAt']!==null)
 	{
 		$gameViewTemplate=new Template('templates/canceldeletiontemplate.php',array('deleteTime'=>$player['willDeleteAt']));
 		$enteredGame=false;		
