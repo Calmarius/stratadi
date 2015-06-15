@@ -140,7 +140,7 @@ var counters=new Object();
 
 var lastNbIndex=6;
 
-var Colors={'own':'#0000FF','guild':'#0080FF','ally':'#FFFF00','neutral':'#FFFFFF','peace':'#008000','enemy':'#FF0000','':"black",'abandoned':'#808080'};
+var Colors={'own':'#0000FF','guild':'#0080FF','ally':'#FFFF00','neutral':'#FFFFFF','peace':'#00FF00','enemy':'#FF0000','':"black",'abandoned':'#808080'};
 var DiplomacyName=new Object();
 DiplomacyName.own='<?php echo $language["own"]?>';
 DiplomacyName.guild='<?php echo $language["guildproperty"]?>';

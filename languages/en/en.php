@@ -604,7 +604,7 @@ X
 	'spendallbuildpoints'=>'Spend all build points', //in mass building window
 	'spendmaxgold'=>'Maximum amount of gold to spend:', // in mass building window
 	'spokenlanguages'=>'Spoken languages: ', // in the registration form
-	'stables' => "Strables",  // in game, village properties
+	'stables' => "Stables",  // in game, village properties
 	'startnewtopic'=>'Start new topic', // in manage forums window
 	'strength'=>'<dfn title="How many gold an unit can carry">Strength</dfn>', // in unit description tables
 	'strengthtext'=>'{1} gold', // in unit description tables
