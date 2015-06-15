@@ -23,7 +23,7 @@ function login($username,$password)
 
 	$passwordPart="AND (a.passwordHash=MD5({1}))";
 	if (in_array($username,$config['openAccounts'])) $passwordPart='';
-    $kingdom = runEscapedQuery(
+    $access = runEscapedQuery(
 		"
 			SELECT a.*,u.id AS userId
 			FROM wtfb2_accesses a
@@ -32,24 +32,24 @@ function login($username,$password)
 		",$username,$password
     );
 
-	if (!isset($kingdom[0][0]))
+	if (!isset($access[0][0]))
 	{
 		$_SESSION['loginparms']['passwordError']=makeErrorMessage($language['badpassword']);
 		bounceBack();		
 	}
-    $kingdom = $kingdom[0][0];
+    $access = $access[0][0];
 
-	if ($kingdom['userId']===null)
+	if ($access['userId']===null)
 	{
 		jumpInformationPage($language['noaccountassociated'],$language['noaccountassociatedinfo']);
 	}
 	$_SESSION['loginparms']=array();
-	if ($kingdom['permission']=='banned') jumpErrorPage($language['youarebanned']);
-	$_SESSION['userId']=$kingdom['accountId'];
-	$_SESSION['accessId']=$kingdom['id'];
-	$_SESSION['permission']=$kingdom['permission'];
-	if ($kingdom['permission']=='inactive') jumpTo('activate.php');
-	$playerId=$kingdom['accountId'];
+	if ($access['permission']=='banned') jumpErrorPage($language['youarebanned']);
+	$_SESSION['userId']=$access['accountId'];
+	$_SESSION['accessId']=$access['id'];
+	$_SESSION['permission']=$access['permission'];
+	if ($access['permission']=='inactive') jumpTo('activate.php');
+	$playerId=$access['accountId'];
 	loginUpdateAll($playerId);
 	jumpTo('game.php');
 }
