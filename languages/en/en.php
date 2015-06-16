@@ -209,8 +209,8 @@ X
 	'foundaguild' => "Found a guildt",  // in guild window, when you don't have guild. 
 	'gamedescription'=><<< X
 		<p>Important note: this game uses <i>&lt;canvas&gt;</i> element for display which works in most modern browsers except Internet Explorer (tough IE9 will support it).</p>
-		<p>Join to the game's facebook group: <a href="http://www.facebook.com/home.php?sk=group_192249450790540&ap=1">here</a> (Most of users are Hungarian there, but English is accepted too.)</p>
-		<p>Silent child's mother never heards the word... If you have problems with login or you experience bugs, please report it in our <a href="http://users.atw.hu/calmarius/phpBB2/index.php">forum</a>!</p>
+		<p>Like the game's Facebook page: <a href="https://www.facebook.com/pages/StraTaDi/209096639149286">here</a> (Most of users are Hungarian there, but English is accepted too.)</p>
+		<p>Silent child's mother never heards the word... If you have problems with login or you experience bugs, please report it on the Facebook page!</p>
 		<p><i>It seems you can't register using @facebook.com mail if you don't white list the admin's e-mail address (${config['adminMail']}) in your setting. Be aware of this! (I already got some bounced mails from there.)</i></p>
 		<p>You look around on the map without registration: <a href="game.php?guest">[Login as guest]</a></p>
 		<p>If you want to try the game, use demo as username and empty password.</p>

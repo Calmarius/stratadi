@@ -211,8 +211,6 @@ X
 	'gamedescription'=><<< X
 			<h3>Szerver indulása: ${config['gameStarted']}</h3>
 			<div style="text-align:left; width:640px; margin-left:auto; margin-right:auto">
-				<p>Ez a játék a <a href="http://users.atw.hu/wtfbattles/index.php">első verzió</a> folytatása lesz. Az ott szerzett és más hasonló faluépítgetős játékokból szerzett tapasztalataim alapján próbálom, azon játékok hiányosságait idegesítő
-				dolgait minimalizálni, és az élvezhetőséget és a kezelhetőséget fejleszteni amennyire lehet - és amennyire ezt ezen a hoston engedik.</p>
 				<p>Változtatások a korábbi verzióhoz képest:</p>
 				<ul>
 					<li>Lesznek klánok, levelezés, és minden, ami a kommunikációval kapcsolatos.</li>
@@ -225,8 +223,8 @@ X
 			</div>
 			<h3>Fontos információk</h3>
 			<p>Fontos megjegyzés: ez a játék &lt;canvas&gt; elemet használ a megjelenítéshez, ami szinte minden böngészőn megy - Internet Explorer-en kívül. Szóval, ha játszani szeretnél, illene szedned legalább egy Firefoxot.</p>
-			<p>Csatlakozz a játék facebook csoportjához: <a href="${config['facebookGroupLink']}">ITT</a></p>
-			<p>Néma gyereknek anyja se hallja a szavát... Ha valami problémád van a bejelentkezéssel vagy a programhibát észlelsz, akkor azt jelentsd a <a href="${config['forumLink']}">fórumban</a> vagy írj az adminnak egy e-mailt!</p>
+    		<p>Lájkold a játék Facebook oldalát: <a href="https://www.facebook.com/pages/StraTaDi/209096639149286">itt.</a></p>
+			<p>Néma gyereknek anyja se hallja a szavát... Ha valami problémád van a bejelentkezéssel vagy a programhibát észlelsz, akkor azt jelentsd a játék oldalán.</p>
 			<p><i>Úgy tűnik, hogy @facebook.com -os e-mail címről nem enged regisztrálni, ha nem engedélyezed az az admin e-mail címét (${config['adminMail']}) a beállításaidban. Figyelj erre oda. (kaptam egy pár visszapattintott levelet onnan már.)</i></p>
 			<p>Ha gondolod, regisztráció nélkül is szétnézhetsz a pályán: <a href="game.php?guest">[Belépés nézelődőként]</a></p>
 			<p>Ha nem szeretnél regelni, de ki szeretnéd próbálni a játékot, akkor beléphetsz <b>demo</b> felhasználónévvel, üres jelszóval.</p>
