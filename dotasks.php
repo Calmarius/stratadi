@@ -296,6 +296,7 @@ function sendTroops($command)
 		}
 	}
 	// deputy mode can't send troops away
+	/*
 	if (isset($_SESSION['asdeputy']))
 	{
 		if ($action!='move')
@@ -312,6 +313,7 @@ function sendTroops($command)
 			}
 		}
 	}
+	*/
 	$unitAmounts=array();
 	$index=0;
 	$speed=100;
