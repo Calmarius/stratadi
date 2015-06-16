@@ -27,7 +27,7 @@ if (isEmptyResult($myGuild)) jumpErrorPage($language['guildnotexist']);
 $myGuild=$myGuild[0][0];
 
 $diplomaticStance=runEscapedQuery("SELECT * FROM wtfb2_diplomacy WHERE (guildId={0}) AND (toGuildId={1})",$myself['guildId'],$theirGuild['id']);
-if (!isEmptyResult(diplomaticStance)) jumpErrorPage($language['diplomaticstancealreadyexist']);
+if (!isEmptyResult($diplomaticStance)) jumpErrorPage($language['diplomaticstancealreadyexist']);
 runEscapedQuery("INSERT INTO wtfb2_diplomacy (attitude,guildId,toGuildId) VALUES ({0},{1},{2})",$_POST['stance'],$myself['guildId'],$theirGuild['id']);
 runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,eventTime,type,guildId,recipientGuildId) VALUES (0,0,NOW(),'diplomacychanged',{0},{1})",$theirGuild['id'],$myself['guildId']); // send event ourselves.
 // notify users with diplomacy right about the change

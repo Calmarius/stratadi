@@ -689,13 +689,14 @@ function setSpareBuildPoints($command)
 
 function doMassBuilding(&$villageArray,$buildingId,$maxGold,$maxLevel)
 {
+    // The village array comes in sorted by the building level to upgrade.
 	global $config;
 	$bd=$config['buildings'][$buildingId];
 	$levelName=$bd['buildingLevelDbName'];
 	$costFn=$bd['costFunction'];
 	$n=count($villageArray);
 
-
+    // This array stores the minimum level to upgrade.
 	$tmpLevels=array();
 	for($i=0;$i<$n;$i++)
 	{
@@ -709,8 +710,11 @@ function doMassBuilding(&$villageArray,$buildingId,$maxGold,$maxLevel)
 	{
 		$iLevel=$tmpLevels[$i];
 
+        if ($iLevel == -1) continue;
+
 		if (($iLevel>=$maxLevel) && ($maxLevel>0))
 		{
+            // Max level reached, we are filled up totally.
 			return $spent;
 		}
 
@@ -722,16 +726,19 @@ function doMassBuilding(&$villageArray,$buildingId,$maxGold,$maxLevel)
 		{
 			if ($spent+$uCost>$maxGold)
 			{
+                // We ran out of gold, stop upgrading.
 				return $spent;
 			}
 			$villageArray[$i][$levelName]++;
 			$villageArray[$i]['buildPoints']--;
 			$spent+=$uCost;
 			$built=true;
+            $tmpLevels[$i]++;
 		}
-
-		$tmpLevels[$i]++;
-
+        else
+        {
+            $tmpLevels[$i] = -1; // -1 means we should skip this village from now on.
+        }
 
 		if ($i+1<$n)
 		{

@@ -17,7 +17,7 @@ $r=doMySqlQuery(sqlPrintf(
 	",
 	array($_GET['id'])));
 $a=mysql_fetch_assoc($r);
-$a['own']=$_GET['id']==$_SESSION['accessId'];
+$a['own']=$_GET['id']==@$_SESSION['accessId'];
 
 showInBox('templates/accesstemplate.php',$a);
 

@@ -8,7 +8,7 @@ $asGuest=(int)isset($_GET['guest']);
 
 if (!$asGuest)
 {
-	if ($_SESSION['permission']=='inactive') jumpTo('activate.php');
+	if (@$_SESSION['permission']=='inactive') jumpTo('activate.php');
 	if (!isset($_SESSION['userId'])) jumpTo('login.php');
 }
 
