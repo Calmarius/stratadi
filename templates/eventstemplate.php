@@ -55,7 +55,7 @@ global $language;
 							"<a href=\"javascript:void(parent.initMap(${event['srcX']},${event['srcY']}))\">".xprintf($language['villagetext'],array($event['source'],$event['srcX'],$event['srcY']))."</a>",
 							"<a href=\"javascript:void(parent.initMap(${event['dstX']},${event['dstY']}))\">".xprintf($language['villagetext'],array($event['destination'],$event['dstX'],$event['dstY']))."</a>",
 							$unitTable,
-							xprintf($language['coordinate'],array($event['targetX'],$event['targetY'])),
+							"<a href=\"javascript:void(parent.initMap(${event['targetX']}, ${event['targetY']}))\">".xprintf($language['coordinate'],array($event['targetX'],$event['targetY']))."</a>",
 							$event['gold'],
 							'<span class="countdown">'.$event['happensIn'].'</span> ~'.$event['estimatedTime'],
 							$event['heroName']!='' ? '<a href="viewhero.php?id='.$event['heroId'].'">'.$event['heroName'].'</a>' : $language['na'],
