@@ -1383,6 +1383,7 @@ function showTooltip(str)
 	divElm.style.backgroundColor='white';
 	divElm.style.border='1px solid black';
 	divElm.innerHTML=str;
+	divElm.onmouseenter=removeTooltip;
 	divElm.onmouseout=removeTooltip;
 }
 
