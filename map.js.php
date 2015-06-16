@@ -2740,7 +2740,7 @@ function showCellTooltip(x,y)
 	sctPrevY=y;
 	if (!mapCache[x] || !mapCache[x][y] || !mapCache[x][y].villageInfo)
 	{
-		removeTooltip();
+	    showTooltip('<?php echo xprintf($language["coordinate"], array("'+x+'","'+y+'")); ?>');
 		return;
 	}
 	var village=mapCache[x][y].villageInfo;
