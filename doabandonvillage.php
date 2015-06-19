@@ -3,7 +3,7 @@
 require_once("userworkerphps.php");
 require_once("villageupdater.php");
 
-$access=runEscapedQuery("SELECT id FROM wtfb2_accesses WHERE (accountId={0}) AND (passwordHash=MD5({1}))",$_SESSION['accessId'],$_POST['password']);
+$access=runEscapedQuery("SELECT id FROM wtfb2_accesses WHERE (accountId={0}) AND (passwordHash=MD5({1}))",$_SESSION['userId'],$_POST['password']);
 if (!isset($access[0][0])) jumpErrorPage($language['accessdenied']);
 
 $village=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (id={0}) AND (ownerId={1})",$_POST['id'],$_SESSION['userId']);
