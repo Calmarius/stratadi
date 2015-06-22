@@ -197,6 +197,7 @@ X
 	'enterpasswordtoconfirm'=>'Type your password to confirm the operation:', // in abandon village window
 	'enterplayernametoinvite'=>'Type the player\'s name to invite: ', // in invite player window
 	'Events' => 'Events',
+	'eventsuccessfullycancelled' => 'Event successfully cancelled.', // when cancelling event, and referrers are disabled.
 	'eventtime'=>'Time of the event', // in world events
 	'eventtype'=>'Type of the event', // in event bar
 	'everyvillageyouselectedwilltrain'=>'The training of the given amount of troops will be distributed among the selected villages so they will be trained the fastest possible.', //in mass training window.
