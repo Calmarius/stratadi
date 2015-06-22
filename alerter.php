@@ -13,6 +13,9 @@ $r = runEscapedQuery(
 ", $_SESSION['userId']
 );
 
+$me = runEscapedQuery("SELECT userName FROM wtfb2_users WHERE (id = {0})", $_SESSION['userId']);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -40,6 +43,7 @@ $r = runEscapedQuery(
                 snd.play();
             }
         </script>
+        <p>Alerter for <?php echo $me[0][0]['userName']; ?></p>
         <p>Last update: <?php echo date(DATE_RSS); ?> <a href="javascript:void(beep())">Test alert</a></p>
         <?php
             if (isEmptyResult($r))
