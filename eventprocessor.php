@@ -510,7 +510,7 @@ function evtAttackWithTroops($event)
 			$sumLevels+=(int)$dstVillage[$value['buildingLevelDbName']];
 		}
 		// dismiss all defending heroes if defenders fallen or the village destroyed.
-		if (($simulationResult['defenderFalls']) || ($sumLevels==0))
+		if ($simulationResult['defenderFalls'])
 		{
 			// select all heroes except the attacking hero (we would dismiss him immediately on conquer otherwise!)
 			$r=doMySqlQuery
