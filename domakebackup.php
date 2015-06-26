@@ -25,7 +25,7 @@ function zipEnumeratorRec($subpath,$root,$zip,$zipfilename)
 		if (filetype($root.$subpath."/".$file)=="dir")
 		{
 			$zip->addEmptyDir(ltrim($subpath."/".$file."/","/"));
-			zipEnumeratorRec($subpath."/".$file,$root,$zip,$tarfilename);
+			zipEnumeratorRec($subpath."/".$file,$root,$zip,$zipfilename);
 			continue;
 		}
 		$str=$subpath."/".$file;
