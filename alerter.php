@@ -33,7 +33,7 @@ $me = runEscapedQuery("SELECT userName FROM wtfb2_users WHERE (id = {0})", $_SES
                 }
             ?>
         </title>
-        <meta http-equiv="refresh" content="60">
+        <meta http-equiv="refresh" content="30">
     </head>
     <body>
         <script>
@@ -56,7 +56,22 @@ $me = runEscapedQuery("SELECT userName FROM wtfb2_users WHERE (id = {0})", $_SES
             {
                 ?>
                     <p>You are under attack!</p>
-                    <script>beep();</script>
+                    <script>
+                        var x = 0;
+                        beep();
+                        setInterval(function()
+                        {
+                            x++;
+                            if (x % 2)
+                            {
+                                document.title = "***";
+                            }
+                            else
+                            {
+                                document.title = "INCOMING ATTACK";
+                            }
+                        }, 500);
+                    </script>
                 <?php
             }
         ?>
