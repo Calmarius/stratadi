@@ -2,7 +2,7 @@
 
 require_once("userworkerphps.php");
 
-$myId=$_SESSION['userId'];
+$myId=@$_SESSION['userId'];
 $reportId=(int)$_GET['id'];
 $token=$_GET['token'];
 

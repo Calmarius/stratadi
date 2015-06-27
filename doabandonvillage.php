@@ -2,6 +2,7 @@
 
 require_once("userworkerphps.php");
 require_once("villageupdater.php");
+bounceSessionOver();
 
 if ($_SESSION['asdeputy'])
 {
@@ -25,7 +26,7 @@ runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints+1 WHERE 
 runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({0},{1},NOW(),'abandon')",$village['x'],$village['y']);
 
 updateAllVillages($_SESSION['userId']);
-jumpSuccessPage($language['villageisabandoned']);
+jumpSuccessPage($language['villageisabandoned'], '');
 
 
 ?>

@@ -4,6 +4,8 @@ require_once("userworkerphps.php");
 
 if (!isset($_GET['id']))
 {
+    bounceSessionOver();
+    $_GET['id'] = 0;
 	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_heroes WHERE (ownerId='{1}')",array($_SESSION['userId'])));
 	$a=mysql_fetch_assoc($r);
 	if ($a!==FALSE)

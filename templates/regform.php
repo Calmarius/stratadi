@@ -56,7 +56,7 @@ $genders[]=$language['female'];
 						</table>
 					</fieldset>
 					<p><?php echo $language['reginfo'];?></p>
-					<p><input type="hidden" name="referer" value="<? echo (int)$_GET['referer']; ?>"><input type="submit" value="<?php echo $language['registrationbutton'] ?>"></p>
+					<p><input type="hidden" name="referer" value="<? echo (int)@$_GET['referer']; ?>"><input type="submit" value="<?php echo $language['registrationbutton'] ?>"></p>
 				</form>
 			</div>
 <script type="text/javascript">
