@@ -782,7 +782,7 @@ function renameVillage(villageId,x,y)
 {
 	var span=_('villagenamespan');
 	if (!span) return;
-	if (!span.firstChild || (span.firstChild.nodeType!=3)) return;
+	if ((span.firstChild) && (span.firstChild.nodeType != 3)) return;
 	var text=span.innerHTML;
 	var pNode=span.parentNode;
 	span.innerHTML='';
