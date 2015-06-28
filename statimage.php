@@ -2,8 +2,8 @@
 
 require_once('userworkerphps.php');
 
-$r=doMySqlQuery('SELECT * FROM wtfb2_worldupdate WHERE (lastStatGenerated<DATE_ADD(NOW(),INTERVAL -1 HOUR))');
-if (mysql_num_rows($r)==0) 
+$r=runEscapedQuery('SELECT * FROM wtfb2_worldupdate WHERE (lastStatGenerated<DATE_ADD(NOW(),INTERVAL -1 HOUR))');
+if (isEmptyResult($r))
 {
 	header('Content-Type: image/png');
 	readfile('statimage.png');
@@ -20,28 +20,28 @@ imagefilledrectangle($img,0,0,IMGWIDTH,IMGHEIGHT,0xFFFFFF);
 
 $vPos=0;
 
-$r=doMySqlQuery('SELECT COUNT(*) AS cnt FROM wtfb2_accesses');
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery('SELECT COUNT(*) AS cnt FROM wtfb2_accesses');
+$a=$r[0][0];
 imagestring($img,FONTUSED,0,$vPos,'Users: '.$a['cnt'],0x000000);
 $vPos+=LINEHEIGHT;
 
-$r=doMySqlQuery('SELECT COUNT(*) AS cnt FROM wtfb2_users');
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery('SELECT COUNT(*) AS cnt FROM wtfb2_users');
+$a=$r[0][0];
 imagestring($img,FONTUSED,0,$vPos,'Kingdoms: '.$a['cnt'],0x000000);
 $vPos+=LINEHEIGHT;
 
-$r=doMySqlQuery('SELECT COUNT(*) AS cnt FROM `wtfb2_iplog` WHERE lastUsed>DATE_ADD(NOW(),INTERVAL -1 DAY)');
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery('SELECT COUNT(*) AS cnt FROM `wtfb2_iplog` WHERE lastUsed>DATE_ADD(NOW(),INTERVAL -1 DAY)');
+$a=$r[0][0];
 imagestring($img,FONTUSED,0,$vPos,'Active: '.$a['cnt'],0x000000);
 $vPos+=LINEHEIGHT;
 
-$r=doMySqlQuery('SELECT COUNT(*) AS cnt FROM `wtfb2_iplog` WHERE lastUsed>DATE_ADD(NOW(),INTERVAL -1 HOUR)');
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery('SELECT COUNT(*) AS cnt FROM `wtfb2_iplog` WHERE lastUsed>DATE_ADD(NOW(),INTERVAL -1 HOUR)');
+$a=$r[0][0];
 imagestring($img,FONTUSED,0,$vPos,'Online: '.$a['cnt'],0x000000);
 $vPos+=LINEHEIGHT;
 
-$r=doMySqlQuery('SELECT COUNT(*) AS cnt FROM `wtfb2_villages`');
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery('SELECT COUNT(*) AS cnt FROM `wtfb2_villages`');
+$a=$r[0][0];
 imagestring($img,FONTUSED,0,$vPos,'Villages: '.$a['cnt'],0x000000);
 $vPos+=LINEHEIGHT;
 
@@ -54,6 +54,6 @@ header('Content-Type: image/png');
 imagepng($img);
 imagepng($img,'statimage.png');
 
-doMySqlQuery('UPDATE wtfb2_worldupdate SET lastStatGenerated=NOW()');
+runEscapedQuery('UPDATE wtfb2_worldupdate SET lastStatGenerated=NOW()');
 
 ?>
