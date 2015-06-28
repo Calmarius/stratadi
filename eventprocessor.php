@@ -7,6 +7,12 @@ require_once("battlecalculation.php");
 require_once("templateclass.php");
 require_once("nightbonus.php");
 
+// TODO: When hero is in movement do not show coordinates.
+// TODO: Do not show buildings to attack when "moving troops".
+// TODO: Instead of failing with "not enough troops" send as many troops as you can.
+// TODO: Prompt for confirmation when sending hero in a "last man standing battle"
+// TODO: Show other things like night bonus and age bonus is battle report to be able to reproduce the conditions in the battle simulator.
+
 //logText("eventProcessor got called!");
 
 $events=array();
