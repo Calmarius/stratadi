@@ -354,8 +354,7 @@ function sendTroops($command)
 	{
 		if ($sum[$countName]<$amounts[$countName])
 		{
-			$responses.=$language["notenougthtroops"]."\n";
-			return;
+		    $amounts[$countName] = $sum[$countName];
 		}
 	}
 	$modSum=array();
