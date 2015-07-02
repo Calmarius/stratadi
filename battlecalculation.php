@@ -53,14 +53,14 @@ function calculateBattleCasualties($params)
 			if (!isset($baseDefenderVector[$key2])) $baseDefenderVector[$key2]=0;
 			$unitCount=(int)floor($params['defender_'.$key]);
 			if ($unitCount<0) $unitCount=0;
-			$baseDefenderVector[$key2]+=$defAmount*$unitCount*$heroAttackFormula($params['defenderhero'])*(double)$params['nightbonus']*(double)$params['agebonus'];
+			$baseDefenderVector[$key2]+=$defAmount*$unitCount*$heroDefendFormula($params['defenderhero'])*(double)$params['nightbonus']*(double)$params['agebonus'];
 		}
 		foreach($unitDescriptor['attack'] as $key2=>$attAmount)
 		{
 			if (!isset($baseAttackerVector[$key2])) $baseAttackerVector[$key2]=0;
 			$unitCount=(int)floor($params['attacker_'.$key]);
 			if ($unitCount<0) $unitCount=0;
-			$baseAttackerVector[$key2]+=$attAmount*(int)$params['attacker_'.$key]*$heroDefendFormula($params['attackhero']);
+			$baseAttackerVector[$key2]+=$attAmount*(int)$params['attacker_'.$key]*$heroAttackFormula($params['attackhero']);
 		}
 		if (isset($unitDescriptor['demolisher']))
 		{
