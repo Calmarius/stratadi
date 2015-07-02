@@ -169,6 +169,12 @@ global $config
 <img src="nightimage.php?img=town5" alt="" id="town5" style="display:none">
 <img src="nightimage.php?img=town6" alt="" id="town6" style="display:none">
 <img src="nightimage.php?img=town7" alt="" id="town7" style="display:none">
+<img src="nightimage.php?img=town8" alt="" id="town8" style="display:none">
+<img src="nightimage.php?img=town9" alt="" id="town9" style="display:none">
+<img src="nightimage.php?img=town10" alt="" id="town10" style="display:none">
+<img src="nightimage.php?img=town11" alt="" id="town11" style="display:none">
+<img src="nightimage.php?img=town12" alt="" id="town12" style="display:none">
+<img src="nightimage.php?img=town13" alt="" id="town13" style="display:none">
 <img src="nightimage.php?img=loadingcell" alt="" id="loading" style="display:none">
 <img src="nightimage.php?img=grasscell" alt="" id="grass" style="display:none">
 <img src="nightimage.php?img=towncell" alt="" id="town" style="display:none">

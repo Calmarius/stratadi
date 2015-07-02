@@ -84,6 +84,12 @@ mapImages.town4=document.getElementById('town4');
 mapImages.town5=document.getElementById('town5');
 mapImages.town6=document.getElementById('town6');
 mapImages.town7=document.getElementById('town7');
+mapImages.town8=document.getElementById('town8');
+mapImages.town9=document.getElementById('town9');
+mapImages.town10=document.getElementById('town10');
+mapImages.town11=document.getElementById('town11');
+mapImages.town12=document.getElementById('town12');
+mapImages.town13=document.getElementById('town13');
 
 
 /*var IMGXASPECT=1;
@@ -104,7 +110,13 @@ var villageLevels=
         {minScore:10000, image:mapImages.town4},
         {minScore:100000, image:mapImages.town5},
         {minScore:1000000, image:mapImages.town6},
-        {minScore:10000000, image:mapImages.town7}
+        {minScore:10000000, image:mapImages.town7},
+        {minScore:100000000, image:mapImages.town8},
+        {minScore:1000000000, image:mapImages.town9},
+        {minScore:10000000000, image:mapImages.town10},
+        {minScore:100000000000, image:mapImages.town11},
+        {minScore:1000000000000, image:mapImages.town12},
+        {minScore:10000000000000, image:mapImages.town13}
 ];
 
 
