@@ -12,6 +12,8 @@ require_once("nightbonus.php");
 // TODO: Instead of failing with "not enough troops" send as many troops as you can.
 // TODO: Prompt for confirmation when sending hero in a "last man standing battle"
 // TODO: Show other things like night bonus and age bonus is battle report to be able to reproduce the conditions in the battle simulator.
+// TODO: Check the 3:1 rule when the troops arrive.
+// TODO: Make simple login.
 
 //logText("eventProcessor got called!");
 
