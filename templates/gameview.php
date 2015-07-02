@@ -162,19 +162,19 @@ global $config
 		<?php
 	}
 ?>
-<img src="nightimage.php?img=town1" alt="" id="town1" style="display:none">
-<img src="nightimage.php?img=town2" alt="" id="town2" style="display:none">
-<img src="nightimage.php?img=town3" alt="" id="town3" style="display:none">
-<img src="nightimage.php?img=town4" alt="" id="town4" style="display:none">
-<img src="nightimage.php?img=town5" alt="" id="town5" style="display:none">
-<img src="nightimage.php?img=town6" alt="" id="town6" style="display:none">
-<img src="nightimage.php?img=town7" alt="" id="town7" style="display:none">
-<img src="nightimage.php?img=town8" alt="" id="town8" style="display:none">
-<img src="nightimage.php?img=town9" alt="" id="town9" style="display:none">
-<img src="nightimage.php?img=town10" alt="" id="town10" style="display:none">
-<img src="nightimage.php?img=town11" alt="" id="town11" style="display:none">
-<img src="nightimage.php?img=town12" alt="" id="town12" style="display:none">
-<img src="nightimage.php?img=town13" alt="" id="town13" style="display:none">
+<img src="nightimage.php?img=town1&amp;rnd=<?php echo rand()?>" alt="" id="town1" style="display:none">
+<img src="nightimage.php?img=town2&amp;rnd=<?php echo rand()?>" alt="" id="town2" style="display:none">
+<img src="nightimage.php?img=town3&amp;rnd=<?php echo rand()?>" alt="" id="town3" style="display:none">
+<img src="nightimage.php?img=town4&amp;rnd=<?php echo rand()?>" alt="" id="town4" style="display:none">
+<img src="nightimage.php?img=town5&amp;rnd=<?php echo rand()?>" alt="" id="town5" style="display:none">
+<img src="nightimage.php?img=town6&amp;rnd=<?php echo rand()?>" alt="" id="town6" style="display:none">
+<img src="nightimage.php?img=town7&amp;rnd=<?php echo rand()?>" alt="" id="town7" style="display:none">
+<img src="nightimage.php?img=town8&amp;rnd=<?php echo rand()?>" alt="" id="town8" style="display:none">
+<img src="nightimage.php?img=town9&amp;rnd=<?php echo rand()?>" alt="" id="town9" style="display:none">
+<img src="nightimage.php?img=town10&amp;rnd=<?php echo rand()?>" alt="" id="town10" style="display:none">
+<img src="nightimage.php?img=town11&amp;rnd=<?php echo rand()?>" alt="" id="town11" style="display:none">
+<img src="nightimage.php?img=town12&amp;rnd=<?php echo rand()?>" alt="" id="town12" style="display:none">
+<img src="nightimage.php?img=town13&amp;rnd=<?php echo rand()?>" alt="" id="town13" style="display:none">
 <img src="nightimage.php?img=loadingcell" alt="" id="loading" style="display:none">
 <img src="nightimage.php?img=grasscell" alt="" id="grass" style="display:none">
 <img src="nightimage.php?img=towncell" alt="" id="town" style="display:none">
