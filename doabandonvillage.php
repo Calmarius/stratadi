@@ -4,7 +4,7 @@ require_once("userworkerphps.php");
 require_once("villageupdater.php");
 bounceSessionOver();
 
-if ($_SESSION['asdeputy'])
+if (isset($_SESSION['asdeputy']))
 {
     $userId = $_SESSION['returnUserId'];
 }
