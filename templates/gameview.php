@@ -92,7 +92,6 @@ global $config
 		if ($this->admin)
 		{
 			?>
-				<a href="javascript:void(0)" onclick="toggleElement('community',this)" id="communitylink"><?php echo $language['community']; ?></a><br>
 				<a href="javascript:void(0)" onclick="toggleElement('admin',this)"><?php echo $language['adminstuff']; ?></a><br>
 				<div id="admin" style="display:none">
 					<ul>
