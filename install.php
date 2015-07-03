@@ -1,17 +1,17 @@
 <?php
 
-require_once('setupmysql.php');
+require_once('setupmysqli.php');
 
 // Check if a table already exists.
-$r = mysql_query("SELECT 1 FROM wtfb2_villages LIMIT 1");
-if ($r !== FALSE)
+$r = runEscapedQuery("SELECT 1 FROM wtfb2_villages LIMIT 1");
+if (!isEmptyResult($r))
 {
 	die('The server is already installed!');
 }
 
 // Creating tables
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `linkexchange` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `url` text CHARACTER SET utf8 NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `linkexchange` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_accesses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `accountId` int(11) NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_accesses` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_deputies` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sponsorId` int(11) NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_deputies` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_diplomacy` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `attitude` enum('ally','peace','war') COLLATE utf8_bin NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_diplomacy` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_events` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `eventType` enum('attack','raid','recon','move','settle','return','heromove') COLLATE utf8_bin NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_events` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_guildinvitations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `recipientId` int(11) NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_guildinvitations` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_guildpermissions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) NOT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_guildpermissions` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_guilds` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `guildName` varchar(100) COLLATE utf8_bin NOT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_guilds` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_heroes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ownerId` int(11) NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_heroes` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_hitlog` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `accessDate` date NOT NULL,
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_hitlog` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=2 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_iplog` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) NOT NULL,
@@ -157,7 +157,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_iplog` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_languages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `language` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_languages` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=80 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 INSERT INTO `wtfb2_languages` (`id`, `language`) VALUES
 (1, 'аҧсуа бызшәа'),
 (2, 'Afrikaans'),
@@ -247,7 +247,7 @@ INSERT INTO `wtfb2_languages` (`id`, `language`) VALUES
 (78, 'isiZulu'),
 (79, 'English');");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_reports` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `recipientId` int(11) NOT NULL,
@@ -265,7 +265,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_reports` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_requestlog` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `requestTime` datetime NOT NULL,
@@ -280,7 +280,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_requestlog` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_spokenlanguages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `playerId` int(11) NOT NULL,
@@ -290,7 +290,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_spokenlanguages` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_threadentries` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `threadId` int(11) NOT NULL,
@@ -304,7 +304,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_threadentries` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_threadlinks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `threadId` int(11) NOT NULL,
@@ -315,7 +315,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_threadlinks` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_threads` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `updated` datetime NOT NULL,
@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_threads` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `guildId` int(11) DEFAULT NULL,
@@ -356,7 +356,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_users` (
   KEY `refererId` (`refererId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_villages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ownerId` int(11) DEFAULT NULL,
@@ -393,7 +393,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_villages` (
   KEY `ownerId` (`ownerId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_worldevents` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `x` int(11) NOT NULL,
@@ -410,7 +410,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_worldevents` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 ");
 
-doMySqlQuery("
+runEscapedQuery("
 CREATE TABLE IF NOT EXISTS `wtfb2_worldupdate` (
   `lastHeroMove` datetime NOT NULL,
   `lastOracleTime` datetime NOT NULL,
@@ -419,7 +419,7 @@ CREATE TABLE IF NOT EXISTS `wtfb2_worldupdate` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ");
 
-doMySqlQuery("INSERT INTO `wtfb2_worldupdate`(`lastHeroMove`, `lastOracleTime`, `lastStatGenerated`) VALUES ('1970-01-01 00:00:00', '1970-01-01 00:00:00', '1970-01-01 00:00:00')");
+runEscapedQuery("INSERT INTO `wtfb2_worldupdate`(`lastHeroMove`, `lastOracleTime`, `lastStatGenerated`) VALUES ('1970-01-01 00:00:00', '1970-01-01 00:00:00', '1970-01-01 00:00:00')");
 
 die('Okay, tables created, please review the settings in configuration.php, and please register yourself, then change your permissions to admin in the database if you wish.');
 
