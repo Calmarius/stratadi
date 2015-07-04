@@ -58,7 +58,7 @@ if (!isset($_languageIncluded))
 	'age' => "Age",  // In the profile
 	'agebonus'=>"Age bonus: ", // In battle simulator
 	'agebonustext'=>"Age bonus: {1}×", // In the profile
-	'agebonusjstext'=>"Age bonus: {0}×", // When attacking a village. // TODO make the PHP string formatters {0} based.
+	'agebonusjstext'=>"Age bonus: {0}×", // When attacking a village. // TODO (refactoring) make the PHP string formatters {0} based.
 	'ally'=>'ally', // diplomatic stance
 	'amountform' => '{1} units of {2}', // general from of amounts, {1} means the amount, {2} is the subject. Eg.: 1 pieces of furniture would be "{1} pieces of {2}", for in game example: 2 spearmen
 	'april' => "April",  // in the date picker control

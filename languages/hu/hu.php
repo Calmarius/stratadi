@@ -58,7 +58,7 @@ if (!isset($_languageIncluded))
 	'age' => "Kor",  // In the profile
 	'agebonus'=>"Korbónusz: ", // In battle simulator
 	'agebonustext'=>"Korbónusz: {1}×", // In the profile
-	'agebonusjstext'=>"Korbónusz: {0}×", // When attacking a village. // TODO make string formatters {0} based.
+	'agebonusjstext'=>"Korbónusz: {0}×", // When attacking a village. // TODO (refactoring) make string formatters {0} based.
 	'ally'=>'szövetséges', // diplomatic stance
 	'amountform' => '{1}db {2}', // general from of amounts, {1} means the amount, {2} is the subject. Eg.: 1 pieces of furniture would be "{1} pieces of {2}", for in game example: 2 spearmen
 	'april' => "április",  // in the date picker control
@@ -735,7 +735,7 @@ X
 	'youractivity'=>'Te aktivitásod', // in the activity plot
 	'youravatar' => "Profilkép: ",		// in the registration form
 	'yourbrowsernotsupportiframe'=>'Hoppá! A böngésződ nem támogatja az IFRAME-tagot, használd ezt a linket, hogy megnyisd az oldalt egy felbukkanó ablakban: <a href="javascript:void(window.open(\"{1}\"))">{1}</a>', //
-	'yourheroinvillage'=>'A hős a következő faluban tartozkodik: {1}', // in hero window. {1}: village as link
+	'yourheroinvillage'=>'A hős a következő faluban tartozkodik: {1}', // in hero window. {1}: village as link // TODO (wishlist): Should be heroisinvillage
 	'yourheroisinthisvillage'=>'A hősöd ebben a faluban tartozkodik.', // in village info window
 	'yourreferreds'=>'Te meghívottjaid: ' // in inviteplayer window
 );

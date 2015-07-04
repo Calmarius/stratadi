@@ -5,7 +5,7 @@ bounceSessionOver();
 
 if (!isset($_GET['id'])) $_GET['id']=$_SESSION['accessId'];
 
-// TODO: Never use $_GET for operations!
+// TODO: (security) Never use $_GET for operations!
 
 $r=runEscapedQuery("SELECT * FROM wtfb2_accesses WHERE (id={0})", $_GET['id']);
 if (isEmptyResult($r))

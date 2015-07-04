@@ -10,7 +10,7 @@ function bounceBack()
 	die();
 }
 
-// TODO: Cleanup inactive accounts. 
+// TODO: (task) Cleanup inactive accounts.
 function cleanupInactiveAccounts()
 {
 	global $config;
@@ -141,15 +141,15 @@ function registerUser($data)
 		}
 		doMySqlQuery("INSERT INTO wtfb2_spokenlanguages (playerId,languageId) VALUES ".implode(',',$values));
 	}
-	
+
 	$recipient=$data['mail'];
 	$from='=?UTF-8?B?'.base64_encode($config['adminName']).'?= <'.$config['adminMail'].'>';
 	$subject='=?UTF-8?B?'.base64_encode($language['regmailsubject']).'?=';
 	$header="MIME-Version: 1.0\r\nContent-type: text/plain; charset=utf-8"; // might sucks
 	$message=xprintf($language['regmailcontent'],array($data['username'],$activationToken));
-	
+
 	if (!mail($recipient,$subject,$message,$header)) jumpErrorPage($language['unabletosendmail']);
-	
+
 }
 
 
@@ -176,7 +176,7 @@ if (isRegisteredKing($s))
 if (isset($_POST['registerkingdom']))
 {
 	$s=$_POST['kingdomname'];
-	if (strlen(trim($s))<$config['minUserNameLength']) // TODO: make function from this checking stuff
+	if (strlen(trim($s))<$config['minUserNameLength']) // TODO: (refactor) make function from this checking stuff
 	{
 		$_SESSION['registrationparms']['userNameError']=makeErrorMessage($language['usernameshort']);
 		bounceBack();

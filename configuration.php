@@ -1,6 +1,6 @@
 <?php
 
-// TODO: Do not let players abandon their last village, or at least prevent the demo account do so.
+// TODO: (wishlist) Do not let players abandon their last village, or at least prevent the demo account do so.
 
 $config=array
 (

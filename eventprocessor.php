@@ -7,14 +7,13 @@ require_once("battlecalculation.php");
 require_once("templateclass.php");
 require_once("nightbonus.php");
 
-// TODO: When hero is in movement do not show coordinates.
-// TODO: Do not show buildings to attack when "moving troops".
-// TODO: Instead of failing with "not enough troops" send as many troops as you can.
-// TODO: Prompt for confirmation when sending hero in a "last man standing battle"
-// TODO: Show other things like night bonus and age bonus is battle report to be able to reproduce the conditions in the battle simulator.
-// TODO: Check the 3:1 rule when the troops arrive.
-// TODO: Make simple login.
-// TODO: Remove iwiw sharing.
+// TODO: (UI) When hero is in movement do not show coordinates. -WIP
+// TODO: (UI) Do not show buildings to attack when "moving troops".
+// TODO: (UI) Prompt for confirmation when sending hero in a "last man standing battle"
+// TODO: (wishlist) Show other things like night bonus and age bonus is battle report to be able to reproduce the conditions in the battle simulator.
+// TODO: (wishlist) Check the 3:1 rule when the troops arrive.
+// TODO: (wishlist) Make simple login.
+// TODO: (task) Remove iwiw sharing.
 
 //logText("eventProcessor got called!");
 

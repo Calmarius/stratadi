@@ -7,7 +7,7 @@ $subjectText = @$this->subject;
 
 if ($subjectText != '' && (substr($subjectText, 0, strlen('RE:')) != 'RE:')) $subjectText = 'RE:' . $subjectText;
 
-// TODO: Check all echo's if they need to use htmlspecialchars. Consider using a new function that prints escaped string.
+// TODO: (security, xss) Check all echo's if they need to use htmlspecialchars. Consider using a new function that prints escaped string.
 
 ?>
 

@@ -1,7 +1,7 @@
 <?php
 
 require_once("presenterphps.php");
-include_once($language['tutorialfile']); //TODO: possible security risk, from the language admins.
+include_once($language['tutorialfile']); //TODO: (wishlist) possible security risk, from the language admins.
 
 if (isset($_GET['step']))
 {

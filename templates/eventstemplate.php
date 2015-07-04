@@ -44,7 +44,7 @@ global $language;
 				    if ($event['catapultTarget'] == 'none') $event['catapultTarget'] = '';
 				    if ($event['catapultTarget'])
 				    {
-				        // TODO: Check if 'none' is a valid catapult target in the database.
+				        // TODO: (task) Check if 'none' is a valid catapult target in the database.
 					    $buildingName=$language[$config['buildings'][$event['catapultTarget']]['languageEntry']];
 					    $buildingImage=$config['buildings'][$event['catapultTarget']]['image'];
 					}

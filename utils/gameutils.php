@@ -1,6 +1,6 @@
 <?php
 
-function randomizeTime($time,$maxDiff=0.01) // TODO: to config
+function randomizeTime($time,$maxDiff=0.01) // TODO: (wishlist) to config
 {
 	return $time+$time*mt_rand(-100,100)*$maxDiff*0.01;
 }

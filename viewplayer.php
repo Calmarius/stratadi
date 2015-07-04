@@ -3,7 +3,7 @@
 require_once("userworkerphps.php");
 //bounceSessionOver();
 
-// TODO: Add fetch player by id function.
+// TODO: (refactoring) Add fetch player by id function.
 if (isset($_SESSION['userId']))
 {
     $myId=$_SESSION['userId'];

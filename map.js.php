@@ -1980,7 +1980,7 @@ function calculateRbRectangles(region)
 	var leftMax=[0,0];
 	var upMax=[0,0];
 	var luMax=[0,0];
-	for(var i=0;i<leftDefs.length;i++) // TODO összevonni.
+	for(var i=0;i<leftDefs.length;i++) // TODO: (refactoring) merge these loops.
 	{
 		if (leftDefs[i][0]>leftMax[0]) leftMax[0]=leftDefs[i][0];
 		if (leftDefs[i][1]>leftMax[1]) leftMax[1]=leftDefs[i][1];
