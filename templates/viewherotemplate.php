@@ -12,10 +12,17 @@ global $language;
 <p class="center"><?php echo xprintf($language['herodefendskill'],array($this->hero['defendskill'],$this->hero['defendnextxp'],$this->hero['defense']));?></p>
 <p class="center">
     <?php
-        echo xprintf($language['yourheroinvillage'],
-            array('<a href="javascript:void(parent.initMap('.(int)$this->hero['villageX'].','.(int)$this->hero['villageY'].'))">'.
-                xprintf($language['villagetext'], array($this->hero['villageName'], $this->hero['villageX'], $this->hero['villageY'])).
-            '</a>'));
+        if ($this->hero['villageName'] !== null)
+        {
+            echo xprintf($language['yourheroinvillage'],
+                array('<a href="javascript:void(parent.initMap('.(int)$this->hero['villageX'].','.(int)$this->hero['villageY'].'))">'.
+                    xprintf($language['villagetext'], array($this->hero['villageName'], $this->hero['villageX'], $this->hero['villageY'])).
+                '</a>'));
+        }
+        else
+        {
+            echo $language['yourheroismoving'];
+        }
     ?>
 </p>
 

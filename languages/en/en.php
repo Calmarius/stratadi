@@ -735,6 +735,7 @@ X
 	'yourbrowsernotsupportiframe'=>'Ooops! Your browser does not support the IFRAME tag, use this link to open the page in popup window: <a href="javascript:void(window.open(\"{1}\"))">{1}</a>.', //
 	'yourheroinvillage'=>'The hero is in {1}', // in hero window. {1}: village as link
 	'yourheroisinthisvillage'=>'Your hero is in this village.', // in village info window
+	'yourheroismoving'=>'Your hero is moving.', // in the view hero page.
 	'yourreferreds'=>'Your invitees: ' // in inviteplayer window
 );
 

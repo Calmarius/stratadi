@@ -737,6 +737,7 @@ X
 	'yourbrowsernotsupportiframe'=>'Hoppá! A böngésződ nem támogatja az IFRAME-tagot, használd ezt a linket, hogy megnyisd az oldalt egy felbukkanó ablakban: <a href="javascript:void(window.open(\"{1}\"))">{1}</a>', //
 	'yourheroinvillage'=>'A hős a következő faluban tartozkodik: {1}', // in hero window. {1}: village as link // TODO (wishlist): Should be heroisinvillage
 	'yourheroisinthisvillage'=>'A hősöd ebben a faluban tartozkodik.', // in village info window
+	'yourheroismoving'=>'A hős mozgásban van.', // in the view hero page. // TODO (wishlist): Should be heroismoving
 	'yourreferreds'=>'Te meghívottjaid: ' // in inviteplayer window
 );
 
