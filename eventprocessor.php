@@ -14,6 +14,7 @@ require_once("nightbonus.php");
 // TODO: Show other things like night bonus and age bonus is battle report to be able to reproduce the conditions in the battle simulator.
 // TODO: Check the 3:1 rule when the troops arrive.
 // TODO: Make simple login.
+// TODO: Remove iwiw sharing.
 
 //logText("eventProcessor got called!");
 
