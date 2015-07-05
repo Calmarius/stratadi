@@ -13,6 +13,7 @@ require_once("nightbonus.php");
 // TODO: (wishlist) Check the 3:1 rule when the troops arrive.
 // TODO: (wishlist) Make simple login.
 // TODO: (task) Remove iwiw sharing.
+// TODO: (security, epic): Remove all doMySqlQuery and replace it with the mysqli runEscapedQuery. - WIP
 
 //logText("eventProcessor got called!");
 

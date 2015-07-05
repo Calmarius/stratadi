@@ -2,15 +2,15 @@
 
 require_once("userworkerphps.php");
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($_SESSION['userId'])));
-$me=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})",$_SESSION['userId']);
+$me=$r[0][0];
 
 
 $invitedPlayers=array();
 if (isset($_SESSION['userId']))
 {
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (refererId='{1}')",array($_SESSION['userId'])));
-	while($row=mysql_fetch_assoc($r))
+	$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (refererId={0})",$_SESSION['userId']);
+	foreach ($r[0] as $row)
 	{
 		$invitedPlayers[]=$row;
 	}

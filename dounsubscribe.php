@@ -2,17 +2,13 @@
 
 require_once('userworkerphps.php');
 
-if (!isset($_SESSION['userId'])) jumpErrorPage($language['sessionisover']);
-
-/*print_r($_POST);
-die();*/
-
+if (!isset($_SESSION['userId'])) jumpErrorPage($language['sessionisover']); // TODO: (task) Can it be replaced with bounceSessionOver?
 
 foreach($_POST['thread'] as $key=>$value)
 {
 	echo $value;
-	$q=sqlPrintf("DELETE FROM wtfb2_threadlinks WHERE (id='{1}') AND (userId='{2}')",array($value,$_SESSION['userId']));
-	$r=doMySqlQuery($q,'jumpErrorPage');	
+	$q=sqlvprintf("DELETE FROM wtfb2_threadlinks WHERE (id={0}) AND (userId={1})",array($value,$_SESSION['userId']));
+	$r=runEscapedQuery($q,'jumpErrorPage');
 }
 
 jumpTo('messages.php');
