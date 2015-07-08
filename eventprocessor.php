@@ -12,9 +12,11 @@ require_once("nightbonus.php");
 // TODO: (wishlist) Show other things like night bonus and age bonus is battle report to be able to reproduce the conditions in the battle simulator.
 // TODO: (wishlist) Make hero attack and defense levels public.
 // TODO: (wishlist) Check the 3:1 rule when the troops arrive.
-// TODO: (wishlist) Make simple login.
+// TODO: (task) Make simple login.
 // TODO: (task) Remove iwiw sharing.
 // TODO: (security, epic): Remove all doMySqlQuery and replace it with the mysqli runEscapedQuery. - WIP
+// TODO: (wishlist) Make numbers grouped by thousands.
+// TODO: (UI) When player is not in a guild the guild page is shifted down.
 
 //logText("eventProcessor got called!");
 
