@@ -4,8 +4,8 @@ require_once('userworkerphps.php');
 
 bounceSessionOver();
 $myId=$_SESSION['userId'];
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guildpermissions WHERE (userId='{1}') AND (permission='grantrights')",array($myId)),'jumpErrorPage');
-if (mysql_num_rows($r)==0) jumpErrorPage($language['accessdenied']);
+$r=runEscapedQuery("SELECT * FROM wtfb2_guildpermissions WHERE (userId={0}) AND (permission='grantrights')",$myId);
+if (isEmptyResult($r)) jumpErrorPage($language['accessdenied']);
 $players=$rights=array();
 if (isset($_POST['players']))
 {
@@ -21,9 +21,14 @@ if (isset($_POST['rights']))
 		$rights[]=sqlPrintf("'{1}'",array($value));
 	}
 }
+if (count($players) == 0)
+{
+    jumpTo('guildops.php?cmd=grantrights');
+    die();
+}
 // first revoke all rights of the selected players
 $userSet='('.implode(',',$players).')';
-doMySqlQuery("DELETE FROM wtfb2_guildpermissions WHERE (userId IN $userSet)",'jumpErrorPage');
+runEscapedQuery("DELETE FROM wtfb2_guildpermissions WHERE (userId IN $userSet)");
 // then add new rights
 $newRecords=array();
 $newParts=array();
@@ -49,7 +54,7 @@ foreach($newParts as $key=>$value)
 {
 	if (count($value)==0) continue;
 	$q='INSERT INTO wtfb2_guildpermissions (userId,permission) VALUES '.implode(',',$value);
-	doMySqlQuery($q); // escaped btw
+	runEscapedQuery($q); // escaped btw
 }
 
 jumpTo('guildops.php?cmd=grantrights');
