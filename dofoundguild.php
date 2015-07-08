@@ -4,12 +4,12 @@ require_once('userworkerphps.php');
 
 bounceSessionOver();
 
-$q=sqlPrintf("INSERT INTO wtfb2_guilds (guildName,profile) VALUES ('{1}','')",array($_POST['guildname']));
-$r=doMySqlQuery($q,'jumpErrorPage'); 
-$insertId=mysql_insert_id();
+$q=sqlvprintf("INSERT INTO wtfb2_guilds (guildName,profile) VALUES ({0},'')",array($_POST['guildname']));
+$r=runEscapedQuery($q);
+$insertId=getLastInsertId();
 
-$q=sqlPrintf("UPDATE wtfb2_users SET guildId='{1}' WHERE (id='{2}')",array($insertId,$_SESSION['userId']));
-$r=doMySqlQuery($q,jumpErrorPage);
+$q=sqlvprintf("UPDATE wtfb2_users SET guildId={0} WHERE (id={1})",array($insertId,$_SESSION['userId']));
+$r=runEscapedQuery($q);
 
 $valuesText='';
 $first=true;
@@ -17,28 +17,28 @@ foreach($config['guildPermissions'] as $key=>$value)
 {
 	if (!$first) $valuesText.=",\n";
 	$first=false;
-	$valuesText.=sqlPrintf("('{1}','{2}')",array($_SESSION['userId'],$key));
+	$valuesText.=sqlvprintf("({0},{1})",array($_SESSION['userId'],$key));
 }
 
-$q=sqlPrintf(
+$q=sqlvprintf(
     "
-        DELETE FROM wtfb2_guildpermissions WHERE userId='{1}'
+        DELETE FROM wtfb2_guildpermissions WHERE userId={0}
     ",
-    $_SESSION['userId']
+    array($_SESSION['userId'])
 );
-$r=doMySqlQuery($q,'jumpErrorPage');
+$r=runEscapedQuery($q);
 
 
-$q=sqlPrintf(
+$q=sqlvprintf(
 	"
-	INSERT INTO wtfb2_guildpermissions (userId,permission) 
+	INSERT INTO wtfb2_guildpermissions (userId,permission)
 		VALUES
 		$valuesText
 	"
 );
-$r=doMySqlQuery($q,'jumpErrorPage');
+$r=runEscapedQuery($q);
 
-doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (eventTime,playerId,type) VALUES (NOW(),'{1}','guildchange')",array($_SESSION['userId'])));		
+runEscapedQuery("INSERT INTO wtfb2_worldevents (eventTime,playerId,type) VALUES (NOW(),{0},'guildchange')",$_SESSION['userId']);
 
 jumpTo('guild.php');
 

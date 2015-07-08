@@ -3,11 +3,11 @@
 require_once("userworkerphps.php");
 bounceSessionOver();
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_heroes WHERE (ownerId='{1}')",array($_SESSION['userId'])));
+$r=runEscapedQuery("SELECT * FROM wtfb2_heroes WHERE (ownerId={0})",$_SESSION['userId']);
 $heroId=-1;
-if (mysql_num_rows($r)>0)
+if (!isEmptyResult($r))
 {
-	$a=mysql_fetch_assoc($r);
+	$a=$r[0][0];
 	$heroId=$a['id'];
 }
 
@@ -29,7 +29,7 @@ else die();
 if (!isset($_GET['p'])) $_GET['p']=0;
 
 $q=
-sqlPrintf(
+sqlvprintf(
 "
 	SELECT SQL_CALC_FOUND_ROWS e.*,
 		IF((e.eventType IN ('attack','raid','recon')) AND (v2.ownerId=u.id),'incomingattack',e.eventType) AS eventType,
@@ -42,30 +42,22 @@ sqlPrintf(
 		v2.x AS dstX,
 		v2.y AS dstY,
 		h.name AS heroName,
-		(((v.ownerId='{1}') OR (e.heroId='{4}')) AND (e.eventType<>'return')) AS cancellable
+		(((v.ownerId={0}) OR (e.heroId={3})) AND (e.eventType<>'return')) AS cancellable
 	FROM wtfb2_events e
 	LEFT JOIN wtfb2_villages v ON (v.id=e.launcherVillage) 
 	LEFT JOIN wtfb2_villages v2 ON (v2.id=e.destinationVillage) 
 	LEFT JOIN wtfb2_heroes h ON (h.id=e.heroId)
 	LEFT JOIN wtfb2_users u ON ($dstring)
-	WHERE (u.id='{2}')
-	HAVING (type='{3}')
+	WHERE (u.id={1})
+	HAVING (type={2})
 	ORDER BY e.estimatedTime
-	LIMIT {5},{6}
-",array($_SESSION['userId'],$_SESSION['userId'],$type,$heroId,(int)$_GET['p']*$config['pageSize'],$config['pageSize'])
+	LIMIT {4},{5}
+",array($_SESSION['userId'],$_SESSION['userId'],$type,$heroId,(int)$_GET['p']*$config['pageSize'],(int)$config['pageSize'])
 );
-/*$e=explainQuery($q);
-while($row=mysql_fetch_assoc($e))
-{
-	ob_start();
-	print_r($row);
-	logText(ob_get_contents());
-	ob_end_clean();
-}*/
 
-$r=doMySqlQuery($q,'jumpErrorPage'); // hackish a bit
+$r=runEscapedQuery($q,'jumpErrorPage'); // hackish a bit
 $events=array();
-while($row=mysql_fetch_assoc($r))
+foreach ($r[0] as $row)
 {
 		$type=$row['eventType'];
 		if ($type=='incomingattack')
@@ -79,8 +71,8 @@ while($row=mysql_fetch_assoc($r))
 	$events[]=$row;
 }
 
-$r=doMySqlQuery("SELECT FOUND_ROWS() AS allRows");
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT FOUND_ROWS() AS allRows");
+$a=$r[0][0];
 $cnt=ceil($a['allRows']/$config['pageSize']);
 
 $content=new Template('templates/eventstemplate.php',array('events'=>$events,'pages'=>$cnt,'type'=>$_GET['type'],'category'=>$_GET['category']));
