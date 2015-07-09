@@ -5,8 +5,8 @@ require_once("inbuiltpie.php");
 $public=isset($_GET['public']);
 if (!$public)
 	bounceNoAdmin();
-$r=doMySqlQuery("SELECT TIMESTAMPDIFF(SECOND,lastOracleTime,NOW()) AS secondsElapsed FROM `wtfb2_worldupdate` WHERE 1");
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT TIMESTAMPDIFF(SECOND,lastOracleTime,NOW()) AS secondsElapsed FROM `wtfb2_worldupdate` WHERE 1");
+$a=$r[0][0];
 $secondsElapsed=(int)$a['secondsElapsed'];
 if ($public)
 {
@@ -18,7 +18,7 @@ if ($public)
 
 $hidden=$public || isset($_GET['hidden']);
 
-$goldTop=doMySqlQuery("SELECT goldProduction,userName,id FROM wtfb2_users ORDER BY goldProduction DESC LIMIT 0,10");
+$goldTop=runEscapedQuery("SELECT goldProduction,userName,id FROM wtfb2_users ORDER BY goldProduction DESC LIMIT 0,10");
 $countDbNames=array();
 $eventCountDbNames=array();
 $sumCountDbNames=array();
@@ -90,8 +90,8 @@ ORDER BY army DESC
 LIMIT 0,10
 ";
 
-$armyTop=doMySqlQuery($q);
-$townHallTop=doMySqlQuery(<<< X
+$armyTop=runEscapedQuery($q);
+$townHallTop=runEscapedQuery(<<< X
 SELECT AVG(townHallLevel) AS thLevel,userName,u.id
 FROM wtfb2_villages v
 JOIN wtfb2_users u ON (u.id=v.ownerId)
@@ -101,7 +101,7 @@ LIMIT 0,10
 X
 );
 
-$playerTop=doMySqlQuery(<<< X
+$playerTop=runEscapedQuery(<<< X
 SELECT totalScore,userName,id
 FROM wtfb2_users
 ORDER BY totalScore DESC
@@ -109,7 +109,7 @@ LIMIT 0,10
 X
 );
 
-$heroTop=doMySqlQuery
+$heroTop=runEscapedQuery
 (
 "
 	SELECT h.*,".xprintf($config['experienceFunctionMySql'],array('offense'))."+".xprintf($config['experienceFunctionMySql'],array('defense'))."+1 AS level, u.userName
@@ -120,7 +120,7 @@ $heroTop=doMySqlQuery
 "
 );
 
-$offenseTop=doMySqlQuery
+$offenseTop=runEscapedQuery
 (
 "
 	SELECT *
@@ -130,7 +130,7 @@ $offenseTop=doMySqlQuery
 "
 );
 
-$defenseTop=doMySqlQuery
+$defenseTop=runEscapedQuery
 (
 "
 	SELECT *
@@ -147,7 +147,7 @@ foreach($config['buildings'] as $key=>$value)
 }
 $bQuery=implode(',',$buildingsQuery);
 
-$theBiggest=doMySqlQuery(<<< X
+$theBiggest=runEscapedQuery(<<< X
 SELECT $bQuery FROM wtfb2_villages
 X
 );
@@ -160,17 +160,17 @@ $paramArray['playerTop']=array();
 $paramArray['heroTop']=array();
 $paramArray['offenseTop']=array();
 $paramArray['defenseTop']=array();
-$paramArray['theHighest']=mysql_fetch_assoc($theBiggest);
+$paramArray['theHighest']=$theBiggest[0][0];
 $paramArray['hidden']=$hidden;
 $paramArray['inbuiltpieimg']=$public ? 'inbuiltpie.png?'.time():'showipie.php';
 
-while($row=mysql_fetch_assoc($goldTop)) $paramArray['goldTop'][]=$row;
-while($row=mysql_fetch_assoc($armyTop)) $paramArray['armyTop'][]=$row;
-while($row=mysql_fetch_assoc($townHallTop)) $paramArray['townHallTop'][]=$row;
-while($row=mysql_fetch_assoc($playerTop)) $paramArray['playerTop'][]=$row;
-while($row=mysql_fetch_assoc($heroTop)) $paramArray['heroTop'][]=$row;
-while($row=mysql_fetch_assoc($offenseTop)) $paramArray['offenseTop'][]=$row;
-while($row=mysql_fetch_assoc($defenseTop)) $paramArray['defenseTop'][]=$row;
+foreach ($goldTop[0] as $row) $paramArray['goldTop'][]=$row;
+foreach ($armyTop[0] as $row) $paramArray['armyTop'][]=$row;
+foreach ($townHallTop[0] as $row) $paramArray['townHallTop'][]=$row;
+foreach ($playerTop[0] as $row) $paramArray['playerTop'][]=$row;
+foreach ($heroTop[0] as $row) $paramArray['heroTop'][]=$row;
+foreach ($offenseTop[0] as $row) $paramArray['offenseTop'][]=$row;
+foreach ($defenseTop[0] as $row) $paramArray['defenseTop'][]=$row;
 
 $tmp=new Template('templates/oraclepub.php',$paramArray);
 $page=new Template('templates/basiclayout.php',array('title'=>'Oracle','content'=>$tmp->getContents()));
@@ -193,7 +193,7 @@ else
 		fwrite($f,$str);
 		fclose($f);
 		ob_end_flush();
-		doMySqlQuery("UPDATE wtfb2_worldupdate SET lastOracleTime=CURDATE()");
+		runEscapedQuery("UPDATE wtfb2_worldupdate SET lastOracleTime=CURDATE()");
 	}
 }
 
