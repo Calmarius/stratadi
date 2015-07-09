@@ -16,8 +16,8 @@ sqlPrintf
 	",array($_SESSION['userId'])
 );
 
-$r=doMySqlQuery($q,'jumpErrorPage');
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery($q);
+$a=$r[0][0];
 $cnt=ceil($a['cnt']/$config['pageSize']);
 
 if (!isset($_GET['p'])) $_GET['p']=0;
@@ -37,10 +37,10 @@ sqlPrintf
 	",array($_SESSION['userId'],((int)$_GET['p'])*$config['pageSize'],$config['pageSize'])
 );
 // 
-$r=doMySqlQuery($q,'jumpErrorPage');
+$r=runEscapedQuery($q);
 $params=array();
 $params['letterlinks']=array();
-while($row=mysql_fetch_assoc($r))
+foreach ($r[0] as $row)
 {
 	$params['letterlinks'][]=$row;
 }
