@@ -3,14 +3,14 @@
 require_once('userworkerphps.php');
 
 $myId=$_SESSION['userId'];
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_heroes WHERE (ownerId='{1}')",array($myId)),'jumpErrorPage');
-if (mysql_num_rows($r)>0) jumpErrorPage($language['youalreadyhaveahero']);
+$r=runEscapedQuery("SELECT * FROM wtfb2_heroes WHERE (ownerId={0})",$myId);
+if (!isEmptyResult($r)) jumpErrorPage($language['youalreadyhaveahero']);
 
 $whichHero=(int)$_GET['id'];
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_heroes WHERE (ownerId=0) AND (id='{1}')",array($whichHero)));
-if (mysql_num_rows($r)==0) jumpErrorPage($language['accessdenied']);
+$r=runEscapedQuery("SELECT * FROM wtfb2_heroes WHERE (ownerId=0) AND (id={0})",$whichHero);
+if (isEmptyResult($r)) jumpErrorPage($language['accessdenied']);
 
-doMySqlQuery(sqlPrintf("UPDATE wtfb2_heroes SET ownerId='{1}' WHERE (id='{2}')",array($myId,$whichHero)));
+runEscapedQuery("UPDATE wtfb2_heroes SET ownerId={0} WHERE (id={1})",$myId,$whichHero);
 
 jumpSuccessPage($language['heroisnowyours'],$language['heroinfo']);
 
