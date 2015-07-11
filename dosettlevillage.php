@@ -26,16 +26,16 @@ function settleFirstVillage($userId)
 		$x=(int)(cos($rad)*$radius);
 		$y=(int)(sin($rad)*$radius);
 		$q=sqlPrintf("SELECT * FROM wtfb2_villages WHERE (x='{1}') AND (y='{2}')",array($x,$y));
-		$r=doMySqlQuery($q,'jumpErrorPage');
-		if (mysql_num_rows($r)==0)
+		$r=runEscapedQuery($q);
+		if (isEmptyResult($r))
 		{
 			$q=sqlPrintf("INSERT INTO wtfb2_villages (ownerId,villageName,x,y,lastUpdate) VALUES ('{1}','{2}','{3}','{4}',NOW())",array($userId,$language['newvillage'],$x,$y));
-			$r=doMySqlQuery($q,'jumpErrorPage');
-			$insertId=mysql_insert_id();
-			doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({1},{2},NOW(),'settle')",array($x,$y)));
-			doMySqlQuery(sqlPrintf("UPDATE wtfb2_heroes SET inVillage='{1}',offense=0,defense=0 WHERE (ownerId='{2}')",array($insertId,$userId)));
-			doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=0,gold={1},lastUpdate=NOW(),regDate=NOW() WHERE (id='{2}')",array($config['startGold'],$userId))); // reset player.
-			doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ('{1}','{2}',NOW(),'settle')",array($x,$y)));
+			$r=runEscapedQuery($q);
+			$insertId= getLastInsertId();
+			runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({0},{1},NOW(),'settle')",$x,$y);
+			runEscapedQuery("UPDATE wtfb2_heroes SET inVillage={0},offense=0,defense=0 WHERE (ownerId={1})",$insertId,$userId);
+			runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=0,gold={0},lastUpdate=NOW(),regDate=NOW() WHERE (id={1})",$config['startGold'],$userId); // reset player.
+			runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({0},{1},NOW(),'settle')",$x,$y);
 			updateAllVillages($userId);
 			updatePlayer($userId);
 			jumpTo("game.php?x=$x&y=$y");
