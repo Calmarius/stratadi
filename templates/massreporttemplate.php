@@ -10,7 +10,7 @@ global $language;
 	<p><textarea name="text" id="text" cols="60" rows="25"></textarea></p>
 	<p><input type="submit" value="<?php echo $language['sendletterbutton'];?>"><input type="button" value="<?php echo $language['preview']; ?>" onclick="document.getElementById('preview').innerHTML=document.getElementById('text').value"></p>
 </form>
-<div id="preview">
+<div id="preview" class="left">
 </div>
 <script>
 	function getCaretPosition (ctrl) {
