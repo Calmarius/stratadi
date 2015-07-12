@@ -14,7 +14,7 @@ $config=array
 		0=>'infantryattack',
 		1=>'archerattack',
 		2=>'cavalryattack',
-	),							
+	),
 	'avatarSize' => 200,				// avatars' dimensions in pixels
 	'buildPointProducer'=>'townhall',		// build point producer building
 	'buildings' => array				// building descriptors
@@ -31,63 +31,56 @@ $config=array
 		'archeryrange' => array
 		(
 			'costFunction' => create_function('$level','return 15*pow(1.3,$level);'),
-			'jsCostFunction' => 'function(level){return 15*Math.pow(1.3,level);}',		
+			'jsCostFunction' => 'function(level){return 15*Math.pow(1.3,level);}',
 			'timeReductionFunction' => create_function('$level','return pow(0.9,$level);'),
-			'buildingLevelDbName'=>'archeryRangeLevel',								
-			'image'=>'img/archeryrange.png',								
-			'languageEntry'=>'archeryrange' 									
-		),
-/*		'blacksmith' => array
-		(
-			'costFunction' => create_function('$level','return 100*pow(1.2,$level);'),
-			'jsCostFunction' => 'function(level){return 100*Math.pow(1.2,level);}',		
-			'buildingLevelDbName'=>'blacksmithLevel',								
-			'languageEntry'=>'blacksmith' 									
-		),*/
-		'goldmine' => array
-		(
-			'costFunction' => create_function('$level','return 0;'),
-			'jsCostFunction' => 'function(level){return 0;}',		
-			'buildingLevelDbName'=>'goldmineLevel',							
-			'goldProductionSpeedFunction'=>create_function('$level','return $level*10;'),	
-			'image'=>'img/goldmine.png',								
-			'languageEntry'=>'goldmine' 									
+			'buildingLevelDbName'=>'archeryRangeLevel',
+			'image'=>'img/archeryrange.png',
+			'languageEntry'=>'archeryrange'
 		),
 		'stables' => array
 		(
 			'costFunction' => create_function('$level','return 40*pow(1.3,$level);'),
-			'jsCostFunction' => 'function(level){return 40*Math.pow(1.3,level);}',		
+			'jsCostFunction' => 'function(level){return 40*Math.pow(1.3,level);}',
 			'timeReductionFunction' => create_function('$level','return pow(0.9,$level);'),
-			'buildingLevelDbName'=>'stablesLevel',								
-			'image'=>'img/stables.png',								
-			'languageEntry'=>'stables' 									
+			'buildingLevelDbName'=>'stablesLevel',
+			'image'=>'img/stables.png',
+			'languageEntry'=>'stables'
 		),
 		'workshop' => array
 		(
 			'costFunction' => create_function('$level','return 100*pow(1.3,$level);'),
-			'jsCostFunction' => 'function(level){return 100*Math.pow(1.3,level);}',		
+			'jsCostFunction' => 'function(level){return 100*Math.pow(1.3,level);}',
 			'timeReductionFunction' => create_function('$level','return pow(0.9,$level);'),
-			'buildingLevelDbName'=>'workshopLevel',								
-			'image'=>'img/workshop.png',								
-			'languageEntry'=>'workshop' 									
+			'buildingLevelDbName'=>'workshopLevel',
+			'image'=>'img/workshop.png',
+			'languageEntry'=>'workshop'
 		),
 		'townhall' => array
 		(
 			'costFunction' => create_function('$level','return 300*pow(1.3,$level);'),
-			'jsCostFunction' => 'function(level){return 300*Math.pow(1.3,level);}',		
+			'jsCostFunction' => 'function(level){return 300*Math.pow(1.3,level);}',
 			'timeReductionFunction' => create_function('$level','return pow(0.9,$level);'),
 			'buildingLevelDbName'=>'townHallLevel',
-			'bpProductionSpeedFunction'=>create_function('$level','return pow(1.1,$level);'),	
-			'image'=>'img/towncenter.png',								
-			'languageEntry'=>'townhall' 									
+			'bpProductionSpeedFunction'=>create_function('$level','return pow(1.1,$level);'),
+			'image'=>'img/towncenter.png',
+			'languageEntry'=>'townhall'
+		),
+		'goldmine' => array
+		(
+			'costFunction' => create_function('$level','return 0;'),
+			'jsCostFunction' => 'function(level){return 0;}',
+			'buildingLevelDbName'=>'goldmineLevel',
+			'goldProductionSpeedFunction'=>create_function('$level','return $level*10;'),
+			'image'=>'img/goldmine.png',
+			'languageEntry'=>'goldmine'
 		),
 		'wall' => array
 		(
 			'costFunction' => create_function('$level','return 10*pow(1.2,$level);'),
-			'jsCostFunction' => 'function(level){return 10*Math.pow(1.2,level);}',		
-			'buildingLevelDbName'=>'wallLevel',								
-			'image'=>'img/wall.png',								
-			'languageEntry'=>'wall' 									
+			'jsCostFunction' => 'function(level){return 10*Math.pow(1.2,level);}',
+			'buildingLevelDbName'=>'wallLevel',
+			'image'=>'img/wall.png',
+			'languageEntry'=>'wall'
 		)
 	),
 	'buildingStrengthFunction'=>create_function('$level','return pow($level,1.7);'),						// calculate the building strength from level
@@ -99,7 +92,7 @@ $config=array
 		0=>'infantrydefense',
 		1=>'archerdefense',
 		2=>'cavalrydefense',
-	),		
+	),
 	'demoAccountName' => 'demo',
 	'experienceFunction'=>create_function('$xp','return floor(pow(max($xp, 0)*0.01,1.0/2.3));'), // experience to level function
 	'experienceFunctionInverse'=>create_function('$level','return pow($level,2.3)*100;'), // level to experience function (must be inverse of the xp to level function)
@@ -149,7 +142,7 @@ $config=array
 	'heroAttackFormula'=>create_function('$level','return 1+$level*0.1;'), // attack factor formula for hero
 	'heroDefendFormula'=>create_function('$level','return 1+$level*0.1;'), // defend factor formula for hero.
 	'heroSpeed'=>20,					// speed of the hero
-	'imageRoot' => 'http://stratadi.calmarius.net/img/home',            // Root URL of ceratin images to save space on the host. 
+	'imageRoot' => 'http://stratadi.calmarius.net/img/home',            // Root URL of ceratin images to save space on the host.
 	'latitude'=>47.498333333,				// latitude of the game. North latitudes are positive.
 	'longitude'=>19.040833333,			// longitude of the game. Eastern longitudes are positive.
 	'maxFreeHeroTravelDistance'=>100, 		// maximum distance, the free heroes can travel.
@@ -186,7 +179,7 @@ $config=array
 		),
 		'move'=>array
 		(
-			'color'=>'transparent',			
+			'color'=>'transparent',
 			'langDesc'=>'moveevent',
 			'langName'=>'movetroops'
 		),
@@ -246,47 +239,47 @@ $config=array
 		'defensefail'=>array
 		(
 			'image'=>'img/defensefail.png',
-			'langName'=>'defensefail'			
+			'langName'=>'defensefail'
 		),
 		'attacknoloss'=>array
 		(
 			'image'=>'img/attacknoloss.png',
-			'langName'=>'attacknoloss'						
+			'langName'=>'attacknoloss'
 		),
 		'attackwithloss'=>array
 		(
 			'image'=>'img/attackwithloss.png',
-			'langName'=>'attackwithloss'						
+			'langName'=>'attackwithloss'
 		),
 		'attackfail'=>array
 		(
 			'image'=>'img/attackfail.png',
-			'langName'=>'attackfail'						
+			'langName'=>'attackfail'
 		),
 		'gotvillagebyconquer'=>array
 		(
 			'image'=>'img/conqueredvillage.png',
-			'langName'=>'gotvillagebyconquer'						
+			'langName'=>'gotvillagebyconquer'
 		),
 		'lostvillagebyconquer'=>array
 		(
 			'image'=>'img/lostvillage.png',
-			'langName'=>'lostvillagebyconquer'						
+			'langName'=>'lostvillagebyconquer'
 		),
 		'destroyedvillage'=>array
 		(
 			'image'=>'img/destroyedvillage.png',
-			'langName'=>'destroyedvillage'						
+			'langName'=>'destroyedvillage'
 		),
 		'lostvillagebydestruct'=>array
 		(
 			'image'=>'img/lostdestroyedvillage.png',
-			'langName'=>'lostvillagebydestruct'						
+			'langName'=>'lostvillagebydestruct'
 		),
 		'adminmessage'=>array
 		(
 			'image'=>'img/systemmessage.png',
-			'langName'=>'adminmessage'						
+			'langName'=>'adminmessage'
 		),
 		'incomingmove'=>array
 		(
@@ -316,7 +309,7 @@ $config=array
 				'2' => 0
 			),
 			'cost' => 10,
-			'countDbName' => 'spearmen',			
+			'countDbName' => 'spearmen',
 			'defense' => array
 			(
 				'0' => 60,
@@ -328,7 +321,7 @@ $config=array
 			'trainedAt' => 'barracks',
 			'trainingDbName'=>'spearmenTraining',
 			'trainingTime' => 600,
-			'languageEntry'=>'spearmen', 									
+			'languageEntry'=>'spearmen',
 			'singularLanguageEntry'=>'spearman',
 			'strength'=>15  // amount of gold the unit can carry.
 		),
@@ -336,12 +329,12 @@ $config=array
 		(
 			'attack' => array				// attack vector of an unit
 			(
-				'0' => 0,	
+				'0' => 0,
 				'1' => 60,
 				'2' => 0
 			),
 			'cost' => 15,					// cost in gold
-			'countDbName' => 'archers',			// the column name in the database 
+			'countDbName' => 'archers',			// the column name in the database
 			'defense' => array				// the defense vector
 			(
 				'0' => 120,
@@ -354,7 +347,7 @@ $config=array
 			'trainingDbName'=>'archersTraining', // the training count name in the database
 			'trainingTime' => 900,				// Training time for a first level building
 			'languageEntry'=>'archers', 				// Plural name of the unit
-			'singularLanguageEntry'=>'archer',		// Singular name of the unit			
+			'singularLanguageEntry'=>'archer',		// Singular name of the unit
 			'strength'=>10  // amount of gold the unit can carry.
 		),
 		'_2knight' => array
@@ -366,7 +359,7 @@ $config=array
 				'2' => 120
 			),
 			'cost' => 25,
-			'countDbName' => 'knights',			
+			'countDbName' => 'knights',
 			'defense' => array
 			(
 				'0' => 60,
@@ -378,7 +371,7 @@ $config=array
 			'trainedAt' => 'stables',
 			'trainingDbName'=>'knightsTraining',
 			'trainingTime' => 1200,
-			'languageEntry'=>'knights', 									
+			'languageEntry'=>'knights',
 			'singularLanguageEntry'=>'knight',
 			'strength'=>50  // amount of gold the unit can carry.
 		),
@@ -391,7 +384,7 @@ $config=array
 				'2' => 20
 			),
 			'cost' => 100,
-			'countDbName' => 'catapults',			
+			'countDbName' => 'catapults',
 			'defense' => array
 			(
 				'0' => 60,
@@ -404,7 +397,7 @@ $config=array
 			'trainedAt' => 'workshop',
 			'trainingDbName'=>'catapultsTraining',
 			'trainingTime' => 3600,
-			'languageEntry'=>'catapults', 									
+			'languageEntry'=>'catapults',
 			'singularLanguageEntry'=>'catapult',
 			'strength'=>30  // amount of gold the unit can carry.
 		),
@@ -417,7 +410,7 @@ $config=array
 				'2' => 20
 			),
 			'cost' => 1000,
-			'countDbName' => 'diplomats',			
+			'countDbName' => 'diplomats',
 			'defense' => array
 			(
 				'0' => 20,
@@ -429,7 +422,7 @@ $config=array
 			'trainedAt' => 'townhall',
 			'trainingDbName'=>'diplomatsTraining',
 			'trainingTime' => 86400,
-			'languageEntry'=>'diplomats', 									
+			'languageEntry'=>'diplomats',
 			'singularLanguageEntry'=>'diplomat',
 			'strength'=>5  // amount of gold the unit can carry.
 		)
