@@ -55,9 +55,9 @@ die();*/
 		<?php
 	}
 ?>
-<p>
+<div>
 	<?php echo $this->report['text']; ?>
-</p>
+</div>
 <?php
 	if ($this->showoptions)
 	{
