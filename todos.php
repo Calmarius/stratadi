@@ -11,6 +11,7 @@
 // TODO: (wishlist) Make numbers grouped by thousands.
 // TODO: (UI) When player is not in a guild the guild page is shifted down.
 // TODO: (wishlist): Make forum not link to something external, instead use the regular threads to make an internal forum.
+// TODO: (UI) Make system messages left aligned when previewed.
 
 */
 
