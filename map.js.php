@@ -985,10 +985,14 @@ function massTraining()
 	for(var i in UnitDescriptors)
 	{
 		var unitDescriptor=UnitDescriptors[i];
-		unitTable+='<tr><td>'+UnitNames[i]+'</td><td><input type="text" style="width:7em" id="amount_'+i+'" onkeyup="normalizeForGold(this,'+unitDescriptor.cost+'); setArmyValue(\'amount_\',\'armycost\')" value="0"></td></tr>';
+		unitTable+='<tr>'+
+    		'<td>'+UnitNames[i]+'</td>'+
+    		'<td><input type="text" style="width:7em" id="amount_'+i+'" onkeyup="normalizeForGold(this,'+unitDescriptor.cost+'); setArmyValue(\'amount_\',\'armycost\')" value="0"></td>'+
+    		'<td>max '+Math.round(playerInfo.maxTrainingPerHour[0][i][0])+'/h</td>' +
+		'</tr>';
 	}
 	unitTable+=
-	'<tr><td colspan="2"><input type="button" value="<?php echo $language["train"]; ?>" onclick="doMassTraining()"></td></tr>'+
+	'<tr><td colspan="3"><input type="button" value="<?php echo $language["train"]; ?>" onclick="doMassTraining()"></td></tr>'+
 	'</table>';
 
 	var iHTML=

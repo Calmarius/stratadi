@@ -126,6 +126,26 @@ $q=sqlPrintf("SELECT *,UNIX_TIMESTAMP(NOW()) AS nowstamp FROM wtfb2_users WHERE 
 $r=runEscapedQuery($q);
 $me=$r[0][0];
 
+$buildingLevelNames = array();
+foreach ($config['units'] as $unitDesc)
+{
+    $buildingLevelNames[] = $config['buildings'][$unitDesc['trainedAt']]['buildingLevelDbName'];
+}
+
+$buildingLevelSet = implode(",", $buildingLevelNames);
+$r = runEscapedQuery("SELECT $buildingLevelSet FROM wtfb2_villages WHERE (ownerId={0})", $_SESSION['userId']);
+$maxTrainingPerHour = array();
+foreach ($config['units'] as $key => $unitDesc)
+{
+    $buildingName = $unitDesc['trainedAt'];
+    $buildingDesc = $config['buildings'][$buildingName];
+    $maxTrainingPerHour[$key] = 0;
+    foreach ($r[0] as $row)
+    {
+        $maxTrainingPerHour[$key] +=
+            1/$buildingDesc['timeReductionFunction']($row[$buildingDesc['buildingLevelDbName']])*3600/$unitDesc['trainingTime']*$config['serverSpeed'];
+    }
+}
 
 $r=runEscapedQuery(
 	"
@@ -134,8 +154,8 @@ $r=runEscapedQuery(
 			IF((e.eventType IN ('attack','raid','recon')) AND (v2.ownerId=u.id),'incomingattack',e.eventType) AS type,
 		SUM( ((v.ownerId=u.Id) AND (e.eventType<>'return')) OR (e.heroId={0})) AS outgoing,SUM(v2.ownerId=u.id) AS incoming
 		FROM wtfb2_events e
-		LEFT JOIN wtfb2_villages v ON (v.id=e.launcherVillage) 
-		LEFT JOIN wtfb2_villages v2 ON (v2.id=e.destinationVillage) 
+		LEFT JOIN wtfb2_villages v ON (v.id=e.launcherVillage)
+		LEFT JOIN wtfb2_villages v2 ON (v2.id=e.destinationVillage)
 		LEFT JOIN wtfb2_heroes h ON (h.id=e.heroId)
 		LEFT JOIN wtfb2_users u ON ((v.ownerId=u.id) OR (v2.ownerId=u.id) OR (h.ownerId=u.id))
 		WHERE (u.id={1})
@@ -206,6 +226,12 @@ foreach($worldEvents as $key=>$worldEvent)
 	echo '</worldEvent>';
 }
 echo '</worldEvents>';
+echo '<maxTrainingPerHour>';
+foreach ($maxTrainingPerHour as $key => $value)
+{
+    echo "<$key>$value</$key>";
+}
+echo '</maxTrainingPerHour>';
 echo '<eventSummary>';
 foreach($eventSummary as $key=>$event)
 {
