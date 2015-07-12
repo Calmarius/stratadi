@@ -1770,10 +1770,10 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 			'<td>'+
 				'<div style="width:50px; height:50px; background-image:url('+descriptor.image+'); position:relative; left:0; top:0">'+
 					'<canvas id="'+cid+'" width="50" height="50" style="position:absolute; left:0; top:0; width:50px; height:50px; z-index:1"></canvas>'+
-					'<span style="position:absolute; left:0; top:0; z-index: 3; color:white; font-weight:bold">'+reduceBigNumber(Math.floor(e[countDbName]),1000000)+'</span>'+
-					'<span style="position:absolute; left:1px; top:1px; z-index: 2; color:black; font-weight:bold">'+reduceBigNumber(Math.floor(e[countDbName]),1000000)+'</span>'+
-					'<span style="position:absolute; right:0; bottom:0; z-index: 2; color:black;">('+reduceBigNumber(Math.ceil(e[trainingDbName]), 1000000)+')</span>'+
-					'<span style="position:absolute; right:1px; bottom:1px; z-index: 2; color:white;">('+reduceBigNumber(Math.ceil(e[trainingDbName]), 1000000)+')</span>'+
+					'<span style="position:absolute; left:0; top:0; z-index: 3; color:white; font-weight:bold">'+reduceBigNumber(Math.floor(e[countDbName]),10000)+'</span>'+
+					'<span style="position:absolute; left:1px; top:1px; z-index: 2; color:black; font-weight:bold">'+reduceBigNumber(Math.floor(e[countDbName]),10000)+'</span>'+
+					'<span style="position:absolute; right:0; bottom:0; z-index: 2; color:black;">('+reduceBigNumber(Math.ceil(e[trainingDbName]), 10000)+')</span>'+
+					'<span style="position:absolute; right:1px; bottom:1px; z-index: 2; color:white;">('+reduceBigNumber(Math.ceil(e[trainingDbName]), 10000)+')</span>'+
 					'<div style="width:100%; height:100%; position:absolute; left:0; top:0; z-index:10" '+
 						'onmouseover="showTooltip(\'<?php echo xprintf($language["unitinfotooltip"],array("'+unitLangName+'","'+Math.floor(e[countDbName])+'","'+Math.ceil(e[trainingDbName])+'","'+(Math.floor(100*(Math.ceil(e[trainingDbName])-e[trainingDbName])))+'","'+descriptor.cost+'"));?>\')"'+
 						'onmouseout="removeTooltip()">'+
@@ -1797,8 +1797,8 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 			buildingTable+=
 					'<td>'+
 						'<div id="'+sId+'" style="width: 50px; height:50px; background-image:url('+value["image"]+'); position:relative; left:0; top:0" title="'+buildingName+'" onclick="upgradeBuilding('+e.id+',\''+key+'\')">'+
-							'<span style="position:absolute; left:1px; top:1px; z-index: 1; color:black; font-weight:bold">'+reduceBigNumber(Math.floor(e[levelName]),1000)+'</span>'+
-							'<span style="position:absolute; left:0; top:0; z-index: 2; color:white; font-weight:bold">'+reduceBigNumber(Math.floor(e[levelName]),1000)+'</span>'+
+							'<span style="position:absolute; left:1px; top:1px; z-index: 1; color:black; font-weight:bold">'+reduceBigNumber(Math.floor(e[levelName]),10000)+'</span>'+
+							'<span style="position:absolute; left:0; top:0; z-index: 2; color:white; font-weight:bold">'+reduceBigNumber(Math.floor(e[levelName]),10000)+'</span>'+
 							'<div style="width:100%; height:100%; position:absolute; left:0; top:0; z-index:3" '+
 								'onmouseover="showTooltip(\'<?php echo xprintf($language["buildinginfotooltip"],array("'+buildingName+'","'+e[levelName]+'","'+Math.ceil((eval('('+value['jsCostFunction']+')'))(e[levelName]))+'"));?>\')"'+
 								'onmouseout="removeTooltip()">'+
