@@ -46,8 +46,8 @@ if (!isset($_SESSION['makingbackup']))
 
 $myId=$_SESSION['userId'];
 
-$r=doMySqlQuery("SELECT NOW() AS now");
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT NOW() AS now");
+$a=$r[0][0];
 $f=fopen("nowstamp.ts",'w+t');
 fwrite($f,$a['now']);
 fclose($f);
@@ -56,12 +56,15 @@ fclose($f);
 // create sql dumps
 if ($_SESSION['makingbackup']['step']<=1)
 {
-	$r=doMySqlQuery("SHOW TABLES LIKE '%wtfb2_%'");
+	$r=runEscapedQuery("SHOW TABLES LIKE '%wtfb2_%'");
 	$tnames=array();
-	while($row=mysql_fetch_array($r))
+	foreach ($r[0] as $row)
 	{
 		// first the table creation statement
-		$tableName=$row[0];
+		foreach ($row as $value)
+		{
+    		$tableName=$value;
+		}
 		$tnames[]=$tableName;
 	}
 	$_SESSION['makingbackup']['tnames']=$tnames;
@@ -69,14 +72,14 @@ if ($_SESSION['makingbackup']['step']<=1)
 	{
 		// first the table creation statement
 		$f=fopen($tableName.'.sql','w+t');
-		$s=doMySqlQuery(sqlPrintf("SHOW CREATE TABLE {1}",array($tableName)));
-		$crTable=mysql_fetch_array($s);
-		fwrite($f,$crTable[1]);
+		$s=runEscapedQuery("SHOW CREATE TABLE $tableName");
+		$crTable=$s[0][0];
+		fwrite($f,$crTable['Create Table']);
 		// the select everything
-		$s=doMySqlQuery(sqlPrintf("SELECT * FROM {1}",array($tableName)));
-		if (mysql_num_rows($s)==0) continue; // no rows then continue
+		$s=runEscapedQuery("SELECT * FROM $tableName");
+		if (isEmptyResult($s)) continue; // no rows then continue
 		// fetch the first row
-		$row2=mysql_fetch_assoc($s);
+		$row2=$s[0][0];
 		$columns=array_keys($row2);
 		foreach($columns as $key=>$value)
 		{
@@ -87,18 +90,16 @@ if ($_SESSION['makingbackup']['step']<=1)
 		fwrite($f,"INSERT INTO `$tableName` (".implode(',',$columns).") VALUES\n");
 		// then select and process all rows
 		$first=true;
-		do
+		foreach ($s[0] as $row2)
 		{
 			if (!$first) fwrite($f,",\n");
 			$first=false;
 			foreach($row2 as $key=>$value)
 			{
-				if ($value===null) $row2[$key]='NULL';
-				else $row2[$key]="'".mysql_real_escape_string($value)."'";
+			    $row2[$key] = sqlvprintf("{0}", array($value));
 			}
 			fwrite($f,"(".implode(',',$row2).")");
 		}
-		while($row2=mysql_fetch_assoc($s));
 		fwrite($f,";\n\n\n");
 		fclose($f);
 	}
