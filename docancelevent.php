@@ -5,20 +5,17 @@ require_once('userworkerphps.php');
 
 $eventId=(int)$_GET['id'];
 $myId=$_SESSION['userId'];
-$r=doMySqlQuery(
-	sqlPrintf(
+$r=runEscapedQuery(
 	"
 	SELECT e.*
 	FROM wtfb2_events e
 	INNER JOIN wtfb2_villages v ON (v.id=e.launcherVillage)
 	LEFT JOIN wtfb2_heroes h ON (h.id=e.heroId)
-	WHERE (((v.ownerId='{1}') AND (h.id IS NULL)) OR (h.ownerId='{1}')) AND (e.id='{2}') AND (e.eventType!='return')
-	",array($myId,$eventId)
-	)
-,'jumpErrorPage');
+	WHERE (((v.ownerId={0}) AND (h.id IS NULL)) OR (h.ownerId={0})) AND (e.id={1}) AND (e.eventType!='return')
+	",$myId,$eventId);
 
-if (mysql_num_rows($r)==0) jumpErrorPage($language['accessdenied']);
-$event=mysql_fetch_assoc($r);
+if (isEmptyResult($r)) jumpErrorPage($language['accessdenied']);
+$event=$r[0][0];
 
 $newEvent=array();
 // add quotes
@@ -40,13 +37,13 @@ $newEvent['destinationVillage']=$event['launcherVillage'];
 // on settle event give us back our expansion point
 if ($event['eventType']=='settle')
 {
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=expansionPoints+1 WHERE (id='{1}')",array($myId)),'jumpErrorPage');
+	runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints+1 WHERE (id={0})",$myId);
 }
 
 // finally we post that event.
-doMySqlQuery("INSERT INTO wtfb2_events (".implode(',',array_keys($newEvent)).") VALUES (".implode(',',$newEvent).")",'jumpErrorPage'); // insecure, be careful.
+runEscapedQuery("INSERT INTO wtfb2_events (".implode(',',array_keys($newEvent)).") VALUES (".implode(',',$newEvent).")"); // insecure, be careful. TODO: why?
 // and delete the old
-doMySqlQuery(sqlPrintf("DELETE FROM wtfb2_events WHERE (id='{1}')",array($eventId)),'jumpErrorPage');
+runEscapedQuery("DELETE FROM wtfb2_events WHERE (id={0})",$eventId);
 
 $_SESSION['successtitle']=$language['eventsuccessfullycancelled'];
 $_SESSION['successcontent']='';
