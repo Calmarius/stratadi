@@ -15,6 +15,8 @@
 // TODO: (UI) Do not fix unit counts automatically in mass training add something more flexible, like fixing ratios.
 // TODO: (task) Investigate why massive building and unit training windows slow to come up.
 // TODO: (task) Separate local settings from serverwide settings.
+// TODO: (wishlist) Add admin's name in system messages.
+
 
 */
 
