@@ -17,11 +17,15 @@ else if (isset($_SESSION['returnUserId'])) $mode='admin';
 
 /*if (!isset($_SESSION['returnUserId']) || (isset($_SESSION['asdeputy'])))
 {*/
-	runEscapedQuery("UPDATE wtfb2_hitlog SET accessCount=accessCount+1 WHERE (accessDate=CURDATE()) AND (page={0}) AND (clientIP={1})",$_SERVER['SCRIPT_NAME'],$_SERVER['REMOTE_ADDR']);
-	if (getAffectedRowCount() == 0)
-	{
-		runEscapedQuery("INSERT INTO wtfb2_hitlog (accessDate,page,clientIP,accessCount) VALUES (CURDATE(),{0},{1},1)",$_SERVER['SCRIPT_NAME'],$_SERVER['REMOTE_ADDR']);
-	}
+    runEscapedQuery("
+        INSERT INTO wtfb2_hitlog
+        (accessDate,page,clientIP,accessCount)
+        VALUES
+        (CURDATE(),{0},{1},1)
+        ON DUPLICATE KEY UPDATE accessCount = accessCount+1",
+        $_SERVER['SCRIPT_NAME'],
+        $_SERVER['REMOTE_ADDR']
+    );
 
 	if (isset($_SESSION['userId'])) // log the request itself
 	{

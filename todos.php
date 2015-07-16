@@ -12,6 +12,8 @@
 // TODO: (UI) When player is not in a guild the guild page is shifted down.
 // TODO: (wishlist): Make forum not link to something external, instead use the regular threads to make an internal forum.
 // TODO: (UI) Make system messages left aligned when previewed.
+// TODO: (UI) Do not fix unit counts automatically in mass training add something more flexible, like fixing ratios.
+// TODO: (task) Investigate why massive building and unit training windows slow to come up.
 
 */
 
