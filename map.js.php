@@ -963,6 +963,7 @@ function getOwnVillageOptions()
 			launcherVillagesText+='<option value="'+village.id+'" '+(selected || !anySelected ? 'selected="selected"':'')+'>'+village.villageName+'</option>';
 		}
 	}
+
 	return launcherVillagesText;
 }
 
@@ -1019,7 +1020,9 @@ function massTraining()
 	{
 		mtPos={'x':parseInt(this.style.left),'y':parseInt(this.style.top)};
 	}
+
 	document.body.appendChild(e);
+
 	makeDraggable(e);
 	bringElementToFront(e);
 	var s=_(selId);
