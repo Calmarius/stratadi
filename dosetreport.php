@@ -10,7 +10,7 @@ $reportId=$_POST['id'];
 $hidden=(int)isset($_POST['hidden']);
 $public=(int)isset($_POST['public']);
 
-doMySqlQuery(sqlPrintf("UPDATE wtfb2_reports SET isHidden='{1}', isPublic='{2}' WHERE (id='{3}') AND (recipientId='$myId')",array($hidden,$public,$reportId)),'jumpErrorPage');
+runEscapedQuery("UPDATE wtfb2_reports SET isHidden={0}, isPublic={1} WHERE (id={2}) AND (recipientId='$myId')",$hidden,$public,$reportId);
 
 jumpTo(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER']:'reports.php');
 
