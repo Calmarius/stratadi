@@ -16,12 +16,12 @@ if (isset($_GET['showhidden']))
 
 if (!isset($_GET['p'])) $_GET['p']=0;
 
-$r=doMySqlQuery(sqlPrintf("SELECT COUNT(*) AS cnt FROM wtfb2_reports WHERE (recipientid={1}) {2}",array($myId,$hideHidden,(int)$_GET['p'])));
-$cnt=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT COUNT(*) AS cnt FROM wtfb2_reports WHERE (recipientid={0}) $hideHidden",$myId);
+$cnt=$r[0][0];
 $cnt=ceil($cnt['cnt']/20);
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_reports WHERE (recipientid={1}) {2} ORDER BY reportTime DESC LIMIT {3},{4}",array($myId,$hideHidden,(int)($_GET['p'])*$config['pageSize'],$config['pageSize'])));
+$r=runEscapedQuery("SELECT * FROM wtfb2_reports WHERE (recipientid={0}) $hideHidden ORDER BY reportTime DESC LIMIT {1},{2}",$myId,(int)($_GET['p'])*$config['pageSize'],$config['pageSize']);
 $reports=array();
-while($row=mysql_fetch_assoc($r))
+foreach ($r[0] as $row)
 {
 	$reports[]=$row;
 }

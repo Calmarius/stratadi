@@ -10,8 +10,8 @@ sqlPrintf(
 		SELECT * FROM wtfb2_accesses
 		WHERE (id='{1}')
 	",array($_SESSION['accessId']));
-$r=doMySqlQuery($q,'jumpErrorPage');
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery($q,'jumpErrorPage');
+$a=$r[0][0];
 
 
 $tm=date_parse($a['birth']);
@@ -24,9 +24,9 @@ $q=
 		SELECT languageId FROM wtfb2_spokenlanguages WHERE (playerId='${_SESSION['accessId']}')
 	";
 
-$r=doMySqlQuery($q);
+$r=runEscapedQuery($q);
 $langIds=array();
-while($row=mysql_fetch_assoc($r)) $langIds[]=$row['languageId'];
+foreach ($r[0] as $row) $langIds[]=$row['languageId'];
 
 $a['languages']=$langIds;
 

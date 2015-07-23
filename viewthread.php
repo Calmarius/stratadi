@@ -7,58 +7,56 @@ if (!isset($_SESSION['userId'])) jumpErrorPage($language['sessionisover']);
 $threadId=(int)$_GET['id'];
 $linkId=(int)$_GET['link'];
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($_SESSION['userId'])),'jumpErrorPage');
-$me=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})",$_SESSION['userId']);
+$me=$r[0][0];
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_threads WHERE (id='{1}') AND ((guildId IS NULL) OR (guildId='{2}'))",array($threadId,$me['guildId'])),'jumpErrorPage');
-if (mysql_num_rows($r)==0) jumpErrorPage($language['threadnotexist']);
-$threadInfo=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT * FROM wtfb2_threads WHERE (id={0}) AND ((guildId IS NULL) OR (guildId={1}))",$threadId,$me['guildId']);
+if (isEmptyResult($r)) jumpErrorPage($language['threadnotexist']);
+$threadInfo=$r[0][0];
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_threadlinks WHERE (userId='{1}') AND ((id='{2}')".($threadInfo['guildId']!='' ? " OR 1":'').")",array($_SESSION['userId'],$linkId)),'jumpErrorPage');
-if (mysql_num_rows($r)==0) jumpErrorPage($language['threadnotexist']);
+$r=runEscapedQuery("SELECT * FROM wtfb2_threadlinks WHERE (userId={0}) AND ((id={1})".($threadInfo['guildId']!='' ? " OR 1":'').")",$_SESSION['userId'],$linkId);
+if (isEmptyResult($r)) jumpErrorPage($language['threadnotexist']);
 
-$r=doMySqlQuery(sqlPrintf("UPDATE wtfb2_threadlinks SET `read`=1 WHERE (userId='{1}') AND (id='{2}')",array($_SESSION['userId'],$linkId)),'jumpErrorPage');
+$r=runEscapedQuery("UPDATE wtfb2_threadlinks SET `read`=1 WHERE (userId={0}) AND (id={1})",$_SESSION['userId'],$linkId);
 
 
-$r=doMySqlQuery(sqlPrintf("SELECT wtfb2_users.userName,wtfb2_threadlinks.* FROM wtfb2_threadlinks INNER JOIN wtfb2_users ON (wtfb2_threadlinks.userId=wtfb2_users.id) WHERE (threadId='{1}')",array($threadId)),'jumpErrorPage');
+$r=runEscapedQuery(
+    "SELECT wtfb2_users.userName,wtfb2_threadlinks.*
+    FROM wtfb2_threadlinks
+    INNER JOIN wtfb2_users ON (wtfb2_threadlinks.userId=wtfb2_users.id)
+    WHERE (threadId={0})",
+    $threadId
+);
 $participants=array();
-while($row=mysql_fetch_assoc($r))
+foreach ($r[0] as $row)
 {
 	$participants[]=$row;
 }
 
-$r=doMySqlQuery
+$r=runEscapedQuery
 (
-	sqlPrintf
-	(
-		"SELECT COUNT(*) AS cnt
-		 FROM
-		 	wtfb2_threadentries
-		 WHERE (threadId='{1}')
-		 ORDER BY  `when`DESC"
-		,array($threadId)
-	)
-	,'jumpErrorPage'
+	"SELECT COUNT(*) AS cnt
+	 FROM
+	 	wtfb2_threadentries
+	 WHERE (threadId={0})
+	 ORDER BY  `when`DESC"
+	,$threadId
 );
 
-$a=mysql_fetch_assoc($r);
+$a=$r[0][0];
 $cnt=ceil($a['cnt']/$config['pageSize']);
 if (!isset($_GET['p'])) $_GET['p']=0;
 
-$r=doMySqlQuery
+$r=runEscapedQuery
 (
-	sqlPrintf
-	(
-		"SELECT wtfb2_threadentries.*,wtfb2_users.userName
-		 FROM
-		 	wtfb2_threadentries
-		 	LEFT JOIN wtfb2_users ON (wtfb2_threadentries.posterId=wtfb2_users.id)
-		 WHERE (threadId='{1}')
-		 ORDER BY  `when`DESC
-		 LIMIT {2},{3}"
-		,array($threadId,(int)$_GET['p']*$config['pageSize'],$config['pageSize'])
-	)
-	,'jumpErrorPage'
+    "SELECT wtfb2_threadentries.*,wtfb2_users.userName
+	 FROM
+	 	wtfb2_threadentries
+	 	LEFT JOIN wtfb2_users ON (wtfb2_threadentries.posterId=wtfb2_users.id)
+	 WHERE (threadId={0})
+	 ORDER BY  `when`DESC
+	 LIMIT {1},{2}"
+	,$threadId,(int)$_GET['p']*$config['pageSize'],$config['pageSize']
 );
 
 $params=array();
@@ -69,7 +67,7 @@ $params['guildLetter']=is_numeric($threadInfo['guildId']);
 $params['pages']=$cnt;
 $params['id']=$_GET['id'];
 $params['link']=$_GET['link'];
-while($row=mysql_fetch_assoc($r))
+foreach ($r[0] as $row)
 {
 	$params['entries'][]=$row;
 }
