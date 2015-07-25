@@ -3,14 +3,14 @@
 require_once('userworkerphps.php');
 bounceSessionOver();
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($_SESSION['userId'])));
-$kingdom=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})",$_SESSION['userId']);
+$kingdom=$r[0][0];
 
 $allowManage=$kingdom['masterAccess']==$_SESSION['accessId'];
 
-$r=doMySqlQuery(sqlPrintf("SELECT *,(id='{2}') AS isMaster,(id='{3}') AS isMe FROM wtfb2_accesses WHERE (accountId='{1}')",array($_SESSION['userId'],$kingdom['masterAccess'],$_SESSION['accessId'])));
+$r=runEscapedQuery("SELECT *,(id={1}) AS isMaster,(id={2}) AS isMe FROM wtfb2_accesses WHERE (accountId={0})",$_SESSION['userId'],$kingdom['masterAccess'],$_SESSION['accessId']);
 $accesses=array();
-while($row=mysql_fetch_assoc($r))
+foreach ($r[0] as $row)
 {
 	$accesses[]=$row;
 }

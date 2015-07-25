@@ -6,28 +6,26 @@ if (!isset($_GET['id']))
 {
     bounceSessionOver();
     $_GET['id'] = 0;
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_heroes WHERE (ownerId='{1}')",array($_SESSION['userId'])));
-	$a=mysql_fetch_assoc($r);
+	$r=runEscapedQuery("SELECT * FROM wtfb2_heroes WHERE (ownerId={0})",$_SESSION['userId']);
+	$a=$r[0][0];
 	if ($a!==FALSE)
 		$_GET['id']=$a['id'];
 }
 
-$r=doMySqlQuery(
-sqlPrintf(
+$r=runEscapedQuery(
 	"
 	SELECT h.*,u.userName AS ownerName,u.id AS ownerId, v.villageName AS villageName,v.x AS villageX,v.y AS villageY
 	FROM wtfb2_heroes h
 	LEFT JOIN wtfb2_users u ON (h.ownerId=u.id)
 	LEFT JOIN wtfb2_villages v ON (v.id=h.inVillage)
-	WHERE (h.id='{1}')
-	",array($_GET['id'])
-)
-,'jumpErrorPage');
-if (mysql_num_rows($r)==0)
+	WHERE (h.id={0})
+	",$_GET['id']
+);
+if (isEmptyResult($r))
 {
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_heroes WHERE (ownerId='{1}')",array($_SESSION['userId'])));
-	logText(mysql_num_rows($r));
-	if (mysql_num_rows($r)==0)
+	$r=runEscapedQuery("SELECT * FROM wtfb2_heroes WHERE (ownerId={0})",$_SESSION['userId']);
+	logText(count($r));
+	if (isEmptyResult($r))
 	{
 		jumpTo("nohero.php");
 	}
@@ -36,7 +34,7 @@ if (mysql_num_rows($r)==0)
 		jumpErrorPage($language['heronotexist']);
 	}
 }
-$hero=mysql_fetch_assoc($r);
+$hero=$r[0][0];
 $ownHero=isset($_SESSION['userId']) && ($hero['ownerId']==$_SESSION['userId']);
 
 $xpToLevel=$config['experienceFunction'];

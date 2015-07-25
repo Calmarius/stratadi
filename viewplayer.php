@@ -7,8 +7,8 @@ require_once("userworkerphps.php");
 if (isset($_SESSION['userId']))
 {
     $myId=$_SESSION['userId'];
-    $r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($myId)));
-    $me=mysql_fetch_assoc($r);
+    $r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})",$myId);
+    $me=$r[0][0];
 }
 else
 {
@@ -30,9 +30,9 @@ $q=sqlPrintf(<<< X
 	GROUP BY u.id
 X
 ,array($_GET['id'],$me['regDate']));
-$r=doMySqlQuery($q,'jumpErrorPage');
-if (mysql_num_rows($r)==0) jumpErrorPage($language['']);
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery($q);
+if (isEmptyResult($r)) jumpErrorPage($language['']);
+$a=$r[0][0];
 $a['own']=$myId==$a['id'];
 
 if ($a['ageBonus'] != 0)
@@ -46,9 +46,9 @@ else
 if ((double)$a['ageBonus']<1) $a['ageBonus']=1;
 if ((double)$a['revAgeBonus']<1) $a['revAgeBonus']=1;
 
-$r=doMySqlQuery(sqlPrintf("SELECT *,(id='{2}') AS isMaster FROM wtfb2_accesses WHERE (accountId='{1}')",array($_GET['id'],$a['masterAccess'])));
+$r=runEscapedQuery("SELECT *,(id={1}) AS isMaster FROM wtfb2_accesses WHERE (accountId={0})",$_GET['id'],$a['masterAccess']);
 $kings=array();
-while($row=mysql_fetch_assoc($r))
+foreach ($r[0] as $row)
 {
 	$kings[]=$row;
 }
