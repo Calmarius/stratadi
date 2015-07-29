@@ -2,9 +2,9 @@
 
 require_once('userworkerphps.php');
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guilds WHERE (id='{1}')",array($_GET['id']))); 
-if (mysql_num_rows($r)==0) jumpErrorPage($language['guildnotexist']);
-$guildInfo=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT * FROM wtfb2_guilds WHERE (id={0})",$_GET['id']);
+if (isEmptyResult($r)) jumpErrorPage($language['guildnotexist']);
+$guildInfo=$r[0][0];
 
 $guildInfo['members']=array();
 $q=
@@ -16,8 +16,8 @@ sqlPrintf(
 		WHERE (guildId='{1}')
 		GROUP BY u.id
 	",array($_GET['id']));
-$r=doMySqlQuery($q);
-while($row=mysql_fetch_assoc($r))
+$r=runEscapedQuery($q);
+foreach ($r[0] as $row)
 {
 	$guildInfo['members'][]=$row;
 }

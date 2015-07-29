@@ -3,8 +3,8 @@
 require_once('userworkerphps.php');
 require_once('villageupdater.php');
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_deputies WHERE (sponsorId='{1}') AND (deputyId='{2}')",array($_GET['id'],$_SESSION['userId'])));
-if (mysql_num_rows($r)<1) jumpErrorPage($language['accessdenied']);
+$r=runEscapedQuery("SELECT * FROM wtfb2_deputies WHERE (sponsorId={0}) AND (deputyId={1})",$_GET['id'],$_SESSION['userId']);
+if (isEmptyResult($r)) jumpErrorPage($language['accessdenied']);
 
 $tmp=array();
 foreach($_SESSION as $key=>$value)
