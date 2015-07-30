@@ -704,7 +704,10 @@ function doMassBuilding(&$villageArray,$buildingId,$maxGold,$maxLevel)
 
 
 	$spent=0;
-	$built=false;
+    $built=false;
+    $first = false;
+	$restartPoint = 0;
+
 	for($i=0;$i<$n;$i++)
 	{
 		$iLevel=$tmpLevels[$i];
@@ -715,6 +718,13 @@ function doMassBuilding(&$villageArray,$buildingId,$maxGold,$maxLevel)
 		{
             // Max level reached, we are filled up totally.
 			return $spent;
+		}
+
+		if (!$first)
+		{
+		    /* The first few villages are always skipped so do not skip over them all the iterations. */
+		    $restartPoint = $i;
+		    $first = true;
 		}
 
 		$bLevel=$villageArray[$i][$levelName];
@@ -739,26 +749,52 @@ function doMassBuilding(&$villageArray,$buildingId,$maxGold,$maxLevel)
             $tmpLevels[$i] = -1; // -1 means we should skip this village from now on.
         }
 
-		if ($i+1<$n)
+        /* Restart if the next village have higher level than the current target level. */
+        for ($j = $i + 1; $j < $n; $j++)
+        {
+            if ($tmpLevels[$j] == -1) continue;
+            if ($tmpLevels[$j] < $iLevel)
+            {
+                logText('This should not happen: tmpLevels[$j]'.$tmpLevels[$j].'. iLevel: '.$iLevel);
+            }
+            if ($tmpLevels[$j] > $iLevel)
+            {
+                $i = $restartPoint - 1;
+                $built = false;
+                $first = false;
+                break;
+            }
+            else
+            {
+                break;
+            }
+        }
+		if (($j == $n) && (($iLevel<$maxLevel) || ($maxLevel==-1)) && ($built))
 		{
-			if ($tmpLevels[$i+1]>$iLevel)
-			{
-				$i=-1;
-				$built=false;
-			}
-		}
-		else
-		{
-			if ((($iLevel<$maxLevel) || ($maxLevel==-1)) && ($built))
-			{
-				$i=-1;
-				$built=false;
-			}
+		    /* There is no next village. Restart if we haven't reached the desired level and built anything in this iteration. */
+			$i = $restartPoint - 1;
+			$built = false;
+            $first = false;
 		}
 	}
 	return $spent;
 }
 
+/*			$str = '';
+			$str.= "Restart point: ". $restartPoint. "\n";
+			for ($j = 0; $j < $n; $j++)
+			{
+			    $str.=
+			        " j: ".$j.
+			        " Id: ".$villageArray[$j]['id'].
+			        " BP: ".floor($villageArray[$j]['buildPoints']).
+			        " Level: ".$villageArray[$j][$levelName].
+			        " tmplevels: ".$tmpLevels[$j].
+			        " spare BP: ".$villageArray[$j]['spareBuildPoints'].
+			        "\n";
+			}
+			$str.="=============\n";
+			logText($str);*/
 
 function massBuild($command)
 {
