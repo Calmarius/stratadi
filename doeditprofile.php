@@ -31,21 +31,6 @@ if (strlen(trim($s))<$config['minHeroNameLength'])
 }
 // checking passwords
 $setPasswordText='';
-/*if ($_POST['password']!='')
-{
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}') AND (passwordHash=MD5('{2}') )",array($_SESSION['userId'],$_POST['oldpassword'])));
-	if (mysql_num_rows($r)==0) jumpErrorPage($language['badpassword']);
-	$s=$_POST['password'];
-	if (strlen($s)<$config['minUserPasswordLength'])
-	{
-		jumpErrorPage($language['passwordtooshort']);
-	}
-	if ($_POST['password']!=$_POST['password2'])
-	{
-		jumpErrorPage($language['passwordnotmatch']);
-	}
-	$setPasswordText=sqlPrintf(",passwordHash=MD5('{1}')",array($s));
-}*/
 
 //checking day
 $s=$_POST['day'];
@@ -97,20 +82,11 @@ $q=sqlPrintf(
 	SET $avLinkMod profile='{4}' $setPasswordText
 	WHERE (id='{5}')
 	",array($_POST['gender'],$_POST['town'],$date,$_POST['profile'],$_SESSION['userId']));
-$r=doMySqlQuery($q,'jumpErrorPage');
-
-/*// set languages
-doMySqlQuery("DELETE FROM wtfb2_spokenlanguages WHERE (playerId=${_SESSION['userId']})");
-$values=array();
-foreach($_POST['spokenlanguages'] as $key=>$value)
-{
-	$values[]=sqlPrintf("('{1}','{2}')",array($_SESSION['userId'],$value));
-	doMySqlQuery("INSERT INTO wtfb2_spokenlanguages (playerId,languageId) VALUES ".implode(',',$values));
-}*/
+$r=runEscapedQuery($q);
 
 
 $q=sqlPrintf("UPDATE wtfb2_heroes SET $hLinkMod name='{1}' WHERE (ownerId='{2}')",array($_POST['heroname'],$_SESSION['userId']));
-$r=doMySqlQuery($q,'jumpErrorPage');
+$r=runEscapedQuery($q);
 
 jumpTo('viewplayer.php');
 

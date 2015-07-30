@@ -6,29 +6,29 @@ htmlize($_POST);
 function sendThreadLink($threadId,$userId,$isRead)
 {
 	$q=sqlPrintf("SELECT * FROM wtfb2_threadlinks WHERE (threadId='{1}') AND (userId='{2}')",array($threadId,$userId));
-	$r=doMySqlQuery($q,'jumpErrorPage');
-	if (mysql_num_rows($r)==0)
+	$r=runEscapedQuery($q);
+	if (isEmptyResult($r))
 	{
 		$q=sqlPrintf("INSERT INTO wtfb2_threadlinks (threadId,userId,`read`) VALUES ({1},{2},{3})",array($threadId,$userId,$isRead));
-		$r=doMySqlQuery($q,'jumpErrorPage');	
+		$r=runEscapedQuery($q);
 	}
 	else
 	{
 		$q=sqlPrintf("UPDATE wtfb2_threadlinks SET `read`='{1}' WHERE (threadId='{2}') AND (userId='{3}')",array($isRead,$threadId,$userId));
-		$r=doMySqlQuery($q,'jumpErrorPage');	
+		$r=runEscapedQuery($q);
 	}
 }
 
 function updateThreadLinks($threadId)
 {
 	$q=sqlPrintf("UPDATE wtfb2_threadlinks SET `read`=0 WHERE (threadId='{1}')",array($threadId));
-	$r=doMySqlQuery($q,'jumpErrorPage');	
+	$r=runEscapedQuery($q);
 }
 
 if (!isset($_SESSION['userId'])) jumpErrorPage($language['sessionisover']);
 $userId=$_SESSION['userId'];
-$r=doMySqlQuery("SELECT NOW() AS now");
-$a=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT NOW() AS now");
+$a=$r[0][0];
 $now=$a['now'];
 
 if (isset($_POST['extra']))
@@ -36,13 +36,13 @@ if (isset($_POST['extra']))
 	$extra=$_POST['extra'];
 	if ($extra=='circular')
 	{
-		$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guildpermissions WHERE (userId='{1}') AND (permission='circular')",array($_SESSION['userId'])));
-		if (mysql_num_rows($r)==0) jumpErrorPage('accessdenied');
+		$r=runEscapedQuery("SELECT * FROM wtfb2_guildpermissions WHERE (userId={0}) AND (permission='circular')", $_SESSION['userId']);
+		if (isEmptyResult($r)) jumpErrorPage('accessdenied');
 	}
 	if ($extra=='guildthread')
 	{
-		$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_guildpermissions WHERE (userId='{1}') AND (permission='moderate')",array($_SESSION['userId'])));
-		if (mysql_num_rows($r)==0) jumpErrorPage('accessdenied');
+		$r=runEscapedQuery("SELECT * FROM wtfb2_guildpermissions WHERE (userId={0}) AND (permission='moderate')", $_SESSION['userId']);
+		if (isEmptyResult($r)) jumpErrorPage('accessdenied');
 	}
 }
 
@@ -50,16 +50,16 @@ $_SESSION['lastcomposition']['subject']=$_POST['subject'];
 $_SESSION['lastcomposition']['content']=$_POST['content'];
 
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($_SESSION['userId'])));
-$me=mysql_fetch_assoc($r);
+$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})", $_SESSION['userId']);
+$me=$r[0][0];
 
 $recipientId=0;
 if ($_POST['recipient']!='')
 {
 	$q=sqlPrintf("SELECT * FROM wtfb2_users WHERE (userName='{1}')",array($_POST['recipient']));
-	$r=doMySqlQuery($q,'jumpErrorPage');
-	if (mysql_num_rows($r)==0) jumpErrorPage($language['recipientisnotexist']);
-	$a=mysql_fetch_assoc($r);
+	$r=runEscapedQuery($q);
+	if (isEmptyResult($r)) jumpErrorPage($language['recipientisnotexist']);
+	$a=$r[0][0];
 	$recipientId=$a['id'];
 }
 
@@ -73,38 +73,35 @@ if ($_POST['thread']=='')
 		$extra=$_POST['extra'];
 		if ($extra=='guildthread')
 		{
-			$extraFields=',guildId';	
+			$extraFields=',guildId';
 			$extraValues=sqlPrintf(",'{1}'",array($me['guildId']));
 		}
 	}
 	$q=sqlPrintf("INSERT INTO wtfb2_threads (updated,lastPosterId,subject $extraFields) VALUES ('$now','{1}','{2}' $extraValues)",array($_SESSION['userId'],$_POST['subject']));
-	$r=doMySqlQuery($q,'jumpErrorPage');
-	$threadId=mysql_insert_id();
+	$r=runEscapedQuery($q);
+	$threadId=getLastInsertId();
 }
 else
 {
 	$threadId=(int)$_POST['thread'];
 	$q=sqlPrintf("SELECT * FROM wtfb2_threadlinks WHERE (threadId='{1}') AND (userId='{2}')",array($threadId,$_SESSION['userId']));
-	$r=doMySqlQuery($q,'jumpErrorPage');
-	if (mysql_num_rows($r)==0) jumpErrorPage($language['threadnotexist']);
+	$r=runEscapedQuery($q);
+	if (isEmptyResult($r)) jumpErrorPage($language['threadnotexist']);
 	$q=sqlPrintf("SELECT *,UNIX_TIMESTAMP(updated) AS tsUpdated FROM wtfb2_threads WHERE (id='{1}')",array($threadId));
-	$r=doMySqlQuery($q,'jumpErrorPage');
-	if (mysql_num_rows($r)==0) jumpErrorPage($language['threadnotexist']);
-	$a=mysql_fetch_assoc($r);
-/*	print_r($_POST);	print_r($a);
-	echo  (int)$a['tsUpdated']>(int)$_POST['nowstamp'];
-	die();*/
+	$r=runEscapedQuery($q);
+	if (isEmptyResult($r)) jumpErrorPage($language['threadnotexist']);
+	$a=$r[0][0];
 	if ((int)$a['tsUpdated']>(int)$_POST['nowstamp'])
 	{
 		jumpTo('compose.php?thread='.urlencode($threadId).'&notification='.urlencode($language['newreplywhileyouwrote']));
 	}
-		
+
 	$q=sqlPrintf("UPDATE wtfb2_threads SET updated='$now',subject='{1}',lastPosterId='{3}' WHERE (id='{2}')",array($_POST['subject'],$threadId,$_SESSION['userId']));
-	$r=doMySqlQuery($q,'jumpErrorPage');
+	$r=runEscapedQuery($q);
 }
 
 $q=sqlPrintf("INSERT INTO wtfb2_threadentries (threadId,posterId,text,`when`) VALUES ('{1}','{2}','{3}','$now')",array($threadId,$_SESSION['userId'],$_POST['content']));
-$r=doMySqlQuery($q,'jumpErrorPage');
+$r=runEscapedQuery($q);
 
 updateThreadLinks($threadId);
 sendThreadLink($threadId,$_SESSION['userId'],"1");
@@ -113,8 +110,8 @@ if (isset($_POST['extra']))
 	$extra=$_POST['extra'];
 	if ($extra=='circular')
 	{
-		$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_users WHERE (guildId='{1}')",array($me['guildId'])));
-		while($row=mysql_fetch_assoc($r))
+		$r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (guildId={0})", $me['guildId']);
+		foreach ($r[0] as $row)
 		{
 			sendThreadLink($threadId,$row['id'],"0");
 		}

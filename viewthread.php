@@ -5,7 +5,7 @@ require_once("userworkerphps.php");
 if (!isset($_SESSION['userId'])) jumpErrorPage($language['sessionisover']);
 
 $threadId=(int)$_GET['id'];
-$linkId=(int)$_GET['link'];
+$linkId=(int)@$_GET['link'];
 
 $r=runEscapedQuery("SELECT * FROM wtfb2_users WHERE (id={0})",$_SESSION['userId']);
 $me=$r[0][0];
@@ -66,7 +66,7 @@ $params['entries']=array();
 $params['guildLetter']=is_numeric($threadInfo['guildId']);
 $params['pages']=$cnt;
 $params['id']=$_GET['id'];
-$params['link']=$_GET['link'];
+$params['link']=@$_GET['link'];
 foreach ($r[0] as $row)
 {
 	$params['entries'][]=$row;
