@@ -15,7 +15,7 @@ if (isset($_GET['turnoff']))
 {
 	require_once("setupmysql.php");
 	require_once("utils/gameutils.php");
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET needsTutorial=0 WHERE (id='{1}')",array($_SESSION['userId'])));
+	runEscapedQuery("UPDATE wtfb2_users SET needsTutorial=0 WHERE (id={0})",$_SESSION['userId']);
 	jumpSuccessPage($language['youfinishedthetutorial'],$language['youcanreenterthetutorial']);
 }
 

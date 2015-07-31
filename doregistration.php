@@ -14,26 +14,26 @@ function bounceBack()
 function cleanupInactiveAccounts()
 {
 	global $config;
-	$r=doMySqlQuery(sqlPrintf("SELECT TIMESTAMPDIFF(SECOND,'{1}',NOW())  AS started",array($config['gameStarted'])));
-	$stime=mysql_fetch_assoc($r);
+	$r=runEscapedQuery("SELECT TIMESTAMPDIFF(SECOND,{0},NOW())  AS started",$config['gameStarted']);
+	$stime=$r[0][0];
 	if ((int)$stime['started']<0) return;
 	$q="DELETE FROM wtfb2_users WHERE (permission='inactive') AND (TIMESTAMPDIFF(HOUR,regDate,NOW())>=24)";
-	$r=doMySqlQuery($q,'jumpErrorPage');
+	$r=runEscapedQuery($q);
 }
 
 
 function isRegisteredName($name)
 {
 	$q=sqlPrintf("SELECT * FROM wtfb2_users WHERE (userName='{1}')",array($name));
-	$r=doMySqlQuery($q,'jumpErrorPage');
-	return mysql_num_rows($r);
+	$r=runEscapedQuery($q);
+	return count($r[0]);
 }
 
 function isRegisteredKing($name)
 {
 	$q=sqlPrintf("SELECT * FROM wtfb2_accesses WHERE (userName='{1}')",array($name));
-	$r=doMySqlQuery($q,'jumpErrorPage');
-	return mysql_num_rows($r);
+	$r=runEscapedQuery($q);
+	return count($r[0]);
 }
 
 function isRegisteredEMail($mail)
@@ -41,8 +41,8 @@ function isRegisteredEMail($mail)
 	global $config;
 	if ($mail==$config['adminMail']) return false;
 	$q=sqlPrintf("SELECT * FROM wtfb2_accesses WHERE (eMail='{1}')",array($mail));
-	$r=doMySqlQuery($q,'jumpErrorPage');
-	return mysql_num_rows($r);
+	$r=runEscapedQuery($q);
+	return count($r[0]);
 }
 
 function createAvatar($fileName,$type,$thumbsize)
@@ -69,8 +69,21 @@ function registerUser($data)
 	global $config;
 
 	$lId=0;
-	$genderStr=$data['gender']!=''  ? "'".mysql_real_escape_string($data['gender'])."'":"NULL";
+	$genderStr=sqlvprintf("'{0}'", array($data['gender']!='' ? $data['gender'] : null));
 	$activationToken='';
+	
+	if (!isset($data['year'])) $data['year'] = '';
+	if (!isset($data['month'])) $data['month'] = '';
+	if (!isset($data['day'])) $data['day'] = '';
+	if (!isset($data['kingdomname'])) $data['kingdomname'] = '';
+	if (!isset($data['password'])) $data['password'] = '';
+	if (!isset($data['mail'])) $data['mail'] = '';
+	if (!isset($data['city'])) $data['city'] = '';
+	if (!isset($data['youravatar'])) $data['youravatar'] = '';
+	if (!isset($data['referer'])) $data['referer'] = '';
+	if (!isset($data['heroname'])) $data['heroname'] = '';
+	if (!isset($data['heroavatar'])) $data['heroavatar'] = '';
+	
 	if ($data['year']=='') $data['year']='0000';
 	if ($data['month']=='') $data['month']='00';
 	if ($data['day']=='') $data['day']='00';
@@ -81,15 +94,13 @@ function registerUser($data)
 	if (isset($data['registerkingdom']))
 	{
 		// create kingdom
+		// TODO: (refactor) Normalize this.
 		$q=
 		sqlPrintf(
 		"
 			INSERT INTO wtfb2_users (userName,regDate,avatarLink,lastUpdate,refererId,lastLoaded)
 			VALUES
-			('{1}',
-			NOW(),
-			'{8}',
-			NOW(),'{10}',NOW());
+			('{1}',NOW(),'{8}',NOW(),'{10}',NOW());
 		",array(
 			$data['kingdomname'],
 			$data['password'],
@@ -103,43 +114,35 @@ function registerUser($data)
 			$data['referer'])
 		);
 		$error="";
-		$r=doMySqlQuery($q,'jumpErrorPage');
-		$lId=mysql_insert_id();
+		$r=runEscapedQuery($q);
+		$lId=getLastInsertId();
 	}
 	// create hero
-	$q=sqlPrintf("INSERT INTO wtfb2_heroes (ownerId,name,avatarLink) VALUES ('{1}','{2}','{3}')",array($lId,$data['heroname'],$data['heroavatar']));
-	$r=doMySqlQuery($q,'jumpErrorPage');
+	$q=sqlPrintf("INSERT INTO wtfb2_heroes (ownerId,name,avatarLink) VALUES ('{1}','{2}','{3}')",array($lId,@$data['heroname'],@$data['heroavatar']));
+	$r=runEscapedQuery($q);
 	// create access
-	doMySqlQuery(sqlPrintf
-		(
-			"
-				INSERT INTO wtfb2_accesses (accountId,userName,passwordHash,eMail,city,birth,gender,permission,activationToken) VALUES ('{1}','{2}',MD5('{3}'),'{4}','{5}','{6}-{7}-{8} 0:00:00',$genderStr,'inactive','{9}')
-			",
-			array
-			(
-				$lId,
-				$data['username'],
-				$data['password'],
-				$data['mail'],
-				$data['city'],
-				$data['year'],
-				$data['month'],
-				$data['day'],
-				$activationToken
-			)
-		)
+	runEscapedQuery("
+        INSERT INTO wtfb2_accesses (accountId,userName,passwordHash,eMail,city,birth,gender,permission,activationToken) 
+        VALUES ({0},{1},MD5({2}),{3},{4},{5},$genderStr,'inactive',{6})",
+		$lId,
+		$data['username'],
+		$data['password'],
+		$data['mail'],
+		$data['city'],
+		"${data['year']}-${data['month']}-${data['day']} 0:00:00",
+		$activationToken
 	);
-	$newAccess=mysql_insert_id();
-	doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET masterAccess='{1}' WHERE (id='{2}')",array($newAccess,$lId)));
+	$newAccess=getLastInsertId();
+	runEscapedQuery("UPDATE wtfb2_users SET masterAccess={0} WHERE (id={1})",$newAccess,$lId);
 	// create languages entry
 	$values=array();
 	if (isset($data['languages']))
 	{
 		foreach($data['languages'] as $key=>$value)
 		{
-			$values[]=sqlPrintf("('{1}','{2}')",array($newAccess,$value));
+			$values[]=sqlPrintf("({0},{1})",$newAccess,$value);
 		}
-		doMySqlQuery("INSERT INTO wtfb2_spokenlanguages (playerId,languageId) VALUES ".implode(',',$values));
+		runEscapedQuery("INSERT INTO wtfb2_spokenlanguages (playerId,languageId) VALUES ".implode(',',$values));
 	}
 
 	$recipient=$data['mail'];
@@ -273,11 +276,5 @@ $_SESSION['regName']=$_POST['username'];
 
 header('HTTP/1.0 301');
 header('Location: successfulregistration.php');
-
-
-
-/*$_SESSION['registrationparms']['userNameError']='<span class="negative">Még nem lehet regelni WAZZE!</span>';
-bounceBack();*/
-
 
 ?>
