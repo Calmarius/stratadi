@@ -7,15 +7,13 @@ require_once("battlecalculation.php");
 require_once("templateclass.php");
 require_once("nightbonus.php");
 
-//logText("eventProcessor got called!");
-
 $events=array();
 error_reporting(E_ALL);
 
 ///// CREATE A DEFAULT EVENT
 $defaultEvent=array();
-$r=doMySqlQuery("DESCRIBE wtfb2_events");
-while($row=mysql_fetch_assoc($r))
+$r=runEscapedQuery("DESCRIBE wtfb2_events");
+foreach ($r[0] as $row)
 {
 	if ($row['Default']=='') continue; // we not set those fields that don't have default value. It would cause errors.
 	$defaultEvent[$row['Field']]=$row['Default'];
@@ -23,20 +21,21 @@ while($row=mysql_fetch_assoc($r))
 
 //// POST EVENT
 
+// This function assumes that the event is properly real escaped.
 function postEvent($event)
 {
 	global $events;
 	global $defaultEvent;
-	$r=doMySqlQuery(sqlPrintf("SELECT TIMESTAMPDIFF(SECOND,NOW(),'{1}') AS happensIn,UNIX_TIMESTAMP('{2}') AS eventTime",array($event['happensAt'],$event['happensAt'])));
-	$info=mysql_fetch_assoc($r);
+	$r=runEscapedQuery("SELECT TIMESTAMPDIFF(SECOND,NOW(),{0}) AS happensIn,UNIX_TIMESTAMP({1}) AS eventTime",$event['happensAt'],$event['happensAt']);
+	$info=$r[0][0];
 	if ((int)$info['happensIn']<0) // already happened so we must insert it into the elapsed events.
 	{
 		foreach($event as $key=>$value) // ez elég szar... Lehet, hogy lehet jobban is csinálni.
 		{
 			// evaluate existing keys
 			if ($value=='') continue;
-			$r=doMySqlQuery(sqlPrintf("SELECT {1} AS result",array($value)));
-			$a=mysql_fetch_assoc($r);
+			$r=runEscapedQuery("SELECT $value AS result");
+			$a=$r[0][0];
 			$event[$key]=$a['result'];
 		}
 		foreach($defaultEvent as $key=>$value)
@@ -51,16 +50,10 @@ function postEvent($event)
 	}
 	else // not yet happened, so we insert it into the database.
 	{
-		doMySqlQuery("INSERT INTO wtfb2_events (".implode(",",array_keys($event)).") VALUES (".implode(",",$event).")"); // events are safe afaik, only ids are there
+		runEscapedQuery("INSERT INTO wtfb2_events (".implode(",",array_keys($event)).") VALUES (".implode(",",$event).")"); // events are safe afaik, only ids are there
 	}
 }
 
-/*SELECT e.* FROM wtfb2_events e
-INNER JOIN wtfb2_villages v ON ((v.id=e.launcherVillage) OR (v.id=e.destinationVillage))
-INNER JOIN wtfb2_users u ON (v.ownerId=u.id)
-WHERE (u.id=4)
-
-*/
 //// HANDLING EVENTS
 
 function evtSettleVillage($event)
@@ -68,12 +61,12 @@ function evtSettleVillage($event)
 	global $config;
 	global $language;
 	// somebody settled at the position we planned to settle?
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_villages WHERE (x='{1}') AND (y='{2}')",array($event['targetX'],$event['targetY'])));
-	$settledOn=mysql_num_rows($r)>0;
-	$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_villages WHERE (id='{1}')",array($event['launcherVillage'])));
-	$isVillage=mysql_num_rows($r)!=0;
+	$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (x={0}) AND (y={1})",$event['targetX'],$event['targetY']);
+	$settledOn=!isEmptyResult($r);
+	$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (id={0})", $event['launcherVillage']);
+	$isVillage=!isEmptyResult($r);
 	$village;
-	if ($isVillage) $village=mysql_fetch_assoc($r);
+	if ($isVillage) $village=$r[0][0];
 	if ($settledOn)
 	{
 		// send back the diplomat if we can.
@@ -87,12 +80,12 @@ function evtSettleVillage($event)
 				'estimatedTime'=>sqlPrintf("TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,'{1}','{2}'),'{3}')",array($event['launchedAt'],$event['happensAt'],$event['happensAt'])),
 				'launchedAt'=>sqlPrintf("'{1}'",array($event['happensAt'])),
 				'launcherVillage'=>"0",
-				'destinationVillage'=>mysql_real_escape_string($village['id']),
+				'destinationVillage'=>$village['id'],
 				$config['units'][$config['settlerUnit']]['countDbName']=>'1'
 			);
 			postEvent($newEvent);
 			// give back an expansion point.
-			doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=expansionPoints+1 WHERE (id='{1}')",array($village['ownerId'])));
+			runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints+1 WHERE (id={0})",$village['ownerId']);
 		}
 	}
 	else
@@ -100,9 +93,16 @@ function evtSettleVillage($event)
 		// get the launcher village
 		if (!$isVillage) return; // no village there is nothing to do.
 		// settle the village
-		doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_villages (ownerId,villageName,x,y,lastUpdate) VALUES ('{1}','{2}','{3}','{4}',NOW())",array($village['ownerId'],$language['newvillage'],$event['targetX'],$event['targetY']))); 
+		runEscapedQuery(
+		    "INSERT INTO wtfb2_villages (ownerId,villageName,x,y,lastUpdate) 
+		    VALUES ({0},{1},{2},{3},NOW())",
+		    $village['ownerId'],
+		    $language['newvillage'],
+		    $event['targetX'],
+		    $event['targetY']
+		); 
 		// also set a world event about the spawn of the village
-		doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ('{1}','{2}',NOW(),'settle')",array($event['targetX'],$event['targetY'])));
+		runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({0},{1},NOW(),'settle')",$event['targetX'],$event['targetY']);
 	}
 }
 
@@ -111,28 +111,28 @@ function evtMoveTroops($event)
 	global $config;
 	global $language;
 	// load the village
-	$r=doMySqlQuery(sqlPrintf("SELECT *,u.userName FROM wtfb2_villages v LEFT JOIN wtfb2_users u ON (v.ownerId=u.id) WHERE (v.id='{1}')",array($event['destinationVillage'])));
-	$isVillage=mysql_num_rows($r)>0;
+	$r=runEscapedQuery("SELECT *,u.userName FROM wtfb2_villages v LEFT JOIN wtfb2_users u ON (v.ownerId=u.id) WHERE (v.id={0})",$event['destinationVillage']);
+	$isVillage=!isEmptyResult($r);;
 	$village;
-	if ($isVillage) $village=mysql_fetch_assoc($r);
+	if ($isVillage) $village=$r[0][0];
 	if ($isVillage)
 	{
 		// if village exists then add the troops
 		$load=array();
 		foreach($config['units'] as $key=>$value)
 		{
-			$levelName=$value['countDbName'];
-			$load[]=mysql_real_escape_string($levelName.'='.$levelName.'+'.(int)$event[$levelName]);
+			$unitName=$value['countDbName'];
+			$load[]=sqlvprintf("$unitName=$unitName+{0}", array((int)$event[$unitName]));
 		}
-		doMySqlQuery(sqlPrintf("UPDATE wtfb2_villages SET ".implode(",",$load)." WHERE (id='{1}')",array($event['destinationVillage'])));
-		doMySqlQuery(sqlPrintf("UPDATE wtfb2_heroes SET inVillage='{1}' WHERE (id='{2}')",array($event['destinationVillage'],$event['heroId'])));
-		doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET gold=gold+{1} WHERE (id='{2}')",array($event['gold'],$village['ownerId'])));
-		doMySqlQuery(sqlPrintf("INSERT INTO wtfb2_worldevents (x,y,eventTime,type,recipientId) VALUES ({1},{2},NOW(),'eventhappened',{3})",array($village['x'],$village['y'],$village['ownerId']))); // update that village
+		runEscapedQuery("UPDATE wtfb2_villages SET ".implode(",",$load)." WHERE (id={0})",$event['destinationVillage']);
+		runEscapedQuery("UPDATE wtfb2_heroes SET inVillage={0} WHERE (id={1})",$event['destinationVillage'],$event['heroId']);
+		runEscapedQuery("UPDATE wtfb2_users SET gold=gold+{0} WHERE (id={1})",(float)$event['gold'],$village['ownerId']);
+		runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,eventTime,type,recipientId) VALUES ({0},{1},NOW(),'eventhappened',{2})",$village['x'],$village['y'],$village['ownerId']); // update that village
 		
 		if ($event['eventType']=='move')
 		{
-			$r=doMySqlQuery(sqlPrintf("SELECT *,u.userName FROM wtfb2_villages v LEFT JOIN wtfb2_users u ON (v.ownerId=u.id) WHERE (v.id='{1}')",array($event['launcherVillage'])));
-			$lVillage=mysql_fetch_assoc($r);
+			$r=runEscapedQuery("SELECT *,u.userName FROM wtfb2_villages v LEFT JOIN wtfb2_users u ON (v.ownerId=u.id) WHERE (v.id={0})",$event['launcherVillage']);
+			$lVillage=$r[0][0];
 			if ($lVillage['ownerId']!=$village['ownerId'])
 			{
 				$reportData=array
@@ -162,19 +162,13 @@ function evtMoveTroops($event)
 					$village['userName']
 				));  				
 				// send reports
-				doMySqlQuery(
-					sqlPrintf
-					(
-						"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ('{1}','{2}','{3}','{4}','{5}',MD5(RAND()))",
-						array($lVillage['ownerId'],$reportTitle,$reportText,$event['happensAt'],'outgoingmove')
-					)
+				runEscapedQuery(
+					"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ({0},{1},{2},{3},{4},MD5(RAND()))",
+					$lVillage['ownerId'],$reportTitle,$reportText,$event['happensAt'],'outgoingmove'
 				);
-				doMySqlQuery(
-					sqlPrintf
-					(
-						"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ('{1}','{2}','{3}','{4}','{5}',MD5(RAND()))",
-						array($village['ownerId'],$reportTitle,$reportText,$event['happensAt'],'incomingmove')
-					)
+				runEscapedQuery(
+					"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ({0},{1},{2},{3},{4},MD5(RAND()))",
+					$village['ownerId'],$reportTitle,$reportText,$event['happensAt'],'incomingmove'
 				);
 				
 			}
@@ -183,11 +177,11 @@ function evtMoveTroops($event)
 	else
 	{
 		// otherwise return back the troops to the owner
-		$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_villages WHERE (id='{1}')",array($event['launcherVillage'])));
-		if ((mysql_num_rows($r)==0) || ($event['eventType']=='return')) // also return event can't be turned back
+		$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (id={0})",$event['launcherVillage']);
+		if ((isEmptyResult($r)) || ($event['eventType']=='return')) // also return event can't be turned back
 		{
 			// if no village to return then troops are lost. Heroes deleted from the database.
-			doMySqlQuery(sqlPrintf("DELETE FROM wtfb2_heroes WHERE (id='{1}')",array($event['heroId'])));
+			runEscapedQuery("DELETE FROM wtfb2_heroes WHERE (id={0})",$event['heroId']);
 			return;
 		}
 		$newEvent=array
@@ -215,34 +209,30 @@ function evtAttackWithTroops($event)
 	global $language;
 	
 	// get attacker village
-	$r=doMySqlQuery(
-		sqlPrintf(
+	$r=runEscapedQuery(
 		"
 			SELECT wtfb2_villages.*,wtfb2_users.userName,wtfb2_users.id AS userId,TIMESTAMPDIFF(SECOND,wtfb2_users.regDate,NOW()) AS ownerGameTime
-			FROM wtfb2_villages LEFT JOIN wtfb2_users ON (wtfb2_users.id=wtfb2_villages.ownerId) WHERE (wtfb2_villages.id='{1}')
-		",array($event['launcherVillage'])
-		)
+			FROM wtfb2_villages LEFT JOIN wtfb2_users ON (wtfb2_users.id=wtfb2_villages.ownerId) WHERE (wtfb2_villages.id={0})
+		",
+		$event['launcherVillage']
 	);	
 	$attVillage=array();
-	if (mysql_num_rows($r)) $attVillage=mysql_fetch_assoc($r);
+	if (!isEmptyResult($r)) $attVillage=$r[0][0];
 	// update the player if updated long ago
-		
 	
-	$r=doMySqlQuery(
-		sqlPrintf(
+	$r=runEscapedQuery(
 		"
 			SELECT wtfb2_villages.*,wtfb2_users.userName,wtfb2_users.id AS userId
-			FROM wtfb2_villages LEFT JOIN wtfb2_users ON (wtfb2_users.id=wtfb2_villages.ownerId) WHERE (wtfb2_villages.id='{1}')
-		",array($event['destinationVillage'])
-		)
+			FROM wtfb2_villages LEFT JOIN wtfb2_users ON (wtfb2_users.id=wtfb2_villages.ownerId) WHERE (wtfb2_villages.id={0})
+		",$event['destinationVillage']
 	);
-	$villageExist=mysql_num_rows($r)>0;
+	$villageExist=!isEmptyResult($r);
 	$buildingsDamaged=false;
 	$conquered=false;
 	if ($villageExist)
 	{
 		// get defender village
-		$dstVillage=mysql_fetch_assoc($r);
+		$dstVillage=$r[0][0];
 		// get owners of the villages
 		$attackerPlayer=$attVillage['ownerId'];
 		$defenderPlayer=$dstVillage['ownerId'];
@@ -251,30 +241,26 @@ function evtAttackWithTroops($event)
 		updatePlayer($attVillage['ownerId'],$event['happensAt']);
 		updateVillage($dstVillage['id'],$event['happensAt']);
 		// get the updated defender village
-		$r=doMySqlQuery(
-			sqlPrintf(
+		$r=runEscapedQuery(
 			"
 				SELECT wtfb2_villages.*,wtfb2_users.userName,wtfb2_users.id AS userId,TIMESTAMPDIFF(SECOND,wtfb2_users.regDate,NOW()) AS ownerGameTime
-				FROM wtfb2_villages LEFT JOIN wtfb2_users ON (wtfb2_users.id=wtfb2_villages.ownerId) WHERE (wtfb2_villages.id='{1}')
-			",array($event['destinationVillage'])
-			)
+				FROM wtfb2_villages LEFT JOIN wtfb2_users ON (wtfb2_users.id=wtfb2_villages.ownerId) WHERE (wtfb2_villages.id={0})
+			",$event['destinationVillage']
 		);
-		$dstVillage=mysql_fetch_assoc($r);		
+		$dstVillage=$r[0][0];
 		
 		// get defender heroes
-		$r=doMySqlQuery(
-			sqlPrintf(
+		$r=runEscapedQuery(
 			"
 				SELECT *
 				FROM wtfb2_heroes
-				WHERE (inVillage ='{1}')
-			",array($dstVillage['id'])
-			)
+				WHERE (inVillage ={0})
+			",$dstVillage['id']
 		);
 		$defenderHeroes=array();
 		$defenderHeroIds=array();
 		$defenderHeroSkills=array('offense'=>0,'defense'=>0);
-		while($row=mysql_fetch_assoc($r))
+		foreach ($r[0] as $row)
 		{
 			$defenderHeroes[]=$row;
 			$defenderHeroIds[]=$row['id'];
@@ -283,17 +269,13 @@ function evtAttackWithTroops($event)
 		}
 		$attackerHeroSkill=0;
 		// get attacker hero data
-		$r=doMySqlQuery
-		(
-			sqlPrintf
-			(
-				"SELECT * FROM wtfb2_heroes WHERE (id='{1}')",array($event['heroId'])
-			)
+		$r=runEscapedQuery(
+	        "SELECT * FROM wtfb2_heroes WHERE (id={0})",$event['heroId']
 		);
 		$attackerHeroes=array();
-		if (mysql_num_rows($r)>0) 
+		if (!isEmptyResult($r)) 
 		{
-			$attackerHeroes[]=mysql_fetch_assoc($r);
+			$attackerHeroes[]=$r[0][0];
 			$attackerHeroSkill=$attackerHeroes[0]['offense'];
 		}
 		// prepare attack
@@ -351,17 +333,17 @@ function evtAttackWithTroops($event)
 		*/
 		// give participant heroes experience
 			// attacker hero
-		doMySqlQuery(sqlPrintf("UPDATE wtfb2_heroes SET offense=offense+'{1}' WHERE (id='{2}')",array($simulationResult['attackerHeroXP'],$event['heroId'])));
+		runEscapedQuery("UPDATE wtfb2_heroes SET offense=offense+{0} WHERE (id={1})",$simulationResult['attackerHeroXP'],$event['heroId']);
 			// defender heroes if any
 		$cntDefenderHeroes=count($defenderHeroes);
 		if ($cntDefenderHeroes>0)
 		{
 			$xp=$simulationResult['defenderHeroXP']/$cntDefenderHeroes;
-			doMySqlQuery("UPDATE wtfb2_heroes SET defense=defense+$xp WHERE (id IN (".implode(',',$defenderHeroIds)."))");	// its not injectable
+			runEscapedQuery("UPDATE wtfb2_heroes SET defense=defense+$xp WHERE (id IN (".implode(',',$defenderHeroIds)."))");	// its not injectable
 		}
 		// add kills to the players
-		doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET attackKills=attackKills+'{1}' WHERE (id='{2}')",array($simulationResult['attackerHeroXP'],$attVillage['ownerId'])));
-		doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET defenseKills=defenseKills+'{1}' WHERE (id='{2}')",array($simulationResult['defenderHeroXP'],$dstVillage['ownerId'])));
+		runEscapedQuery("UPDATE wtfb2_users SET attackKills=attackKills+{0} WHERE (id={1})",$simulationResult['attackerHeroXP'],$attVillage['ownerId']);
+		runEscapedQuery("UPDATE wtfb2_users SET defenseKills=defenseKills+{0} WHERE (id={1})",$simulationResult['defenderHeroXP'],$dstVillage['ownerId']);
 		
 		// set the attack back event
 		$newEvent=array();
@@ -371,7 +353,7 @@ function evtAttackWithTroops($event)
 		{
 			// he eaten it.
 			// dissmiss his hero but place it in the destination village
-			doMySqlQuery(sqlPrintf("UPDATE wtfb2_heroes SET ownerId=0,inVillage='{1}' WHERE (id='{2}')",array($dstVillage['id'],$event['heroId']))); //safe
+			runEscapedQuery("UPDATE wtfb2_heroes SET ownerId=0,inVillage={0} WHERE (id={1})",$dstVillage['id'],$event['heroId']); //safe
 			$heroesToDismiss[]=$event['heroId'];
 		}
 		else
@@ -391,23 +373,19 @@ function evtAttackWithTroops($event)
 			if ($event['eventType']=='attack')
 			{
 				$conquerorUnitDbName=$config['units'][$config['conquerorUnit']]['countDbName'];
-//				if ((int)$event[$conquerorUnitDbName]>(int)$simulationResult['attacker']['casualties'][$config['conquerorUnit']])
 				if ($simulationResult['wouldConquer'])
 				{
 					// the player must have enough expansion points to finish the conquer
-					$r=doMySqlQuery(sqlPrintf("SELECT expansionPoints FROM wtfb2_users WHERE (id={1})",array($attVillage['ownerId'])));
+					$r=runEscapedQuery("SELECT expansionPoints FROM wtfb2_users WHERE (id={0})",$attVillage['ownerId']);
 					$canConquer=true;
-					if (mysql_num_rows($r)<1) $canConquer=false;
-					$player=mysql_fetch_assoc($r);
+					if (isEmptyResult($r)) $canConquer=false;
+					$player=$r[0][0];
 					if ((int)$player['expansionPoints']<1) $canConquer=false;
 					if ($canConquer)
 					{
-						doMySqlQuery
+						runEscapedQuery
 						(
-							sqlPrintf
-							(
-								"INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ('{1}','{2}','{3}','conquer')",array($dstVillage['x'],$dstVillage['y'],$event['happensAt'])
-							)
+					        "INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({0},{1},{2},'conquer')",$dstVillage['x'],$dstVillage['y'],$event['happensAt']
 						); // set up a world event
 						// add the troops to the newly conquered village
 						foreach($config['units'] as $key=>$value)
@@ -417,23 +395,21 @@ function evtAttackWithTroops($event)
 							$dstVillage[$countDbName]+=$newEvent[$countDbName];
 						}
 						$dstVillage[$conquerorUnitDbName]-=1; // we take the conqueror unit
-/*						// if the hero came with us we will place him in this village
-						doMySqlQuery(sqlPrintf("UPDATE wtfb2_heroes SET inVillage='{1}' WHERE (id='{2}')",array($dstVillage['id'],$event['heroId'])));*/
 						// take that expansion point from the player
-						doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=expansionPoints-1 WHERE (id='{1}')",array($attVillage['ownerId'])));
+						runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints-1 WHERE (id={0})",$attVillage['ownerId']);
 						// give expansion point to the victim
-						doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=expansionPoints+1 WHERE (id='{1}')",array($dstVillage['ownerId'])));
+						runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints+1 WHERE (id={0})",$dstVillage['ownerId']);
 						// pending settlings can mess up things
 							// so how many settlings are on the way?
-							$r=doMySqlQuery(sqlPrintf("SELECT COUNT(*) AS pendingSettlingCount FROM wtfb2_events WHERE (launcherVillage='{1}') AND (eventType='settle')",array($dstVillage['id'])));
-							$a=mysql_fetch_assoc($r);
+							$r=runEscapedQuery("SELECT COUNT(*) AS pendingSettlingCount FROM wtfb2_events WHERE (launcherVillage={0}) AND (eventType='settle')",$dstVillage['id']);
+							$a=$r[0][0];
 							$pendingSettings=$a['pendingSettlingCount'];
 							// take as many expansion points from the attacker
-							doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=expansionPoints-{1} WHERE (id='{2}')",array($pendingSettings,$attVillage['ownerId'])));
+							runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints-{0} WHERE (id={1})",$pendingSettings,$attVillage['ownerId']);
 							// and give back as many expansion points to the victim
-							doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=expansionPoints+{1} WHERE (id='{2}')",array($pendingSettings,$dstVillage['ownerId'])));
+							runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints+{0} WHERE (id={1})",$pendingSettings,$dstVillage['ownerId']);
 						// the new owner can turn back the troops that's moving away. We must prevent this.
-						doMySqlQuery(sqlPrintf("UPDATE wtfb2_events SET eventType='return' WHERE (eventType='move') AND (launcherVillage='{1}')",array($dstVillage['id'])));
+						runEscapedQuery("UPDATE wtfb2_events SET eventType='return' WHERE (eventType='move') AND (launcherVillage={0})",$dstVillage['id']);
 						// finally change owner
 						$dstVillage['ownerId']=(int)$attVillage['ownerId'];
 						$dstVillage['buildPoints']=0;
@@ -456,22 +432,16 @@ function evtAttackWithTroops($event)
 				$newEvent['gold']=0;
 				if ($event['eventType']!='recon')
 				{
-					$r=doMySqlQuery(sqlPrintf("SELECT COUNT(*) AS villageCount FROM wtfb2_villages WHERE (ownerId='{1}')",array($dstVillage['ownerId'])));
-					$a=mysql_fetch_assoc($r);
+					$r=runEscapedQuery("SELECT COUNT(*) AS villageCount FROM wtfb2_villages WHERE (ownerId={0})", $dstVillage['ownerId']);
+					$a=$r[0][0];
 					$villages=(int)$a['villageCount'];
-					$r=doMySqlQuery(sqlPrintf("SELECT gold FROM wtfb2_users WHERE (id='{1}')",array($dstVillage['ownerId'])));
-					$a=mysql_fetch_assoc($r);
+					$r=runEscapedQuery("SELECT gold FROM wtfb2_users WHERE (id={0})",$dstVillage['ownerId']);
+					$a=$r[0][0];
 					$allGold=(double)$a['gold'];
 					$goldCanBeTaken=$allGold/$villages;
 					$newEvent['gold']=round($goldCanBeTaken < $possibleGold ? $goldCanBeTaken : $possibleGold);
-	/*				echo 'villages='.$villages."\r\n";
-					echo 'allGold='.$allGold."\r\n";
-					echo 'goldCanBeTaken='.$goldCanBeTaken."\r\n";
-					echo 'possibleGold='.$possibleGold."\r\n";
-					print_r($newEvent);
-					die($newEvent['gold']);*/
 					// take the gold from the player
-					doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET gold=gold-{1} WHERE (id={2})",array($newEvent['gold'],$dstVillage['ownerId'])));
+					runEscapedQuery("UPDATE wtfb2_users SET gold=gold-{0} WHERE (id={1})",$newEvent['gold'],$dstVillage['ownerId']);
 				}
 				postEvent($newEvent);
 			}
@@ -491,13 +461,9 @@ function evtAttackWithTroops($event)
 			$buildingDescriptor=$config['buildings'][$event['catapultTarget']];
 			if ($dstVillage[$buildingDescriptor['buildingLevelDbName']]!=$simulationResult['defender']['targetdemolished'])
 			{
-				doMySqlQuery
-				(
-					sqlPrintf
-					(
-						"INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ('{1}','{2}','{3}','scorechanged')"
-						,array($dstVillage['x'],$dstVillage['y'],$event['happensAt'])
-					)
+				runEscapedQuery (
+						"INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({0},{1},{2},'scorechanged')",
+						$dstVillage['x'],$dstVillage['y'],$event['happensAt']
 				); // score will change as a result of demolition
 				$buildingsDamaged=true;
 			}
@@ -513,31 +479,25 @@ function evtAttackWithTroops($event)
 		if ($simulationResult['defenderFalls'])
 		{
 			// select all heroes except the attacking hero (we would dismiss him immediately on conquer otherwise!)
-			$r=doMySqlQuery
+			$r=runEscapedQuery
 			(
-				sqlPrintf
-				(
-					"SELECT id FROM wtfb2_heroes WHERE (inVillage={1})",
-					array($dstVillage['id'])
-				)
+				"SELECT id FROM wtfb2_heroes WHERE (inVillage={0})",
+				$dstVillage['id']
 			); 
-			while($row=mysql_fetch_assoc($r))
+			foreach ($r[0] as $row)
 			{
 				$heroesToDismiss[]=(int)$row['id'];
 			}
 			
-			doMySqlQuery
+			runEscapedQuery
 			(
-				sqlPrintf
-				(
-					"UPDATE wtfb2_heroes SET ownerId=0 WHERE (inVillage={1})",
-					array($dstVillage['id'])
-				)
+				"UPDATE wtfb2_heroes SET ownerId=0 WHERE (inVillage={0})",
+				$dstVillage['id']
 			);
 		}
 		// Now move the attacker hero to the conquered village (if we did that before we would dismiss the attacker hero too!)
 		if ($conquered)
-			doMySqlQuery(sqlPrintf("UPDATE wtfb2_heroes SET inVillage='{1}' WHERE (id='{2}')",array($dstVillage['id'],$event['heroId'])));
+			runEscapedQuery("UPDATE wtfb2_heroes SET inVillage={0} WHERE (id={1})",$dstVillage['id'],$event['heroId']);
 		// move out dismissed heroes
 		if (count($heroesToDismiss)>0)
 			moveFreeHeroes($event['happensAt'],$heroesToDismiss);
@@ -547,51 +507,38 @@ function evtAttackWithTroops($event)
 			// give back expansion points to the victim for pending settlings if the village is not also conquered
 			if (!$conquered)
 			{
-				$r=doMySqlQuery
+				$r=runEscapedQuery
 				(
-					sqlPrintf
-					(
-						"SELECT COUNT(*) AS pendingSettlingCount FROM wtfb2_events WHERE (launcherVillage='{1}') AND (eventType='settle')"
-						,array($dstVillage['id'])
-					)
+					"SELECT COUNT(*) AS pendingSettlingCount FROM wtfb2_events WHERE (launcherVillage={0}) AND (eventType='settle')"
+					,$dstVillage['id']
 				);
-				$a=mysql_fetch_assoc($r);
+				$a=$r[0][0];
 				$pendingSettings=$a['pendingSettlingCount'];
 				// give back as many expansion points to the victim
-				doMySqlQuery
+				runEscapedQuery
 				(
-					sqlPrintf
-					(
-						"UPDATE wtfb2_users SET expansionPoints=expansionPoints+'{1}' WHERE (id='{2}')"
-						,array($pendingSettings,$dstVillage['ownerId'])
-					)
+						"UPDATE wtfb2_users SET expansionPoints=expansionPoints+{0} WHERE (id={1})"
+						,$pendingSettings,$dstVillage['ownerId']
 				);
 			}
 			
 			// delete the village
-			doMySqlQuery(sqlPrintf("DELETE FROM wtfb2_villages WHERE (id='{1}')",array($dstVillage['id'])));
+			runEscapedQuery("DELETE FROM wtfb2_villages WHERE (id={0})",$dstVillage['id']);
 			// give expansion point to the victim
-			doMySqlQuery(sqlPrintf("UPDATE wtfb2_users SET expansionPoints=expansionPoints+1 WHERE (id='{1}')",array($dstVillage['ownerId'])));
+			runEscapedQuery("UPDATE wtfb2_users SET expansionPoints=expansionPoints+1 WHERE (id={0})",$dstVillage['ownerId']);
 
-			doMySqlQuery
+			runEscapedQuery
 			(
-				sqlPrintf
-				(
-					"INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ('{1}','{2}','{3}','destroy')",array($dstVillage['x'],$dstVillage['y'],$event['happensAt'])
-				)
+			    "INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({0},{1},{2},'destroy')",$dstVillage['x'],$dstVillage['y'],$event['happensAt']
 			); // set up a world event
 			$destroyed=true;
 		}
 
-
-		doMySqlQuery
+		runEscapedQuery
 		(
-			sqlPrintf
-			(
-				"INSERT INTO wtfb2_worldevents (x,y,eventTime,type,recipientId)
-				VALUES ('{1}','{2}','{3}','eventhappened','{4}')"
-				,array($dstVillage['x'],$dstVillage['y'],$event['happensAt']),$dstVillage['ownerId']
-			)
+			"INSERT INTO wtfb2_worldevents (x,y,eventTime,type,recipientId)
+			VALUES ({0},{1},{2},'eventhappened',{3})"
+			,$dstVillage['x'],$dstVillage['y'],$event['happensAt'],$dstVillage['ownerId']
 		); // set up a world event for the owner of the village
 
 		$attackerReportType='attackwithloss';
@@ -640,12 +587,9 @@ function evtAttackWithTroops($event)
 			$dstVillage['userName']
 		)); // hát ennek nem itt kéne lennie...
 			// sending the report now
-		doMySqlQuery(
-			sqlPrintf
-			(
-				"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ('{1}','{2}','{3}','{4}','{5}',MD5(RAND()))",
-				array($dstVillage['userId'],$reportTitle,$reportText,$event['happensAt'],$defenderReportType)
-			)
+		runEscapedQuery(
+				"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ({0},{1},{2},{3},{4},MD5(RAND()))",
+				$dstVillage['userId'],$reportTitle,$reportText,$event['happensAt'],$defenderReportType
 		);
 		
 		// the send report to the attacker.
@@ -662,13 +606,10 @@ function evtAttackWithTroops($event)
 		}
 		$report=new Template("templates/battlereport.php",array('params'=>$reportData));
 		$reportText=$report->getContents();
-		doMySqlQuery
+		runEscapedQuery
 		(
-			sqlPrintf
-			(
-				"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ('{1}','{2}','{3}','{4}','{5}',MD5(RAND()))"
-				,array($attVillage['userId'],$reportTitle,$reportText,$event['happensAt'],$attackerReportType)
-			)
+			"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ({0},{1},{2},{3},{4},MD5(RAND()))"
+			,$attVillage['userId'],$reportTitle,$reportText,$event['happensAt'],$attackerReportType
 		);
 		// so update the defender village.
 		$updates=array();
@@ -678,15 +619,12 @@ function evtAttackWithTroops($event)
 		foreach($dstVillage as $key=>$value)
 		{
 			if ($key=='') continue; // WTF?
-			$updates[]="$key='".mysql_real_escape_string($value)."'";
+			$updates[]= sqlvprintf("$key={0}", array($value));
 		}
-		doMySqlQuery
+		runEscapedQuery
 		(
-			sqlPrintf
-			(
-				"UPDATE wtfb2_villages SET ".implode(',',$updates)." WHERE (id='{1}')",
-				array($dstVillage['id'])
-			)
+			"UPDATE wtfb2_villages SET ".implode(',',$updates)." WHERE (id={0})",
+			$dstVillage['id']
 		);
 	}
 	else
@@ -727,8 +665,8 @@ function moveFreeHeroes($happensAt=null,$heroIds=array())
 {
 	global $config;
 	// select the count of the villages
-	$r=doMySqlQuery("SELECT COUNT(*) AS villageCount FROM wtfb2_villages");
-	$a=mysql_fetch_assoc($r);
+	$r=runEscapedQuery("SELECT COUNT(*) AS villageCount FROM wtfb2_villages");
+	$a=$r[0][0];
 	$villageCount=$a['villageCount'];
 	// select all abandoned or from the idsheroes that are in a village.
 	$insetText="";
@@ -736,16 +674,16 @@ function moveFreeHeroes($happensAt=null,$heroIds=array())
 	{
 		$insetText="AND (id IN (".implode(',',$heroIds)."))";
 	}
-	$freeHeroes=doMySqlQuery("SELECT * FROM wtfb2_heroes WHERE (ownerId=0) AND (inVillage<>0) $insetText"); // ids won't contain '-s so they are safe.
-	while($freeHero=mysql_fetch_assoc($freeHeroes))
+	$freeHeroes=runEscapedQuery("SELECT * FROM wtfb2_heroes WHERE (ownerId=0) AND (inVillage<>0) $insetText"); // ids won't contain '-s so they are safe.
+	foreach ($freeHeroes[0] as $freeHero)
 	{
 		// select the village the hero in
-		$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_villages WHERE (id='{1}')",array($freeHero['inVillage'])));
-		if (mysql_num_rows($r)<1) continue; // if village not found then the hero is lost.
-		$village=mysql_fetch_assoc($r);
+		$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (id={0})",$freeHero['inVillage']);
+		if (isEmptyResult($r)) continue; // if village not found then the hero is lost.
+		$village=$r[0][0];
 		// select a 'random' destination village
-		$r=doMySqlQuery("SELECT * FROM wtfb2_villages LIMIT ".mt_rand(0,$villageCount-1).",1"); // explain says ALL :(
-		$dstVillage=mysql_fetch_assoc($r);
+		$r=runEscapedQuery("SELECT * FROM wtfb2_villages LIMIT ".mt_rand(0,$villageCount-1).",1"); // explain says ALL :(
+		$dstVillage=$r[0][0];
 		// move the hero to that village
 		$dx=(int)$village['x']-(int)$dstVillage['x'];
 		$dy=(int)$village['y']-(int)$dstVillage['y'];
@@ -774,7 +712,7 @@ function moveFreeHeroes($happensAt=null,$heroIds=array())
 			'heroId'=>$freeHero['id']
 		);
 		// leave the village
-		doMysqlQuery(sqlPrintf("UPDATE wtfb2_heroes SET inVillage=0 WHERE (id='{1}')",array($freeHero['id'])));
+		runEscapedQuery("UPDATE wtfb2_heroes SET inVillage=0 WHERE (id={0})",$freeHero['id']);
 		// then post that event
 		postEvent($event);
 	}
@@ -783,12 +721,12 @@ function moveFreeHeroes($happensAt=null,$heroIds=array())
 function moveFreeHeroesIfNeeded()
 {
 	global $config;
-	$r=doMysqlQuery("SELECT TIMESTAMPDIFF(DAY,lastHeroMove,NOW()) AS needHeroMove FROM wtfb2_worldupdate");
-	$a=mysql_fetch_assoc($r);
+	$r=runEscapedQuery("SELECT TIMESTAMPDIFF(DAY,lastHeroMove,NOW()) AS needHeroMove FROM wtfb2_worldupdate");
+	$a=$r[0][0];
 	if ((int)$a['needHeroMove']>0)
 	{
 		moveFreeHeroes();
-		$r=doMysqlQuery("UPDATE wtfb2_worldupdate SET lastHeroMove=CURDATE()"); // then update it.
+		$r=runEscapedQuery("UPDATE wtfb2_worldupdate SET lastHeroMove=CURDATE()"); // then update it.
 	}
 }
 
@@ -805,7 +743,7 @@ function onShutdown()
     chdir(WORKING_DIR);
     if (count($toDelete)>0)
     {
-        doMysqlQuery("DELETE FROM wtfb2_events WHERE (id IN (".implode(',',$toDelete)."))");	 //safe
+        runEscapedQuery("DELETE FROM wtfb2_events WHERE (id IN (".implode(',',$toDelete)."))");	 //safe
         $f=fopen('elapsedevents_uccsetalalodkimianevedhkashdjkhasjdhjkashdka.txt','a+t');
         foreach($elapsedEvents as $key=>$value)
         {
@@ -828,8 +766,8 @@ if (!file_exists('lockfile'))
 ///// MOVE FREE HEROES IF NEEDED
 	moveFreeHeroesIfNeeded();
 ///// MAGIC
-	$r=doMysqlQuery("SELECT *,UNIX_TIMESTAMP(happensAt) AS eventTime FROM wtfb2_events WHERE (happensAt<=NOW())"); // hottest query in the game
-	while($row=mysql_fetch_assoc($r))
+	$r=runEscapedQuery("SELECT *,UNIX_TIMESTAMP(happensAt) AS eventTime FROM wtfb2_events WHERE (happensAt<=NOW())"); // hottest query in the game
+	foreach ($r[0] as $row)
 	{
 		$events[$row['eventTime']][]=$row;
 	}
@@ -853,8 +791,6 @@ if (!file_exists('lockfile'))
 		if ($noEvent) break;
 		$event=$events[$k1][$k2];
 		// stuff goes here
-	/*	echo "I HANDLED THIS FUCKED EVENT: \n";
-		print_r($event);*/
 		if ($event['eventType']=='settle') evtSettleVillage($event);
 		else if (($event['eventType']=='move') || ($event['eventType']=='return') || ($event['eventType']=='heromove')) evtMoveTroops($event);
 		else if (($event['eventType']=='attack') || ($event['eventType']=='recon') || ($event['eventType']=='raid')) evtAttackWithTroops($event);
@@ -872,7 +808,7 @@ if (!file_exists('lockfile'))
 	}
 	if (count($toDelete)>0)
 	{
-		doMysqlQuery("DELETE FROM wtfb2_events WHERE (id IN (".implode(',',$toDelete)."))");	//safe
+		runEscapedQuery("DELETE FROM wtfb2_events WHERE (id IN (".implode(',',$toDelete)."))");	//safe
 		$f=fopen('elapsedevents_uccsetalalodkimianevedhkashdjkhasjdhjkashdka.txt','a+t');
 		foreach($elapsedEvents as $key=>$value)
 		{
@@ -883,17 +819,6 @@ if (!file_exists('lockfile'))
 	$toDelete=array();
 	$elapsedEvents=array();
 }
-//die('YEAH');
-
-
-
-/*print_r($events);
-die();*/
-
-/*$testArray=array('9'=>'foo','10'=>'bar','11'=>'zig');
-ksort($testArray,SORT_NUMERIC);
-print_r($testArray);
-die();*/
 
 
 ?>
