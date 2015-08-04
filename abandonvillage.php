@@ -4,12 +4,12 @@ require_once("userworkerphps.php");
 
 bounceSessionOver();
 
-$r=doMySqlQuery(sqlPrintf("SELECT * FROM wtfb2_villages WHERE (id='{1}') AND (ownerId='{2}')",array($_GET['id'],$_SESSION['userId'])));
-if (mysql_num_rows($r)==0) 
+$r=runEscapedQuery("SELECT * FROM wtfb2_villages WHERE (id={0}) AND (ownerId={1})",$_GET['id'],$_SESSION['userId']);
+if (isEmptyResult($r))
 {
 	jumpErrorPage($language['accessdenied']);
 }
-$a=mysql_fetch_assoc($r);
+$a=$r[0][0];
 
 showInBox('templates/abandonvillage.php',array('village'=>$a));
 

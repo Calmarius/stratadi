@@ -74,11 +74,11 @@ function getInbuiltPie()
 		GROUP BY g.id
 		ORDER BY built DESC
 	";
-	$r=doMySqlQuery($q);
+	$r=runEscapedQuery($q);
 	$sum=0;
 	$count=0;
 	$data=array();
-	while($row=mysql_fetch_assoc($r))
+	foreach ($r[0] as $row)
 	{
 		$data[]=$row;
 		$sum+=$row['built'];
