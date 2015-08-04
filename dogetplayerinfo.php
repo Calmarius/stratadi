@@ -12,7 +12,7 @@ $myId=(int)@$_SESSION['userId'];
 $r;
 if ($myId!=0)
 {
-	$q=sqlPrintf("SELECT * FROM wtfb2_users WHERE (id='{1}')",array($_SESSION['userId']));
+	$q=sqlvprintf("SELECT * FROM wtfb2_users WHERE (id={0})",array($_SESSION['userId']));
 	$r=runEscapedQuery($q);
 }
 $sessionOver=$myId==0;
@@ -57,7 +57,7 @@ $peace=array();
 $enemies=array();
 if ($me['guildId']!='')
 {
-	$q=sqlPrintf("SELECT * FROM wtfb2_diplomacy WHERE (guildId='{1}')",array($me['guildId']));
+	$q=sqlvprintf("SELECT * FROM wtfb2_diplomacy WHERE (guildId={0})",array($me['guildId']));
 	$r=runEscapedQuery($q);
 	if (!isEmptyResult($r))
 	foreach ($r[0] as $row)
@@ -122,7 +122,7 @@ runEscapedQuery(
 );
 
 
-$q=sqlPrintf("SELECT *,UNIX_TIMESTAMP(NOW()) AS nowstamp FROM wtfb2_users WHERE (id='{1}')",array($_SESSION['userId']));
+$q=sqlvprintf("SELECT *,UNIX_TIMESTAMP(NOW()) AS nowstamp FROM wtfb2_users WHERE (id={0})",array($_SESSION['userId']));
 $r=runEscapedQuery($q);
 $me=$r[0][0];
 

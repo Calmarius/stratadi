@@ -26,8 +26,6 @@ function globRecursive($filter)
 	return $array;
 }
 
-//die(sqlPrintf("SELECT * FROM wtfb2_users WHERE (userName='{1}') AND (MD5(paswordHash)=MD5('{2}') )",array("HEHE","HAHA')) OR (1=1)")));
-
 $youLookFor=$_GET['what'];
 $filter=$_GET['where'];
 if (($youLookFor!='') && ($filter!=''))

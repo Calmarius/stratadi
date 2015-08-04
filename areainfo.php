@@ -22,7 +22,7 @@ else
     $me['regDate'] = date('Y-m-d H:i:s');
 }
 
-$q=sqlPrintf(
+$q=sqlvprintf(
 	"
 		SELECT
 		    wtfb2_villages.*,
@@ -34,7 +34,7 @@ $q=sqlPrintf(
 		    $scoreQuery AS score,
 		    TIMESTAMPDIFF(SECOND,'{5}',NOW())/TIMESTAMPDIFF(SECOND,wtfb2_users.regDate,NOW()) AS ageBonus
 		FROM wtfb2_villages LEFT JOIN wtfb2_users ON (wtfb2_villages.ownerId=wtfb2_users.id) LEFT JOIN wtfb2_guilds ON (wtfb2_users.guildId=wtfb2_guilds.id)
-		WHERE (x>='{1}') AND (x<='{2}') AND (y>='{3}') AND (y<='{4}')
+		WHERE (x>={0}) AND (x<={1}) AND (y>={2}) AND (y<={3})
 	"
 	,array($_GET['left'],$_GET['right'],$_GET['top'],$_GET['bottom'], $me['regDate'])
 );

@@ -18,15 +18,15 @@ else
 
 if (!isset($_GET['id'])) $_GET['id']=$myId;
 
-$q=sqlPrintf(<<< X
+$q=sqlvprintf(<<< X
 	SELECT u.*,
 		g.guildName AS guildName, h.id AS heroId,
 		h.name AS heroName,
-		TIMESTAMPDIFF(SECOND,'{2}',NOW())/TIMESTAMPDIFF(SECOND,regDate,NOW()) AS ageBonus
+		TIMESTAMPDIFF(SECOND,{1},NOW())/TIMESTAMPDIFF(SECOND,regDate,NOW()) AS ageBonus
 	FROM wtfb2_users u
 	LEFT JOIN wtfb2_guilds g ON (u.guildId=g.id)
 	LEFT JOIN wtfb2_heroes h ON (h.ownerId=u.id)
-	WHERE (u.id='{1}')
+	WHERE (u.id={0})
 	GROUP BY u.id
 X
 ,array($_GET['id'],$me['regDate']));

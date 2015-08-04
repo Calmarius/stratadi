@@ -5,10 +5,10 @@ require_once('userworkerphps.php');
 if (!isset($_SESSION['userId'])) jumpErrorPage($language['sessionisover']);
 
 $q=
-sqlPrintf(
+sqlvprintf(
 	"
 		SELECT * FROM wtfb2_accesses
-		WHERE (id='{1}')
+		WHERE (id={0})
 	",array($_SESSION['accessId']));
 $r=runEscapedQuery($q,'jumpErrorPage');
 $a=$r[0][0];

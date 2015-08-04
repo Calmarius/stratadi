@@ -24,14 +24,14 @@ function cleanupInactiveAccounts()
 
 function isRegisteredName($name)
 {
-	$q=sqlPrintf("SELECT * FROM wtfb2_users WHERE (userName='{1}')",array($name));
+	$q=sqlvprintf("SELECT * FROM wtfb2_users WHERE (userName={0})",array($name));
 	$r=runEscapedQuery($q);
 	return count($r[0]);
 }
 
 function isRegisteredKing($name)
 {
-	$q=sqlPrintf("SELECT * FROM wtfb2_accesses WHERE (userName='{1}')",array($name));
+	$q=sqlvprintf("SELECT * FROM wtfb2_accesses WHERE (userName={0})",array($name));
 	$r=runEscapedQuery($q);
 	return count($r[0]);
 }
@@ -40,7 +40,7 @@ function isRegisteredEMail($mail)
 {
 	global $config;
 	if ($mail==$config['adminMail']) return false;
-	$q=sqlPrintf("SELECT * FROM wtfb2_accesses WHERE (eMail='{1}')",array($mail));
+	$q=sqlvprintf("SELECT * FROM wtfb2_accesses WHERE (eMail={0})",array($mail));
 	$r=runEscapedQuery($q);
 	return count($r[0]);
 }
@@ -96,11 +96,11 @@ function registerUser($data)
 		// create kingdom
 		// TODO: (refactor) Normalize this.
 		$q=
-		sqlPrintf(
+		sqlvprintf(
 		"
 			INSERT INTO wtfb2_users (userName,regDate,avatarLink,lastUpdate,refererId,lastLoaded)
 			VALUES
-			('{1}',NOW(),'{8}',NOW(),'{10}',NOW());
+			({0},NOW(),{7},NOW(),{9},NOW());
 		",array(
 			$data['kingdomname'],
 			$data['password'],
@@ -118,7 +118,7 @@ function registerUser($data)
 		$lId=getLastInsertId();
 	}
 	// create hero
-	$q=sqlPrintf("INSERT INTO wtfb2_heroes (ownerId,name,avatarLink) VALUES ('{1}','{2}','{3}')",array($lId,@$data['heroname'],@$data['heroavatar']));
+	$q=sqlvprintf("INSERT INTO wtfb2_heroes (ownerId,name,avatarLink) VALUES ({0},{1},{2})",array($lId,@$data['heroname'],@$data['heroavatar']));
 	$r=runEscapedQuery($q);
 	// create access
 	runEscapedQuery("
@@ -140,7 +140,7 @@ function registerUser($data)
 	{
 		foreach($data['languages'] as $key=>$value)
 		{
-			$values[]=sqlPrintf("({0},{1})",$newAccess,$value);
+			$values[]=sqlvprintf("({0},{1})",array($newAccess,$value));
 		}
 		runEscapedQuery("INSERT INTO wtfb2_spokenlanguages (playerId,languageId) VALUES ".implode(',',$values));
 	}

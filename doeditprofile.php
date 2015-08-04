@@ -73,19 +73,20 @@ $date="${_POST['year']}-${_POST['month']}-${_POST['day']} 0:00:00";
 
 $avLinkMod='';
 $hLinkMod='';
-if ($_POST['youravatar']!='') $avLinkMod=sqlPrintf("avatarLink='{1}',",array($_POST['youravatar']));
-if ($_POST['heroavatar']!='') $hLinkMod=sqlPrintf("avatarLink='{1}',",array($_POST['heroavatar']));
+if ($_POST['youravatar']!='') $avLinkMod=sqlvprintf("avatarLink={0},",array($_POST['youravatar']));
+if ($_POST['heroavatar']!='') $hLinkMod=sqlvprintf("avatarLink={0},",array($_POST['heroavatar']));
 
-$q=sqlPrintf(
+// TODO: (task) Normalize this, remove unnecessary parameters.
+$q=sqlvprintf(
 	"
 	UPDATE wtfb2_users
-	SET $avLinkMod profile='{4}' $setPasswordText
-	WHERE (id='{5}')
+	SET $avLinkMod profile={3} $setPasswordText
+	WHERE (id={4})
 	",array($_POST['gender'],$_POST['town'],$date,$_POST['profile'],$_SESSION['userId']));
 $r=runEscapedQuery($q);
 
 
-$q=sqlPrintf("UPDATE wtfb2_heroes SET $hLinkMod name='{1}' WHERE (ownerId='{2}')",array($_POST['heroname'],$_SESSION['userId']));
+$q=sqlvprintf("UPDATE wtfb2_heroes SET $hLinkMod name={0} WHERE (ownerId={1})",array($_POST['heroname'],$_SESSION['userId']));
 $r=runEscapedQuery($q);
 
 jumpTo('viewplayer.php');

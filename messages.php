@@ -3,7 +3,7 @@
 require_once("userworkerphps.php");
 
 $q=
-sqlPrintf
+sqlvprintf
 (
 	"
 	SELECT COUNT(*) AS cnt
@@ -11,7 +11,7 @@ sqlPrintf
 		wtfb2_threadlinks
 		LEFT JOIN wtfb2_threads ON (wtfb2_threadlinks.threadId=wtfb2_threads.id)
 		LEFT JOIN wtfb2_users ON (wtfb2_users.id=wtfb2_threads.lastPosterId)
-	WHERE (wtfb2_threadlinks.userId='{1}')
+	WHERE (wtfb2_threadlinks.userId={0})
 	ORDER BY wtfb2_threads.updated DESC
 	",array($_SESSION['userId'])
 );
@@ -23,7 +23,7 @@ $cnt=ceil($a['cnt']/$config['pageSize']);
 if (!isset($_GET['p'])) $_GET['p']=0;
 
 $q=
-sqlPrintf
+sqlvprintf
 (
 	"
 	SELECT wtfb2_users.userName,wtfb2_users.id AS senderId,wtfb2_threads.subject,wtfb2_threads.updated,wtfb2_threads.id AS messageId,wtfb2_threadlinks.`read`,wtfb2_threadlinks.id AS linkId
@@ -31,10 +31,10 @@ sqlPrintf
 		wtfb2_threadlinks
 		LEFT JOIN wtfb2_threads ON (wtfb2_threadlinks.threadId=wtfb2_threads.id)
 		LEFT JOIN wtfb2_users ON (wtfb2_users.id=wtfb2_threads.lastPosterId)
-	WHERE (wtfb2_threadlinks.userId='{1}')
+	WHERE (wtfb2_threadlinks.userId={0})
 	ORDER BY wtfb2_threads.updated DESC
-	LIMIT {2},{3}
-	",array($_SESSION['userId'],((int)$_GET['p'])*$config['pageSize'],$config['pageSize'])
+	LIMIT {1},{2}
+	",array($_SESSION['userId'],((int)$_GET['p'])*$config['pageSize'],(int)$config['pageSize'])
 );
 // 
 $r=runEscapedQuery($q);

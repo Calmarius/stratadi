@@ -11,14 +11,14 @@ if (isset($_POST['players']))
 {
 	foreach($_POST['players'] as $key=>$value)
 	{
-		$players[]=sqlPrintf("'{1}'",array($value));
+		$players[]=sqlvprintf("{0}",array($value));
 	}
 }
 if (isset($_POST['rights']))
 {
 	foreach($_POST['rights'] as $key=>$value)
 	{
-		$rights[]=sqlPrintf("'{1}'",array($value));
+		$rights[]=sqlvprintf("{0}",array($value));
 	}
 }
 if (count($players) == 0)

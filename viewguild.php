@@ -8,12 +8,12 @@ $guildInfo=$r[0][0];
 
 $guildInfo['members']=array();
 $q=
-sqlPrintf(
+sqlvprintf(
 	"
 		SELECT u.*,SUM(p.permission='diplomacy') AS diplomacyRight, SUM(p.permission='invite') AS inviteRight
 		FROM wtfb2_users u
 		LEFT JOIN wtfb2_guildpermissions p ON (u.id=p.userId)
-		WHERE (guildId='{1}')
+		WHERE (guildId={0})
 		GROUP BY u.id
 	",array($_GET['id']));
 $r=runEscapedQuery($q);

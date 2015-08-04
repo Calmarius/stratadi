@@ -25,11 +25,11 @@ function settleFirstVillage($userId)
 		$rad=deg2rad($angle);
 		$x=(int)(cos($rad)*$radius);
 		$y=(int)(sin($rad)*$radius);
-		$q=sqlPrintf("SELECT * FROM wtfb2_villages WHERE (x='{1}') AND (y='{2}')",array($x,$y));
+		$q=sqlvprintf("SELECT * FROM wtfb2_villages WHERE (x={0}) AND (y={1})",array($x,$y));
 		$r=runEscapedQuery($q);
 		if (isEmptyResult($r))
 		{
-			$q=sqlPrintf("INSERT INTO wtfb2_villages (ownerId,villageName,x,y,lastUpdate) VALUES ('{1}','{2}','{3}','{4}',NOW())",array($userId,$language['newvillage'],$x,$y));
+			$q=sqlvprintf("INSERT INTO wtfb2_villages (ownerId,villageName,x,y,lastUpdate) VALUES ({0},{1},{2},{3},NOW())",array($userId,$language['newvillage'],$x,$y));
 			$r=runEscapedQuery($q);
 			$insertId= getLastInsertId();
 			runEscapedQuery("INSERT INTO wtfb2_worldevents (x,y,eventTime,type) VALUES ({0},{1},NOW(),'settle')",$x,$y);

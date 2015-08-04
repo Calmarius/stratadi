@@ -76,9 +76,9 @@ function evtSettleVillage($event)
 			$newEvent=array
 			(
 				'eventType'=>"'move'",
-				'happensAt'=>sqlPrintf("TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,'{1}','{2}'),'{3}')",array($event['launchedAt'],$event['happensAt'],$event['happensAt'])),
-				'estimatedTime'=>sqlPrintf("TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,'{1}','{2}'),'{3}')",array($event['launchedAt'],$event['happensAt'],$event['happensAt'])),
-				'launchedAt'=>sqlPrintf("'{1}'",array($event['happensAt'])),
+				'happensAt'=>sqlvprintf("TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,{0},{1}),{2})",array($event['launchedAt'],$event['happensAt'],$event['happensAt'])),
+				'estimatedTime'=>sqlvprintf("TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,{0},{1}),{2})",array($event['launchedAt'],$event['happensAt'],$event['happensAt'])),
+				'launchedAt'=>sqlvprintf("{0}",array($event['happensAt'])),
 				'launcherVillage'=>"0",
 				'destinationVillage'=>$village['id'],
 				$config['units'][$config['settlerUnit']]['countDbName']=>'1'
@@ -187,11 +187,11 @@ function evtMoveTroops($event)
 		$newEvent=array
 		(
 			'eventType'=>"'return'",
-			'happensAt'=>sqlPrintf("TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,'{1}','{2}'),'{3}')",array($event['launchedAt'],$event['happensAt'],$event['happensAt'])),
-			'estimatedTime'=>sqlPrintf("TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,'{1}','{2}'),'{3}')",array($event['launchedAt'],$event['happensAt'],$event['happensAt'])),
-			'launchedAt'=>sqlPrintf("'{1}'",array($event['happensAt'])),
+			'happensAt'=>sqlvprintf("TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,{0},{1}),{2})",array($event['launchedAt'],$event['happensAt'],$event['happensAt'])),
+			'estimatedTime'=>sqlvprintf("TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,{0},{1}),{2})",array($event['launchedAt'],$event['happensAt'],$event['happensAt'])),
+			'launchedAt'=>sqlvprintf("{0}",array($event['happensAt'])),
 			'launcherVillage'=>"0",
-			'heroId'=>sqlPrintf("'{1}'",array($event['heroId'])),
+			'heroId'=>sqlvprintf("{0}",array($event['heroId'])),
 			'destinationVillage'=>$event['launcherVillage'],
 		);
 		foreach($config['units'] as $key=>$value)
@@ -436,8 +436,15 @@ function evtAttackWithTroops($event)
 					$a=$r[0][0];
 					$villages=(int)$a['villageCount'];
 					$r=runEscapedQuery("SELECT gold FROM wtfb2_users WHERE (id={0})",$dstVillage['ownerId']);
-					$a=$r[0][0];
-					$allGold=(double)$a['gold'];
+					if (isEmptyResult($r))
+					{
+					    $allGold = 0;
+					}
+					else
+					{					
+					    $a=$r[0][0];
+					    $allGold=(double)$a['gold'];
+					}
 					$goldCanBeTaken=$allGold/$villages;
 					$newEvent['gold']=round($goldCanBeTaken < $possibleGold ? $goldCanBeTaken : $possibleGold);
 					// take the gold from the player
@@ -587,10 +594,13 @@ function evtAttackWithTroops($event)
 			$dstVillage['userName']
 		)); // hát ennek nem itt kéne lennie...
 			// sending the report now
-		runEscapedQuery(
-				"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ({0},{1},{2},{3},{4},MD5(RAND()))",
-				$dstVillage['userId'],$reportTitle,$reportText,$event['happensAt'],$defenderReportType
-		);
+		if ($dstVillage['userId'] !== null)
+		{
+		    runEscapedQuery(
+				    "INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ({0},{1},{2},{3},{4},MD5(RAND()))",
+				    $dstVillage['userId'],$reportTitle,$reportText,$event['happensAt'],$defenderReportType
+		    );
+		}
 		
 		// the send report to the attacker.
 		if ($simulationResult['attackerFalls'])
@@ -704,9 +714,9 @@ function moveFreeHeroes($happensAt=null,$heroIds=array())
 		$event=array
 		(
 			'eventType'=>"'heromove'",
-			'launchedAt'=>sqlPrintf("'{1}'",array($currentDate)),
-			'estimatedTime'=>sqlPrintf("TIMESTAMPADD(SECOND,{1},'{2}')",array($travelTime,$currentDate)),
-			'happensAt'=>sqlPrintf("TIMESTAMPADD(SECOND,{1},'{2}')",array($realTime,$currentDate)),
+			'launchedAt'=>sqlvprintf("{0}",array($currentDate)),
+			'estimatedTime'=>sqlvprintf("TIMESTAMPADD(SECOND,{0},{1})",array((int)$travelTime,$currentDate)),
+			'happensAt'=>sqlvprintf("TIMESTAMPADD(SECOND,{0},{1})",array((int)$realTime,$currentDate)),
 			'launcherVillage'=>$village['id'],
 			'destinationVillage'=>$dstVillage['id'],
 			'heroId'=>$freeHero['id']

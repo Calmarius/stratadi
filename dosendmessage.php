@@ -5,23 +5,23 @@ htmlize($_POST);
 
 function sendThreadLink($threadId,$userId,$isRead)
 {
-	$q=sqlPrintf("SELECT * FROM wtfb2_threadlinks WHERE (threadId='{1}') AND (userId='{2}')",array($threadId,$userId));
+	$q=sqlvprintf("SELECT * FROM wtfb2_threadlinks WHERE (threadId={0}) AND (userId={1})",array($threadId,$userId));
 	$r=runEscapedQuery($q);
 	if (isEmptyResult($r))
 	{
-		$q=sqlPrintf("INSERT INTO wtfb2_threadlinks (threadId,userId,`read`) VALUES ({1},{2},{3})",array($threadId,$userId,$isRead));
+		$q=sqlvprintf("INSERT INTO wtfb2_threadlinks (threadId,userId,`read`) VALUES ({0},{1},{2})",array($threadId,$userId,$isRead));
 		$r=runEscapedQuery($q);
 	}
 	else
 	{
-		$q=sqlPrintf("UPDATE wtfb2_threadlinks SET `read`='{1}' WHERE (threadId='{2}') AND (userId='{3}')",array($isRead,$threadId,$userId));
+		$q=sqlvprintf("UPDATE wtfb2_threadlinks SET `read`={0} WHERE (threadId={1}) AND (userId={2})",array($isRead,$threadId,$userId));
 		$r=runEscapedQuery($q);
 	}
 }
 
 function updateThreadLinks($threadId)
 {
-	$q=sqlPrintf("UPDATE wtfb2_threadlinks SET `read`=0 WHERE (threadId='{1}')",array($threadId));
+	$q=sqlvprintf("UPDATE wtfb2_threadlinks SET `read`=0 WHERE (threadId={0})",array($threadId));
 	$r=runEscapedQuery($q);
 }
 
@@ -56,7 +56,7 @@ $me=$r[0][0];
 $recipientId=0;
 if ($_POST['recipient']!='')
 {
-	$q=sqlPrintf("SELECT * FROM wtfb2_users WHERE (userName='{1}')",array($_POST['recipient']));
+	$q=sqlvprintf("SELECT * FROM wtfb2_users WHERE (userName={0})",array($_POST['recipient']));
 	$r=runEscapedQuery($q);
 	if (isEmptyResult($r)) jumpErrorPage($language['recipientisnotexist']);
 	$a=$r[0][0];
@@ -74,20 +74,20 @@ if ($_POST['thread']=='')
 		if ($extra=='guildthread')
 		{
 			$extraFields=',guildId';
-			$extraValues=sqlPrintf(",'{1}'",array($me['guildId']));
+			$extraValues=sqlvprintf(",{0}",array($me['guildId']));
 		}
 	}
-	$q=sqlPrintf("INSERT INTO wtfb2_threads (updated,lastPosterId,subject $extraFields) VALUES ('$now','{1}','{2}' $extraValues)",array($_SESSION['userId'],$_POST['subject']));
+	$q=sqlvprintf("INSERT INTO wtfb2_threads (updated,lastPosterId,subject $extraFields) VALUES ('$now',{0},{1} $extraValues)",array($_SESSION['userId'],$_POST['subject']));
 	$r=runEscapedQuery($q);
 	$threadId=getLastInsertId();
 }
 else
 {
 	$threadId=(int)$_POST['thread'];
-	$q=sqlPrintf("SELECT * FROM wtfb2_threadlinks WHERE (threadId='{1}') AND (userId='{2}')",array($threadId,$_SESSION['userId']));
+	$q=sqlvprintf("SELECT * FROM wtfb2_threadlinks WHERE (threadId={0}) AND (userId={1})",array($threadId,$_SESSION['userId']));
 	$r=runEscapedQuery($q);
 	if (isEmptyResult($r)) jumpErrorPage($language['threadnotexist']);
-	$q=sqlPrintf("SELECT *,UNIX_TIMESTAMP(updated) AS tsUpdated FROM wtfb2_threads WHERE (id='{1}')",array($threadId));
+	$q=sqlvprintf("SELECT *,UNIX_TIMESTAMP(updated) AS tsUpdated FROM wtfb2_threads WHERE (id={0})",array($threadId));
 	$r=runEscapedQuery($q);
 	if (isEmptyResult($r)) jumpErrorPage($language['threadnotexist']);
 	$a=$r[0][0];
@@ -96,11 +96,11 @@ else
 		jumpTo('compose.php?thread='.urlencode($threadId).'&notification='.urlencode($language['newreplywhileyouwrote']));
 	}
 
-	$q=sqlPrintf("UPDATE wtfb2_threads SET updated='$now',subject='{1}',lastPosterId='{3}' WHERE (id='{2}')",array($_POST['subject'],$threadId,$_SESSION['userId']));
+	$q=sqlvprintf("UPDATE wtfb2_threads SET updated='$now',subject={0},lastPosterId={2} WHERE (id={1})",array($_POST['subject'],$threadId,$_SESSION['userId']));
 	$r=runEscapedQuery($q);
 }
 
-$q=sqlPrintf("INSERT INTO wtfb2_threadentries (threadId,posterId,text,`when`) VALUES ('{1}','{2}','{3}','$now')",array($threadId,$_SESSION['userId'],$_POST['content']));
+$q=sqlvprintf("INSERT INTO wtfb2_threadentries (threadId,posterId,text,`when`) VALUES ({0},{1},{2},'$now')",array($threadId,$_SESSION['userId'],$_POST['content']));
 $r=runEscapedQuery($q);
 
 updateThreadLinks($threadId);
