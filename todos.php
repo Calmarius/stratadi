@@ -17,6 +17,7 @@
 // TODO: (task) Separate local settings from serverwide settings.
 // TODO: (wishlist) Add admin's name in system messages.
 // TODO: (task) Make database migration scripts.
+// TODO: (bug) Cannot move more than 2^31 units, the rest are lost. - WIP
 
 
 */

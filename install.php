@@ -421,6 +421,8 @@ CREATE TABLE IF NOT EXISTS `wtfb2_worldupdate` (
 
 runEscapedQuery("INSERT INTO `wtfb2_worldupdate`(`lastHeroMove`, `lastOracleTime`, `lastStatGenerated`) VALUES ('1970-01-01 00:00:00', '1970-01-01 00:00:00', '1970-01-01 00:00:00')");
 
+require_once('dbmigrate.php');
+
 die('Okay, tables created, please review the settings in configuration.php, and please register yourself, then change your permissions to admin in the database if you wish.');
 
 
