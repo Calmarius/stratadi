@@ -695,13 +695,15 @@ function doMassBuilding(&$villageArray,$buildingId,$maxGold,$maxLevel)
 	$costFn=$bd['costFunction'];
 	$n=count($villageArray);
 
+    // Make sure it won't timeout too early.
+ 	ini_set('max_execution_time', 300);
+
     // This array stores the minimum level to upgrade.
 	$tmpLevels=array();
 	for($i=0;$i<$n;$i++)
 	{
 		$tmpLevels[$i]=$villageArray[$i][$levelName];
 	}
-
 
 	$spent=0;
     $built=false;
