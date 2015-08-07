@@ -17,7 +17,6 @@ if ($myId!=0)
 }
 $sessionOver=$myId==0;
 if (!$sessionOver) $sessionOver=isEmptyResult($r);
-$me=$r[0][0];
 if (!$sessionOver)
 {
 	if (isset($_SESSION['asdeputy']) && $_SESSION['asdeputy'])
@@ -37,6 +36,7 @@ if ($sessionOver)
 
 	die();
 }
+$me=$r[0][0];
 
 // log ip address
 if (!isset($_SESSION['returnUserId']))
