@@ -5,7 +5,6 @@ ini_set('log_errors', 1);
 ini_set('error_log', 'error_log');
 
 require_once("presenterphps.php");
-require_once("setupmysql.php");
 require_once("setupmysqli.php");
 require_once("utils/gameutils.php");
 
@@ -37,5 +36,10 @@ else if (isset($_SESSION['returnUserId'])) $mode='admin';
 			$_SERVER['REMOTE_ADDR'],$_SESSION['userId'],$_SERVER['SCRIPT_NAME'],$mode,$_SERVER['QUERY_STRING'],$s);
 	}
 /*}*/
+
+if (isset($_POST)) neutralizeGpc($_POST);
+if (isset($_GET)) neutralizeGpc($_GET);
+if (isset($_COOKIE)) neutralizeGpc($_COOKIE);
+
 
 ?>

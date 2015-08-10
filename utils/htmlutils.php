@@ -137,6 +137,24 @@ function showInBox($templateFile,$contentArray,$title='',$description='',$altUrl
 	
 }
 
+function htmlize(&$arr)
+{
+	if (!is_array($arr)) return;
+	foreach($arr as $key=>$value)
+	{
+		if (is_array($value))
+		{
+			htmlize($arr[$key]);
+		}
+		else
+		{
+			$arr[$key]=htmlspecialchars($value);
+		}
+	}
+}
+
+
+
 
 
 ?>

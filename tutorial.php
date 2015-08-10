@@ -13,7 +13,7 @@ if (!isset($_SESSION['tutorialStep']))
 }
 if (isset($_GET['turnoff']))
 {
-	require_once("setupmysql.php");
+	require_once("setupmysqli.php");
 	require_once("utils/gameutils.php");
 	runEscapedQuery("UPDATE wtfb2_users SET needsTutorial=0 WHERE (id={0})",$_SESSION['userId']);
 	jumpSuccessPage($language['youfinishedthetutorial'],$language['youcanreenterthetutorial']);

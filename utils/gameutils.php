@@ -158,5 +158,21 @@ function xprintf($format,$arguments)
 	return $result;
 }
 
+function neutralizeGpc(&$array)
+{
+	if (!get_magic_quotes_gpc()) return;
+	if (!is_array($array)) return;
+	foreach($array as $key=>$value)
+	{
+		if (is_array($value))
+		{
+			escapeArray($array[$key]);
+		}
+		else
+		{
+			$array[$key]=stripslashes($value);
+		}
+	}
+}
 
 ?>
