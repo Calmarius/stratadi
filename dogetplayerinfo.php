@@ -16,7 +16,7 @@ if ($myId!=0)
 	$userSet=runEscapedQuery($q);
 }
 $sessionOver=$myId==0;
-if (!$sessionOver) $sessionOver=isEmptyResult($r);
+if (!$sessionOver) $sessionOver=isEmptyResult($userSet);
 if (!$sessionOver)
 {
 	if (isset($_SESSION['asdeputy']) && $_SESSION['asdeputy'])
