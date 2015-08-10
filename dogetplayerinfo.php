@@ -13,7 +13,7 @@ $r;
 if ($myId!=0)
 {
 	$q=sqlvprintf("SELECT * FROM wtfb2_users WHERE (id={0})",array($_SESSION['userId']));
-	$r=runEscapedQuery($q);
+	$userSet=runEscapedQuery($q);
 }
 $sessionOver=$myId==0;
 if (!$sessionOver) $sessionOver=isEmptyResult($r);
@@ -36,7 +36,7 @@ if ($sessionOver)
 
 	die();
 }
-$me=$r[0][0];
+$me=$userSet[0][0];
 
 // log ip address
 if (!isset($_SESSION['returnUserId']))
