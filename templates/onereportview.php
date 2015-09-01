@@ -20,7 +20,6 @@ die();*/
 					<a title="Facebook" onclick="window.open('http://www.facebook.com/share.php?u=<?php echo urlencode($this->reportLink); ?>'); return false;" href="http://www.facebook.com/share.php?u=<?php echo urlencode($this->reportLink); ?>"><img src="img/facebook.png"></a>
 					<a title="Twitter" onclick="window.open('http://twitter.com/home?status=<?php echo urlencode($this->reportLink); ?>'); return false;" href="http://twitter.com/home?status=<?php echo urlencode($this->reportLink); ?>"><img src="img/twitter.png"></a>
 					<a title="Tumblr" onclick="window.open('http://www.tumblr.com/share?v=3&u=<?php echo urlencode($this->reportLink); ?>'); return false;" href="http://www.tumblr.com/share?v=3&u=<?php echo urlencode($this->reportLink); ?>"><img src="img/tumblr.png"></a>
-					<a title="Iwiw" onclick="window.open('http://iwiw.hu/pages/share/share.jsp?u=<?php echo urlencode($this->reportLink); ?>'); return false;" href="http://iwiw.hu/pages/share/share.jsp?u=<?php echo urlencode($this->reportLink); ?>"><img src="img/iwiw.png"></a>
 				</p>					
 			<?php
 		}
