@@ -432,6 +432,7 @@ function sendTroops($command)
 			runEscapedQuery("UPDATE wtfb2_heroes SET inVillage=0 WHERE (id={0})",$hero['id']); // hogy ne legyen ott a hős.
 			$sendHeroId=$hero['id'];
 		}
+		if ($action == 'move') $catapultTarget = 'none';
 		$toInsertEvent[]=
 		sqlvprintf(
 			"({0},TIMESTAMPADD(SECOND,{1},NOW()),TIMESTAMPADD(SECOND,{2},NOW()),NOW(),{3},{4},".implode(',',$unitVector).",{5},{6})",

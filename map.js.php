@@ -349,7 +349,7 @@ function sendTroops(launcherVillages,destinationVillageId,action,operationName)
 {
 	var task=new Object();
 	var heroMod=_('launchhero').checked ? 'WITHHERO':'WITHOUTHERO';
-	task.command=['SENDTROOPS','FOR',action,'TO',destinationVillageId,'TARGET',_('catapulttarget').value,heroMod,'FROM'];
+	task.command=['SENDTROOPS','FOR',action,'TO',destinationVillageId,'TARGET',(_('catapulttarget')) ? _('catapulttarget').value : 'none',heroMod,'FROM'];
 	task.villages=[];
 	var destinationVillage=villagesById[destinationVillageId];
 	for(var i in launcherVillages)
@@ -517,7 +517,10 @@ function setupAction(action,launcherVillages,x,y,destinationVillageId,mp)
 		amountText+='</table>';
 
 		var catapultText='';
+		if (action != 'move')
+		{
 			catapultText='<p><?php echo $language["pleasechoosecatapulttarget"]; ?><?php echo generateBuildingSelector("catapulttarget","catapulttarget");?></p>';
+		}
 
 		var rId=generateRandomId();
 		var ageBonus = +villagesById[destinationVillageId].ageBonus;
