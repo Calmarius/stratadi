@@ -11,6 +11,7 @@
 // TODO: (UI) Do not fix unit counts automatically in mass training add something more flexible, like fixing ratios.
 // TODO: (task) Separate local settings from serverwide settings.
 // TODO: (task) Why grass remains dark?
+// TODO: (bug) Mass build overbuilds.
 
 
 */
