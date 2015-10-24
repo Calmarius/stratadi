@@ -35,6 +35,9 @@ else if (isset($_SESSION['returnUserId'])) $mode='admin';
 		runEscapedQuery("INSERT INTO wtfb2_requestlog (requestTime,clientIP,userId,requestedPage,requestType,queryGet,queryPost) VALUES (NOW(),{0},{1},{2},{3},{4},{5})",
 			$_SERVER['REMOTE_ADDR'],$_SESSION['userId'],$_SERVER['SCRIPT_NAME'],$mode,$_SERVER['QUERY_STRING'],$s);
 	}
+
+	// Delete old world events.
+	runEscapedQuery("DELETE FROM wtfb2_worldevents WHERE TIMESTAMPDIFF(DAY, eventTime, NOW()) > 3");
 /*}*/
 
 if (isset($_POST)) neutralizeGpc($_POST);

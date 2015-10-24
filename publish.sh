@@ -16,9 +16,6 @@ read -p "Enter username: " USERNAME
 read -p "Enter FTP password: " -s PASSWORD
 echo
 
-echo "*** PUBLISHING TO NET1 ***"
-publish ftp.calmarius.net /public_html/stratadi/net1
-
 echo "*** PUBLISHING TO XHU1 ***"
 publish ftp.calmarius.net /public_html/stratadi/xhu1
 
