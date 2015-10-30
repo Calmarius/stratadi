@@ -1815,7 +1815,7 @@ function showCellInfo(x,y,refreshIfUpdateNeeded)
 								'onmouseout="removeTooltip()">'+
 							'</div>'+
 						'</div>'+
-						'<p><a href="javascript:void(showBuildingCosts(\''+key+'\'))" onmouseover="showTooltip(\'<?php echo $language["showcost"]; ?>\')" onmouseout="removeTooltip()"><?php echo xprintf($language["coststring"],array("'+Math.ceil((eval('('+value['jsCostFunction']+')'))(e[levelName]))+'"))?></a></p>'+
+						'<p><a href="javascript:void(showBuildingCosts(\''+key+'\'))" onmouseover="showTooltip(\'<?php echo $language["showcost"]; ?>\')" onmouseout="removeTooltip()"><?php echo xprintf($language["coststring"],array("'+formatThousands(Math.ceil((eval('('+value['jsCostFunction']+')'))(e[levelName])))+'"))?></a></p>'+
 //						'<a href="javascript:void(upgradeBuilding('+e.id+',\''+key+'\'))"><?php echo $language["upgrade"]; ?></a>'+
 					'</td>';
 			buildingDivs[key]=sId;

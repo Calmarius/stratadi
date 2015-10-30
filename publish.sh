@@ -12,6 +12,10 @@ function publish()
     shopt -u dotglob
 }
 
+echo "*** CREATING EXPORT ***"
+./createexport.sh
+echo "DONE."
+
 read -p "Enter username: " USERNAME
 read -p "Enter FTP password: " -s PASSWORD
 echo
