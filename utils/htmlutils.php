@@ -153,7 +153,10 @@ function htmlize(&$arr)
 	}
 }
 
-
+function nf($number)
+{
+    return str_replace("x", " ", number_format($number, 0, ".", "x"));
+}
 
 
 

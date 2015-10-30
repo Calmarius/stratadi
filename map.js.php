@@ -223,7 +223,7 @@ function spinCounters(interval)
 		if (e)
 		{
 			var dec=Math.pow(10,counter.decimals);
-			e.innerHTML=Math.floor(counter.value*dec)/dec;
+			e.innerHTML=formatThousands(Math.floor(counter.value*dec)/dec);
 		}
 	}
 }
@@ -1546,7 +1546,7 @@ function showVillageSummary(orderBy)
 		else
 		{
 			iHTML+='<td><a href="javascript:void(showCellInfo('+village.x+','+village.y+',{\'x\': mouseX,\'y\':mouseY}))">'+(village.villageName==undefined ? '':village.villageName) +'</a></td>'+
-				'<td>'+(village.buildPoints==undefined ? '':Math.floor(village.buildPoints*100)/100) +'</td><td>'+village.score+'</td>';
+				'<td>'+(village.buildPoints==undefined ? '':Math.floor(village.buildPoints*100)/100) +'</td><td>'+formatThousands(village.score)+'</td>';
 			for(var j in UnitDescriptors)
 			{
 				var uDesc=UnitDescriptors[j];
@@ -1556,14 +1556,14 @@ function showVillageSummary(orderBy)
 				else unitCount=Math.floor(unitCount);
 				if (trainingCount==undefined) trainingCount='';
 				else trainingCount=Math.ceil(trainingCount);
-				iHTML+='<td>'+unitCount+' ('+trainingCount+')</td>';
+				iHTML+='<td>'+formatThousands(unitCount)+' ('+formatThousands(trainingCount)+')</td>';
 			}
 			for(var j in BuildingDescriptors)
 			{
 				var bDesc=BuildingDescriptors[j];
 				var bLevel=village[bDesc.buildingLevelDbName];
 				if (bLevel==undefined) bLevel='';
-				iHTML+='<td>'+bLevel+'</td>';
+				iHTML+='<td>'+formatThousands(bLevel)+'</td>';
 			}
 			iHTML+='<td><?php echo xprintf($language["lastupdatesecondstext"],array("'+village._vsLastUpdate+'"));?></td>';
 		}
@@ -1574,7 +1574,7 @@ function showVillageSummary(orderBy)
 		iHTML+='<tr>';
 		iHTML+='<td>'+loadedVillageCount+'</td>';
 		iHTML+='<td colspan="3">&nbsp;</td>';
-		iHTML+='<td>'+sumRow['score']+'</td>';
+		iHTML+='<td>'+formatThousands(sumRow['score'])+'</td>';
 		for(var j in UnitDescriptors)
 		{
 			var uDesc=UnitDescriptors[j];
@@ -1582,14 +1582,14 @@ function showVillageSummary(orderBy)
 			var trainingCount=village[uDesc.trainingDbName];
 			if (unitCount==undefined) unitCount='';
 			if (trainingCount==undefined) trainingCount='';
-			iHTML+='<td>'+unitCount+' ('+trainingCount+')</td>';
+			iHTML+='<td>'+formatThousands(unitCount)+' ('+formatThousands(trainingCount)+')</td>';
 		}
 		for(var j in BuildingDescriptors)
 		{
 			var bDesc=BuildingDescriptors[j];
 			var bLevel=village[bDesc.buildingLevelDbName];
 			if (bLevel==undefined) bLevel='';
-			iHTML+='<td>'+bLevel+'</td>';
+			iHTML+='<td>'+formatThousands(bLevel)+'</td>';
 		}
 		iHTML+='<td>&nbsp;</td>';
 		iHTML+='</tr>';
@@ -1703,6 +1703,11 @@ function setSpareBuildPoints(spanId,villageId)
 	};
 	span.appendChild(input);
 	input.focus();
+}
+
+function formatThousands(number)
+{
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009');
 }
 
 function reduceBigNumber(number,minReduce)
@@ -2531,7 +2536,7 @@ function processPlayerInfoXML(xml)
 	}
 	var div=_('trdiv');
 	var str=
-	'<img class="image16" style="vertical-align:middle;" src="img/gold.png" alt="<?php echo $language["gold"]; ?>" title="<?php echo $language["gold"]; ?>"> <?php echo xprintf($language["goldtext"],array("<span id=\"goldindicator\"></span>","'+Math.round(info.goldProduction)+'")); ?>'+
+	'<img class="image16" style="vertical-align:middle;" src="img/gold.png" alt="<?php echo $language["gold"]; ?>" title="<?php echo $language["gold"]; ?>"> <?php echo xprintf($language["goldtext"],array("<span id=\"goldindicator\"></span>","'+formatThousands(Math.round(info.goldProduction))+'")); ?>'+
 	' | <img class="image16"  style="vertical-align:middle;" src="img/expansionpoints.png" alt="<?php echo $language["expansionpoints"]; ?>" title="<?php echo $language["expansionpoints"]; ?>"> <span id="expansionpointindicator">'+Math.floor(info.expansionPoints*100)/100+'</span>'+
 	(parseFloat(info.nightBonus[0]) > 1 ? ' | <img class="image16"  style="vertical-align:middle; " src="img/nightbonus.png" alt="<?php echo $language["nightbonus"]; ?>" title="<?php echo $language["nightbonus"]; ?>"> <?php echo xprintf($language["nightbonustext"],array("'+Math.floor(info.nightBonus*100)/100+'")); ?>':'')+
 	''

@@ -137,7 +137,7 @@ global $config;
 							<tr>
 								<td><?php echo $i;?></td>
 								<td><a href="viewplayer.php?id=<?php echo $row['id']; ?>"><?php echo $row['userName']; ?></a></td>
-								<td><?php echo $row['totalScore']; ?></td>
+								<td><?php echo nf($row['totalScore']); ?></td>
 							</tr>
 						<?php
 						$i++;
@@ -154,7 +154,7 @@ global $config;
 					foreach($this->heroTop as $key=>$row)
 					{
 						?>
-							<tr><td><?php echo $i;?></td><td><a href="viewhero.php?id=<?php echo $row['ownerId']; ?>"><?php echo $row['userName']; ?></a></td><td><a href="viewhero.php?id=<?php echo $row['id']; ?>"><?php echo $row['name']; ?></a></td><td><?php echo $row['level']; ?></td></tr>					
+							<tr><td><?php echo $i;?></td><td><a href="viewplayer.php?id=<?php echo $row['ownerId']; ?>"><?php echo $row['userName']; ?></a></td><td><a href="viewhero.php?id=<?php echo $row['id']; ?>"><?php echo $row['name']; ?></a></td><td><?php echo $row['level']; ?></td></tr>
 						<?php
 						$i++;
 					}
@@ -170,7 +170,11 @@ global $config;
 					foreach($this->offenseTop as $key=>$row)
 					{
 						?>
-							<tr><td><?php echo $i;?></td><td><a href="viewplayer.php?id=<?php echo $row['id']; ?>"><?php echo $row['userName']; ?></a></td><td><?php echo $row['attackKills']; ?></td></tr>					
+							<tr>
+							    <td><?php echo $i;?></td>
+							    <td><a href="viewplayer.php?id=<?php echo $row['id']; ?>"><?php echo $row['userName']; ?></a></td>
+							    <td><?php echo nf($row['attackKills']); ?></td>
+							</tr>
 						<?php
 						$i++;
 					}
@@ -186,7 +190,11 @@ global $config;
 					foreach($this->defenseTop as $key=>$row)
 					{
 						?>
-							<tr><td><?php echo $i;?></td><td><a href="viewplayer.php?id=<?php echo $row['id']; ?>"><?php echo $row['userName']; ?></a></td><td><?php echo $row['defenseKills']; ?></td></tr>					
+							<tr>
+							    <td><?php echo $i;?></td>
+							    <td><a href="viewplayer.php?id=<?php echo $row['id']; ?>"><?php echo $row['userName']; ?></a></td>
+							    <td><?php echo nf($row['defenseKills']); ?></td>
+							</tr>
 						<?php
 						$i++;
 					}
@@ -201,7 +209,7 @@ global $config;
 					foreach($config['buildings'] as $key=>$value)
 					{
 						?>
-							<tr><td><?php echo $language[$value['languageEntry']]; ?></td><td><?php echo $this->theHighest[$value['buildingLevelDbName']]; ?></td></tr>
+							<tr><td><?php echo $language[$value['languageEntry']]; ?></td><td><?php echo nf($this->theHighest[$value['buildingLevelDbName']]); ?></td></tr>
 						<?php
 					}
 				?>
