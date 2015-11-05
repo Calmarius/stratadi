@@ -1613,7 +1613,7 @@ function showBuildingCosts(building)
 	var costLines='';
 	for(var i=0;i<100;i++)
 	{
-		costLines+='<tr><td>'+(i+1)+'</td><td><?php echo xprintf($language["coststring"],array("'+Math.ceil(costFn(i))+'"))?></td></tr>';
+		costLines+='<tr><td>'+(i+1)+'</td><td><?php echo xprintf($language["coststring"],array("'+formatThousands(Math.ceil(costFn(i)))+'"))?></td></tr>';
 	}
 	var costTable=
 	'<table>'+
