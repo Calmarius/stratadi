@@ -162,14 +162,20 @@ function evtMoveTroops($event)
 					$village['userName']
 				));  				
 				// send reports
-				runEscapedQuery(
-					"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ({0},{1},{2},{3},{4},MD5(RAND()))",
-					$lVillage['ownerId'],$reportTitle,$reportText,$event['happensAt'],'outgoingmove'
-				);
-				runEscapedQuery(
-					"INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ({0},{1},{2},{3},{4},MD5(RAND()))",
-					$village['ownerId'],$reportTitle,$reportText,$event['happensAt'],'incomingmove'
-				);
+				if ($lVillage['ownerId'] !== null)
+				{
+				    runEscapedQuery(
+					    "INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ({0},{1},{2},{3},{4},MD5(RAND()))",
+					    $lVillage['ownerId'],$reportTitle,$reportText,$event['happensAt'],'outgoingmove'
+				    );
+				}
+				if ($village['ownerId'] !== null)
+				{
+				    runEscapedQuery(
+					    "INSERT INTO wtfb2_reports (recipientId,title,text,reportTime,reportType,token) VALUES ({0},{1},{2},{3},{4},MD5(RAND()))",
+					    $village['ownerId'],$reportTitle,$reportText,$event['happensAt'],'incomingmove'
+				    );
+				}
 				
 			}
 		}
