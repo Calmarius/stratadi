@@ -224,7 +224,7 @@ X
 			</div>
 			<h3>Fontos információk</h3>
 			<p>Fontos megjegyzés: ez a játék &lt;canvas&gt; elemet használ a megjelenítéshez, ami szinte minden böngészőn megy - Internet Explorer-en kívül. Szóval, ha játszani szeretnél, illene szedned legalább egy Firefoxot.</p>
-    		<p>Lájkold a játék Facebook oldalát: <a href="https://www.facebook.com/pages/StraTaDi/209096639149286">itt.</a></p>
+            <p>Lájkold a játék Facebook oldalát: <a href="${config['facebookPage']}">itt.</a></p>
 			<p>Néma gyereknek anyja se hallja a szavát... Ha valami problémád van a bejelentkezéssel vagy a programhibát észlelsz, akkor azt jelentsd a játék oldalán.</p>
 			<p><i>Úgy tűnik, hogy @facebook.com -os e-mail címről nem enged regisztrálni, ha nem engedélyezed az az admin e-mail címét (${config['adminMail']}) a beállításaidban. Figyelj erre oda. (kaptam egy pár visszapattintott levelet onnan már.)</i></p>
 			<p>Ha gondolod, regisztráció nélkül is szétnézhetsz a pályán: <a href="game.php?guest">[Belépés nézelődőként]</a></p>

@@ -97,11 +97,12 @@ $config=array
 	'experienceFunction'=>create_function('$xp','return floor(pow(max($xp, 0)*0.01,1.0/2.3));'), // experience to level function
 	'experienceFunctionInverse'=>create_function('$level','return pow($level,2.3)*100;'), // level to experience function (must be inverse of the xp to level function)
 	'experienceFunctionMySql'=>'FLOOR(POW(GREATEST(0, {1})*0.01,1.0/2.3))', // mysql format of the experience function. {1} is the column name substituted
-	'facebookDefaultUrl' => 'http://calmarius.net/stratadi/xhu1/login.php',
-	'facebookGroupLink' => htmlspecialchars('http://www.facebook.com/home.php?sk=group_192249450790540&ap=1'), // Link to the Facebook group (you may put it into the main page)
-	'facebookImageLink' => 'http://calmarius.net/stratadi/xhu1/img/town7.png', // Image to be shown on Facebook
+	'facebookDefaultUrl' => 'http://example.com/login.php', // Link to the login page.
+	'facebookGroupLink' => 'about:blank', // Link to the Facebook group (you may put it into the main page)
+	'facebookImageLink' => 'http://example.com/img/town7.png', // Image to be shown on Facebook
+	'facebookPage' => 'about:blank',  // Put a facebook page's link here.
 	'forceUpdatePeriod'=>'3600',				// For performance reasons. When a player gets massive amount of attacks we don't update the player every time. The interval here describes the minimal amount of time (in seconds) that must be elapsed before the next update.
-	'forumLink' => 'http://calmarius.net/forum', // Link to a forum, you may put it into the main page.
+	'forumLink' => 'http://forum.example.com', // Link to a forum, you may put it into the main page.
 	'gameStarted'=>'2015-05-24 0:00:00',
 	'goldProducer'=>'goldmine',
 	'guildPermissions'=>array  // permission types in a guild
