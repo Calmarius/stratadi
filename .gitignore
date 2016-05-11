@@ -6,3 +6,4 @@ statimage.png
 export/*
 lockfile
 php_errors.log
+error_log
