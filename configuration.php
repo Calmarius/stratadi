@@ -5,8 +5,8 @@
 $config=array
 (
 	'activationCodeLength' => 16,		// length of the activation code in characters
-	'adminMail' => 'calmarius@calmarius.net',	// admin's mail
-	'adminName' => 'Calmarius',		// admin's name
+	'adminMail' => 'admin@example.com',	// admin's mail
+	'adminName' => 'Admin',		// admin's name
 	'ageInteractionLimit'=>3,			// The age limit of the unit transfer. (If set 3, that means you can't send troops against a 3 or more times younger or older account.
 	'armorBuilding'=>'wall', 			// the armor building in the game (the wall)
 	'attackVectorDescription'=> array			// description of the attack vector (language entries)
@@ -294,7 +294,7 @@ $config=array
 		)
 	),
 	'serverLanguage'=>'hu',         // Server's language.
-	'serverSpeed'=>100,					// server speed
+	'serverSpeed'=>1,					// server speed
 	'settlerUnit'=>'_4diplomat',				// unit you can settle width
 	'startGold'=>'500',					// start amount of gold
 	'superiorityExponent'=>'1.5',			// superiority exponent
