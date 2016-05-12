@@ -140,7 +140,7 @@ X
 	'coordinate'=>'({1};{2})', // the form of the coordinates
 	'coordinates'=>'Koordináták', // in the village summary, world events window
 	'cost'=>'Ár', // in unit description tables, and building cost view.
-	'coststring'=>' {1} <img src="/img/gold_small.png" alt="arany" title="arany">', // cost string. {1} the amount of gold (as html <span></span> tags for buildings, and raw number for units)
+	'coststring'=>' {1} <img src="img/gold_small.png" alt="arany" title="arany">', // cost string. {1} the amount of gold (as html <span></span> tags for buildings, and raw number for units)
 	'createnewhero'=>'Új hős kiképzése ebben a faluban.', //
 	'currentrights'=>'Jelenleg kiosztott jogok: ', //
 	'databaseerror'=>'Nem lehetett kapcsolódni az adatbázishoz, a hiba oka: {1}.<br><br>Ezen a játék készítője se tud segíteni... Elkúrt valamit a rendszergazda... Nem kicsit...', // FATAL ERROR

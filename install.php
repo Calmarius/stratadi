@@ -3,7 +3,7 @@
 require_once('setupmysqli.php');
 
 // Check if a table already exists.
-$r = runEscapedQuery("SELECT 1 FROM wtfb2_villages LIMIT 1");
+$r = runEscapedQuery("SHOW TABLES LIKE 'wtfb2_villages'");
 if (!isEmptyResult($r))
 {
 	die('The server is already installed!');

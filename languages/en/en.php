@@ -140,7 +140,7 @@ X
 	'coordinate'=>'({1};{2})', // the form of the coordinates
 	'coordinates'=>'Coordinates', // in the village summary, world events window
 	'cost'=>'Cost', // in unit description tables, and building cost view.
-	'coststring'=>' {1} <img src="/img/gold_small.png" alt="gold" title="gold">', // cost string. {1} the amount of gold (as html <span></span> tags for buildings, and raw number for units)
+	'coststring'=>' {1} <img src="img/gold_small.png" alt="gold" title="gold">', // cost string. {1} the amount of gold (as html <span></span> tags for buildings, and raw number for units)
 	'createnewhero'=>'Create new hero in this village.', //
 	'currentrights'=>'Currently granted rights: ', //
 	'databaseerror'=>'Unable to connect to the database, the cause of the error: {1}, creator of the game can not fix this.', // FATAL ERROR
