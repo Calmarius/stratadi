@@ -69,7 +69,7 @@ function registerUser($data)
 	global $config;
 
 	$lId=0;
-	$genderStr=sqlvprintf("'{0}'", array($data['gender']!='' ? $data['gender'] : null));
+	$genderStr=sqlvprintf("{0}", array($data['gender']!='' ? $data['gender'] : null));
 	$activationToken='';
 	
 	if (!isset($data['year'])) $data['year'] = '';
