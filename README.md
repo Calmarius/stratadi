@@ -15,7 +15,7 @@ you will need a PHP and MySQL enabled webserver. (LAMP or XAMPP server).
 Then do the following:
 
 1. Dump the contents of this repo to your webserver. 
-2. Set the database passwords and admin e-mail in the shadow.php
+2. Set the database passwords and admin e-mail in the shadow.php (rename the template to shadow.php)
 3. Visit install.php (it should create all the tables the game needs).
 4. Now read the configuration.php there you can tweak pretty much everything. 
 

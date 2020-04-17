@@ -7,3 +7,4 @@ export/*
 lockfile
 php_errors.log
 error_log
+shadow.php
